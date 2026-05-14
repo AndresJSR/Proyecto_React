@@ -1,0 +1,21 @@
+import { Group } from './Group';
+import { StudyPlan } from './StudyPlan';
+import { Evaluation } from './Evaluation';
+
+export interface Subject {
+  id?: string;
+
+  name?: string;
+  code?: string;
+  description?: string;
+
+  credits?: number;
+  is_active?: boolean;
+
+  created_at?: string;
+  updated_at?: string;
+
+  groups?: Group[];
+  study_plans?: StudyPlan[];
+  evaluations?: Evaluation[];
+}

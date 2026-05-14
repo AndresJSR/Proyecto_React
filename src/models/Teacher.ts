@@ -1,14 +1,19 @@
-import { User } from "./User";
+import { User } from './User';
+import { Group } from './Group';
 
 export interface Teacher {
-  id?:string;
-  user_id?:string;
-  first_name?:string;
-  last_name?:string;
-  phone?:string;
-  identification?:string;
-  specialty?:string;
+  id?: string;
+  user_id?: string;
 
-  user?:User;
-  groups?:Group;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  identification?: string;
+  specialty?: string;
+
+  created_at?: string;
+  updated_at?: string;
+
+  user?: User;
+  groups?: Group[];
 }
