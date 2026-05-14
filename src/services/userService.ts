@@ -1,13 +1,13 @@
 import axios from "axios";
 import { User } from "../models/User";
 
-const API_URL = import.meta.env.VITE_API_URL + "/users" || "";
-
+const API_URL = '/api/users/';
 class UserService {
     async getUsers(): Promise<User[]> {
         try {
             const response = await axios.get<User[]>(API_URL);
-            return response.data;
+            console.log(response.data)
+            return response.data.data;
         } catch (error) {
             console.error("Error al obtener usuarios:", error);
             return [];
@@ -56,4 +56,4 @@ class UserService {
 }
 
 // Exportamos una instancia de la clase para reutilizarla
-export const userService = new UserService();
+//export const userService = new UserService();

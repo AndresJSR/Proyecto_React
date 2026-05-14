@@ -1,8 +1,17 @@
+import { Student } from './Student';
+import { Teacher } from './Teacher';
+import { UserRole } from './UserRole';
 export interface User {
-    id?: number;
-    name?: string;
-    username?: string;
-    email?: string;
-    phone?: string;
-    password?: string;
+  id?: string;
+  email?: string;
+  password_hash?: string;
+  code?: string;
+  role?: UserRole;
+  is_active?: boolean;
+
+  created_at?: string;
+  updated_at?: string;
+
+  teacher?: Teacher;
+  student?: Student;
 }
