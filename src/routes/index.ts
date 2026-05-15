@@ -11,6 +11,7 @@ const Alerts = lazy(() => import('../pages/UiElements/Alerts'));
 const Buttons = lazy(() => import('../pages/UiElements/Buttons'));
 const Demo= lazy(() => import('../pages/Demo'));
 const ImageEditor= lazy(() => import('../pages/ImageEditor'));
+const RubricaCreate = lazy(() => import('../pages/Rubricas/Create'));
 const UserList= lazy(() => import('../pages/Users/ListUsers'));
 const UserCreate= lazy(() => import('../pages/Users/Create'));
 const UserUpdate= lazy(() => import('../pages/Users/Update'));
@@ -92,6 +93,11 @@ const coreRoutes = [
     path: '/ui/buttons',
     title: 'Buttons',
     component: Buttons,
+  },
+  {
+    path: '/rubricas/create',
+    title: 'Crear Rúbrica',
+    component: RubricaCreate,
   },
   {
     path: '/image-editor',
