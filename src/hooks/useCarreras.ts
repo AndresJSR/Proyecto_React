@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Carrera } from '../models/Carrera';
-import { carreraService } from '../services/carreraService';
+import { Carrera } from '../models/Career';
+import { carreraService } from '../services/careerService';
 
 const useCarreras = () => {
     const [carreras, setCarreras] = useState<Carrera[]>([]);

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { Carrera } from '../../models/Carrera';
-import { carreraService } from '../../services/carreraService';
+import { Carrera } from '../../models/Career';
+import { carreraService } from '../../services/careerService';
 
 const CreateCarrera: React.FC = () => {
     const navigate = useNavigate();
