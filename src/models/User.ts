@@ -12,6 +12,5 @@ export interface User {
   created_at?: string;
   updated_at?: string;
 
-  teacher?: Teacher;
-  student?: Student;
+  profile?: Teacher | Student;
 }
