@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import DeactivateUser from '../pages/Users/DeactivateUser';
 
 const Calendar = lazy(() => import('../pages/Calendar'));
 const Chart = lazy(() => import('../pages/Chart'));
@@ -32,6 +33,11 @@ const coreRoutes = [
     path: '/users/update/:id',
     title: 'Edit User',
     component: UserUpdate,
+  },
+  {
+    path: '/users/deactivate/:id',
+    title: 'Deactivate User',
+    component: DeactivateUser,
   },
   {
     path: '/posts/list',

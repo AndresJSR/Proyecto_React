@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import GenericTable from '../../components/GenericTable';
-import { userService } from '../../services/UserService2';
-import { userBusiness, UserTableRow } from '../../business/UserBusiness';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { userBusiness, UserTableRow } from '../../business/UserBusiness';
+import GenericTable from '../../components/GenericTable';
+import { userService } from '../../services/userService';
 
 const Users: React.FC = () => {
   const navigate = useNavigate();
@@ -24,9 +25,18 @@ const Users: React.FC = () => {
     if (action === 'edit') {
       navigate(`/users/update/${item.id}`);
     }
-
-    if (action === 'delete') {
-      console.log('Delete user:', item);
+    if (action === 'deactivate') {
+      if (!item.status) {
+        Swal.fire({
+          title: 'Aviso',
+          text: 'Este usuario ya se encuentra inactivo.',
+          icon: 'info',
+          timer: 3000,
+        });
+        return;
+      } else {
+        navigate(`/users/deactivate/${item.id}`);
+      }
     }
   };
 
@@ -52,12 +62,13 @@ const Users: React.FC = () => {
           { key: 'name', label: 'Nombre' },
           { key: 'email', label: 'Email' },
           { key: 'role', label: 'Rol' },
+          { key: 'career', label: 'Carrera' },
           { key: 'status', label: 'Estado' },
           { key: 'created_at', label: 'Fecha de creación' },
         ]}
         actions={[
           { name: 'edit', label: 'Editar' },
-          { name: 'delete', label: 'Desactivar' },
+          { name: 'deactivate', label: 'Desactivar' },
         ]}
         onAction={handleAction}
       />

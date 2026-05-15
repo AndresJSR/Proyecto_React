@@ -51,6 +51,7 @@ class UserService {
 
   async updateUser(id: string, user: Partial<User>): Promise<User | null> {
     try {
+      console.log(user)
       const response = await axios.put<ApiResponse<User>>(
         `${API_URL}${id}`,
         user,
