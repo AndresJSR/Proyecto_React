@@ -1,17 +1,25 @@
-import { Teacher } from "./Teacher";
+import { Teacher } from './Teacher';
+import { Subject } from './Subject';
+import { Semester } from './Semester';
+import { Enrollment } from './Enrollment';
+import { Evaluation } from './Evaluation';
 
-export interface Gruop {
+export interface Group {
   id?: string;
   teacher_id?: string;
   subject_id?: string;
   semester_id?: string;
+
   name?: string;
   group_code?: string;
   capacity?: number;
 
+  created_at?: string;
+  updated_at?: string;
+
   teacher?: Teacher;
-  subject?: string;
-  semester?: string;
-  enrollments?: string;
-  evaluations?: string;
+  subject?: Subject;
+  semester?: Semester;
+  enrollments?: Enrollment[];
+  evaluations?: Evaluation[];
 }
