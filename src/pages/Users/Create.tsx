@@ -48,8 +48,7 @@ const CreateUserPage: React.FC = () => {
 
   return (
     <div>
-      <Breadcrumb pageName="Crear Usuario" />
-
+      <Breadcrumb pageName="Crear Usuario" showBackButton />
       <UserFormValidator handleAction={handleCreateUser} mode={1} />
     </div>
   );

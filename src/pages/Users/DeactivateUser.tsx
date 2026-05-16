@@ -67,7 +67,7 @@ const DeactivateUser: React.FC = () => {
 
   return (
     <>
-      <Breadcrumb pageName="Desactivar Usuario" />
+      <Breadcrumb pageName="Desactivar Usuario" showBackButton />
 
       <div className="rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="mb-6 text-center">

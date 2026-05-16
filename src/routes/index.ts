@@ -1,5 +1,6 @@
-import { lazy } from 'react';
+import { Component, lazy } from 'react';
 import DeactivateUser from '../pages/Users/DeactivateUser';
+import ViewUserPage from '../pages/Users/ViewUser';
 
 const Calendar = lazy(() => import('../pages/Calendar'));
 const Chart = lazy(() => import('../pages/Chart'));
@@ -34,10 +35,16 @@ const coreRoutes = [
     title: 'Edit User',
     component: UserUpdate,
   },
+
   {
     path: '/users/deactivate/:id',
     title: 'Deactivate User',
     component: DeactivateUser,
+  },
+  {
+    path: '/users/view/:id',
+    title: 'View User',
+    component: ViewUserPage,
   },
   {
     path: '/posts/list',
@@ -103,7 +110,7 @@ const coreRoutes = [
     path: '/image-editor',
     title: 'Image Editor',
     component: ImageEditor,
-  }
+  },
 ];
 
 const routes = [...coreRoutes];

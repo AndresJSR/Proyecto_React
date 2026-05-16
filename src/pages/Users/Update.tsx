@@ -68,8 +68,8 @@ const UpdateUserPage: React.FC = () => {
 
   return (
     <>
-      <Breadcrumb pageName="Actualizar Usuario" />
-
+      <Breadcrumb pageName="Actualizar Usuario" showBackButton/>
+    
       <UserFormValidator handleAction={handleUpdateUser} mode={2} user={user} />
     </>
   );
