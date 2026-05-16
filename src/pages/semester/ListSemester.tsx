@@ -1,18 +1,18 @@
 import React, {
-  useEffect,
-  useState
+    useEffect,
+    useState
 } from 'react'
 
 import Swal from 'sweetalert2'
 
-import SemesterTable from '../../components/semester/SemesterTable'
+import SemesterTable from '../../components/Semester/SemesterTable'
 
 import {
-  Semester
+    Semester
 } from '../../models/Semester'
 
 import {
-  semesterBusiness
+    semesterBusiness
 } from '../../business/SemesterBusiness'
 
 const ListSemester: React.FC = () => {

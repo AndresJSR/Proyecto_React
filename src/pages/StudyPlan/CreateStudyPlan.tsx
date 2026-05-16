@@ -1,35 +1,33 @@
-// src/pages/Career/CreateCareer.tsx
-
 import { useState } from 'react'
 
 import { useNavigate } from 'react-router-dom'
 
 import Swal from 'sweetalert2'
 
-import CareerForm from '../../components/Career/CareerForm'
+import StudyPlanForm from '../../components/StudyPlan/StudyPlanForm'
 
-import {
-  CreateCareerDto
-} from '../../models/Career'
+import { CreateStudyPlanDto } from '../../models/StudyPlan'
 
-import { careerBusiness } from '../../business/CareerBusiness'
+import { studyPlanBusiness } from '../../business/StudyPlanBusiness'
 
-const CreateCareer = () => {
+const CreateStudyPlan = () => {
   const navigate = useNavigate()
 
   const [loading, setLoading] =
     useState(false)
 
   const [formData, setFormData] =
-    useState<CreateCareerDto>({
+    useState<CreateStudyPlanDto>({
+      career_id: '',
+      subject_id: '',
       name: '',
-      code: '',
-      description: ''
+      year: 2025,
+      suggested_semester: 1
     })
 
   const handleChange = (
     field: string,
-    value: string | boolean
+    value: string | number | boolean
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -41,22 +39,22 @@ const CreateCareer = () => {
     try {
       setLoading(true)
 
-      await careerBusiness.createCareer(
+      await studyPlanBusiness.createStudyPlan(
         formData
       )
 
       await Swal.fire(
         'Created',
-        'Career created successfully',
+        'Study plan created successfully',
         'success'
       )
 
-      navigate('/carreras/list')
+      navigate('/study-plans/list')
     } catch (error: any) {
       Swal.fire(
         'Error',
         error.message ||
-          'Could not create career',
+          'Could not create study plan',
         'error'
       )
     } finally {
@@ -67,10 +65,10 @@ const CreateCareer = () => {
   return (
     <div className="p-6">
       <h1 className="mb-6 text-2xl font-bold">
-        Create Career
+        Create Study Plan
       </h1>
 
-      <CareerForm
+      <StudyPlanForm
         formData={formData}
         onChange={handleChange}
         onSubmit={handleSubmit}
@@ -80,4 +78,4 @@ const CreateCareer = () => {
   )
 }
 
-export default CreateCareer
+export default CreateStudyPlan

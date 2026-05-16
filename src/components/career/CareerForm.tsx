@@ -1,99 +1,96 @@
-import { useState } from 'react'
+// src/components/Career/CareerForm.tsx
+
+import React from 'react'
 
 import {
-  CreateCareerDto
+  CreateCareerDto,
+  UpdateCareerDto
 } from '../../models/Career'
 
 interface Props {
-  initialData?: CreateCareerDto
+  formData:
+    | CreateCareerDto
+    | UpdateCareerDto
+
+  onChange: (
+    field: string,
+    value: string | boolean
+  ) => void
+
+  onSubmit: () => void
+
   loading?: boolean
-  onSubmit: (
-    data: CreateCareerDto
-  ) => Promise<void>
 }
 
-export default function CareerForm({
-  initialData,
-  loading = false,
-  onSubmit
-}: Props) {
-
-  const [formData, setFormData] =
-    useState<CreateCareerDto>({
-      name: initialData?.name || '',
-      code: initialData?.code || '',
-      description: initialData?.description || ''
-    })
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement
-    >
-  ) => {
-
-    const { name, value } = e.target
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }))
-  }
-
-  const handleSubmit = async (
-    e: React.FormEvent
-  ) => {
-
-    e.preventDefault()
-
-    await onSubmit(formData)
-  }
-
+const CareerForm: React.FC<Props> = ({
+  formData,
+  onChange,
+  onSubmit,
+  loading = false
+}) => {
   return (
-    <form onSubmit={handleSubmit}>
-
+    <div className="space-y-4">
       <div>
-        <label>Name</label>
+        <label className="mb-1 block text-sm font-medium">
+          Name
+        </label>
 
         <input
           type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
+          value={formData.name || ''}
+          onChange={(e) =>
+            onChange('name', e.target.value)
+          }
+          className="w-full rounded-md border p-2"
         />
       </div>
 
       <div>
-        <label>Code</label>
+        <label className="mb-1 block text-sm font-medium">
+          Code
+        </label>
 
         <input
           type="text"
-          name="code"
-          value={formData.code}
-          onChange={handleChange}
+          value={formData.code || ''}
+          onChange={(e) =>
+            onChange('code', e.target.value)
+          }
+          className="w-full rounded-md border p-2"
         />
       </div>
 
       <div>
-        <label>Description</label>
+        <label className="mb-1 block text-sm font-medium">
+          Description
+        </label>
 
         <textarea
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
+          value={
+            formData.description || ''
+          }
+          onChange={(e) =>
+            onChange(
+              'description',
+              e.target.value
+            )
+          }
+          className="w-full rounded-md border p-2"
         />
       </div>
 
       <button
-        type="submit"
+        type="button"
+        onClick={onSubmit}
         disabled={loading}
+        className="rounded-md bg-primary px-4 py-2 text-white"
       >
-        {
-          loading
-            ? 'Saving...'
-            : 'Save'
-        }
+        {loading
+          ? 'Saving...'
+          : 'Save Career'}
       </button>
-
-    </form>
+    </div>
   )
 }
+
+export default CareerForm

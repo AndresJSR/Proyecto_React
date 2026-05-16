@@ -4,7 +4,7 @@ import SubjectForm from '../../components/Subject/SubjectForm'
 
 import { CreateSubjectDto } from '../../models/Subject'
 
-import { subjectBusiness } from '../../business/subjectBusiness'
+import { subjectBusiness } from '../../business/SubjectBusiness'
 
 const CreateSubject = () => {
   const [loading, setLoading] =

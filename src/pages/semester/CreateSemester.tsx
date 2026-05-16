@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
 import Swal from 'sweetalert2'
 
-import SemesterForm from '../../components/semester/SemesterForm'
-import SemesterModal from '../../components/semester/SemesterModal'
+import SemesterForm from '../../components/Semester/SemesterForm'
+import SemesterModal from '../../components/Semester/SemesterModal'
 
 import {
-  CreateSemesterDto
+    CreateSemesterDto
 } from '../../models/Semester'
 
 import {
-  semesterBusiness
+    semesterBusiness
 } from '../../business/SemesterBusiness'
 
 const CreateSemester: React.FC = () => {

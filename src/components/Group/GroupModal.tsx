@@ -1,5 +1,3 @@
-// src/components/Career/CareerModal.tsx
-
 import React from 'react'
 
 interface Props {
@@ -12,7 +10,7 @@ interface Props {
   onClose: () => void
 }
 
-const CareerModal: React.FC<Props> = ({
+const GroupModal: React.FC<Props> = ({
   isOpen,
   title,
   children,
@@ -43,4 +41,4 @@ const CareerModal: React.FC<Props> = ({
   )
 }
 
-export default CareerModal
+export default GroupModal

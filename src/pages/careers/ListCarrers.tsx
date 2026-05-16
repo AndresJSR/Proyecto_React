@@ -1,61 +1,219 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import TablaAcademica from '../../components/TablaAcademica';
-import useCarreras from '../../hooks/useCareer';
-import { Career } from '../../models/Career';
-import { careerService } from '../../services/careerService';
+// src/pages/Career/ListCareer.tsx
 
-const ListCareers: React.FC = () => {
-    const navigate = useNavigate();
-    const { careers, loading, error, refresh } = useCarreras();
+import { useEffect, useState } from 'react'
 
-    const handleAction = async (action: string, item: any) => {
-        const career = item as Career;
-        if (action === 'edit') {
-            navigate(`/carreras/edit/${career.id}`);
+import Swal from 'sweetalert2'
+
+import CareerModal from '../../components/Career/CareerModal'
+import CareerTable from '../../components/Career/CarrerTable'
+import CareerForm from '../../components/Career/CareerForm'
+
+import {
+  Career,
+  CreateCareerDto,
+  UpdateCareerDto
+} from '../../models/Career'
+
+import { careerBusiness } from '../../business/CareerBusiness'
+
+const ListCareer = () => {
+  const [careers, setCareers] =
+    useState<Career[]>([])
+
+  const [loading, setLoading] =
+    useState(false)
+
+  const [openModal, setOpenModal] =
+    useState(false)
+
+  const [selectedCareer, setSelectedCareer] =
+    useState<Career | null>(null)
+
+  const [formData, setFormData] =
+    useState<
+      CreateCareerDto | UpdateCareerDto
+    >({
+      name: '',
+      code: '',
+      description: ''
+    })
+
+  const loadCareers = async () => {
+    setLoading(true)
+
+    try {
+      const data =
+        await careerBusiness.getCareers()
+
+      setCareers(data)
+    } catch (error) {
+      console.error(error)
+
+      Swal.fire(
+        'Error',
+        'Could not load careers',
+        'error'
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadCareers()
+  }, [])
+
+  const handleCreate = () => {
+    setSelectedCareer(null)
+
+    setFormData({
+      name: '',
+      code: '',
+      description: ''
+    })
+
+    setOpenModal(true)
+  }
+
+  const handleEdit = (
+    career: Career
+  ) => {
+    setSelectedCareer(career)
+
+    setFormData({
+      name: career.name,
+      code: career.code,
+      description:
+        career.description || ''
+    })
+
+    setOpenModal(true)
+  }
+
+ const handleDelete = async (
+  id: string
+) => {
+  const result = await Swal.fire({
+    title: 'Delete career?',
+    text: 'This action cannot be undone',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Delete'
+  })
+
+  if (!result.isConfirmed) return
+
+  try {
+    await careerBusiness.deleteCareer(id)
+
+    await Swal.fire(
+      'Deleted',
+      'Career deleted successfully',
+      'success'
+    )
+
+    loadCareers()
+  } catch (error) {
+    console.error(error)
+
+    Swal.fire(
+      'Error',
+      'Could not delete career',
+      'error'
+    )
+  }
+}
+
+  const handleChange = (
+    field: string,
+    value: string | boolean
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleSubmit = async () => {
+    try {
+      if (selectedCareer) {
+        await careerBusiness.updateCareer(
+          selectedCareer.id,
+          formData as UpdateCareerDto
+        )
+
+        Swal.fire(
+          'Updated',
+          'Career updated successfully',
+          'success'
+        )
+      } else {
+        await careerBusiness.createCareer(
+          formData as CreateCareerDto
+        )
+
+        Swal.fire(
+          'Created',
+          'Career created successfully',
+          'success'
+        )
+      }
+
+      setOpenModal(false)
+
+      loadCareers()
+    } catch (error: any) {
+      Swal.fire(
+        'Error',
+        error.message ||
+          'Operation failed',
+        'error'
+      )
+    }
+  }
+
+  return (
+    <div className="p-6">
+      <div className="mb-5 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">
+          Careers
+        </h1>
+
+        <button
+          type="button"
+          onClick={handleCreate}
+          className="rounded-md bg-primary px-4 py-2 text-white"
+        >
+          Create Career
+        </button>
+      </div>
+
+      <CareerTable
+        careers={careers}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+
+      <CareerModal
+        isOpen={openModal}
+        title={
+          selectedCareer
+            ? 'Edit Career'
+            : 'Create Career'
         }
-        if (action === 'delete' && career.id) {
-            const result = await Swal.fire({
-                title: '¿Eliminar carrera?',
-                text: `Carrera: ${item.name}`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-            });
-            if (result.isConfirmed) {
-                try {
-                    await careerService.deleteCareer(item.id);
-                    await Swal.fire('Eliminada', 'La carrera fue eliminada.', 'success');
-                    refresh();
-                } catch (err) {
-                    await Swal.fire('Error', 'No se pudo eliminar la carrera.', 'error');
-                }
-            }
+        onClose={() =>
+          setOpenModal(false)
         }
-    };
+      >
+        <CareerForm
+          formData={formData}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
+          loading={loading}
+        />
+      </CareerModal>
+    </div>
+  )
+}
 
-    return (
-        <div>
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold">Carreras</h2>
-                <button
-                    onClick={() => navigate('/carreras/create')}
-                    className="rounded-md bg-primary px-4 py-2 text-white hover:bg-primary/90"
-                >
-                    Crear Carrera
-                </button>
-            </div>
-            {loading && <p>Cargando carreras...</p>}
-            {error && <p className="text-red-500">{error}</p>}
-            <TablaAcademica
-                datos={careers}
-                columnas={['id', 'name', 'code', 'description']}
-                acciones={[{ name: 'edit', label: 'Editar' }, { name: 'delete', label: 'Eliminar' }]}
-                onAction={handleAction}
-            />
-        </div>
-    );
-};
-
-export default ListCareers;
+export default ListCareer

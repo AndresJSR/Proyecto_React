@@ -1,12 +1,12 @@
 import { useState } from 'react'
 
 import {
-  Subject,
-  CreateSubjectDto,
-  UpdateSubjectDto
+    CreateSubjectDto,
+    Subject,
+    UpdateSubjectDto
 } from '../models/Subject'
 
-import { subjectBusiness } from '../business/subjectBusiness'
+import { subjectBusiness } from '../business/SubjectBusiness'
 
 export const useSubject = () => {
   const [subjects, setSubjects] =

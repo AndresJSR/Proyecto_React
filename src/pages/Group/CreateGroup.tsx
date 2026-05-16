@@ -1,4 +1,4 @@
-// src/pages/Career/CreateCareer.tsx
+// src/pages/Group/CreateGroup.tsx
 
 import { useState } from 'react'
 
@@ -6,30 +6,33 @@ import { useNavigate } from 'react-router-dom'
 
 import Swal from 'sweetalert2'
 
-import CareerForm from '../../components/Career/CareerForm'
+import GroupForm from '../../components/Group/GroupForm'
 
 import {
-  CreateCareerDto
-} from '../../models/Career'
+  CreateGroupDto
+} from '../../models/Group'
 
-import { careerBusiness } from '../../business/CareerBusiness'
+import { groupBusiness } from '../../business/GroupBusiness'
 
-const CreateCareer = () => {
+const CreateGroup = () => {
   const navigate = useNavigate()
 
   const [loading, setLoading] =
     useState(false)
 
   const [formData, setFormData] =
-    useState<CreateCareerDto>({
+    useState<CreateGroupDto>({
+      teacher_id: '',
+      subject_id: '',
+      semester_id: '',
       name: '',
-      code: '',
-      description: ''
+      group_code: '',
+      capacity: 30
     })
 
   const handleChange = (
     field: string,
-    value: string | boolean
+    value: string | number
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -41,22 +44,22 @@ const CreateCareer = () => {
     try {
       setLoading(true)
 
-      await careerBusiness.createCareer(
+      await groupBusiness.createGroup(
         formData
       )
 
       await Swal.fire(
         'Created',
-        'Career created successfully',
+        'Group created successfully',
         'success'
       )
 
-      navigate('/carreras/list')
+      navigate('/grupos/list')
     } catch (error: any) {
       Swal.fire(
         'Error',
         error.message ||
-          'Could not create career',
+          'Could not create group',
         'error'
       )
     } finally {
@@ -67,10 +70,10 @@ const CreateCareer = () => {
   return (
     <div className="p-6">
       <h1 className="mb-6 text-2xl font-bold">
-        Create Career
+        Create Group
       </h1>
 
-      <CareerForm
+      <GroupForm
         formData={formData}
         onChange={handleChange}
         onSubmit={handleSubmit}
@@ -80,4 +83,4 @@ const CreateCareer = () => {
   )
 }
 
-export default CreateCareer
+export default CreateGroup
