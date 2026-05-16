@@ -2,8 +2,8 @@ import { lazy } from 'react';
 
 const ListCarreras = lazy(() => import('../pages/careers/ListCarrers'));
 const CreateCarrera = lazy(() => import('../pages/careers/CreateCareers'));
-const ListSemestres = lazy(() => import('../pages/semester/ListSemester'));
-const CreateSemestre = lazy(() => import('../pages/semester/CreateSemester'));
+const ListSemestres = lazy(() => import('../pages/Semester/ListSemester'));
+const CreateSemestre = lazy(() => import('../pages/Semester/CreateSemester'));
 const ListAsignaturas = lazy(() => import('../pages/asignaturas/ListAsignaturas'));
 const CreateAsignatura = lazy(() => import('../pages/asignaturas/CreateAsignatura'));
 const ListGrupos = lazy(() => import('../pages/grupos/ListGrupos'));
