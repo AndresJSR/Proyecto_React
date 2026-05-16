@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Carrera } from '../models/Career';
-import { carreraService } from '../services/careerService';
+import { Career } from '../models/Career';
+import { careerService } from '../services/careerService';
 
 const useCarreras = () => {
-    const [carreras, setCarreras] = useState<Carrera[]>([]);
+    const [carreras, setCarreras] = useState<Career[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const refresh = async () => {
         setLoading(true);
         try {
-            const result = await carreraService.getCarreras();
+            const result = await careerService.getCareers();
             setCarreras(result);
             setError(null);
         } catch (err) {

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 import {
-    CreateCareerDto
-} from '../models/Career'
+  CreateCareerDto
+} from '../../models/Career'
 
 interface Props {
   initialData?: CreateCareerDto

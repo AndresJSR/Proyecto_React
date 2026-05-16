@@ -1,30 +1,42 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { Carrera } from '../../models/Career';
-import { carreraService } from '../../services/careerService';
+import { CreateCareerDto } from '../../models/Career';
+import { careerService } from '../../services/careerService';
 
-const CreateCarrera: React.FC = () => {
+const CreateCareer: React.FC = () => {
     const navigate = useNavigate();
-    const [carrera, setCarrera] = useState<Carrera>(new Carrera());
 
-    const handleChange = (field: keyof Carrera, value: string | number) => {
-        setCarrera((prev) => ({ ...prev, [field]: value }));
+    interface FormCareer {
+        name: string;
+        code: string;
+        description: string;
+        totalCredits: number;
+    }
+
+    const [career, setCareer] = useState<FormCareer>({
+        name: '',
+        code: '',
+        description: '',
+        totalCredits: 0
+    });
+
+    const handleChange = (field: keyof FormCareer, value: string | number) => {
+        setCareer((prev) => ({ ...prev, [field]: value }));
     };
 
     const handleSubmit = async () => {
-        const payload = {
-            nombre: carrera.nombre,
-            codigo: carrera.codigo,
-            descripcion: carrera.descripcion,
-            creditosTotales: carrera.creditosTotales,
+        const payload: CreateCareerDto = {
+            name: career.name,
+            code: career.code,
+            description: career.description
         };
 
-        const created = await carreraService.createCarrera(payload);
-        if (created) {
+        try {
+            await careerService.createCareer(payload);
             await Swal.fire('Creado', 'La carrera fue creada con éxito.', 'success');
             navigate('/carreras/list');
-        } else {
+        } catch (err) {
             await Swal.fire('Error', 'No se pudo crear la carrera.', 'error');
         }
     };
@@ -36,24 +48,24 @@ const CreateCarrera: React.FC = () => {
                 <div>
                     <label className="block text-sm font-medium">Nombre</label>
                     <input
-                        value={carrera.nombre}
-                        onChange={(e) => handleChange('nombre', e.target.value)}
+                        value={career.name}
+                        onChange={(e) => handleChange('name', e.target.value)}
                         className="mt-1 w-full rounded-md border p-2"
                     />
                 </div>
                 <div>
                     <label className="block text-sm font-medium">Código</label>
                     <input
-                        value={carrera.codigo}
-                        onChange={(e) => handleChange('codigo', e.target.value)}
+                        value={career.code}
+                        onChange={(e) => handleChange('code', e.target.value)}
                         className="mt-1 w-full rounded-md border p-2"
                     />
                 </div>
                 <div>
                     <label className="block text-sm font-medium">Descripción</label>
                     <input
-                        value={carrera.descripcion}
-                        onChange={(e) => handleChange('descripcion', e.target.value)}
+                        value={career.description}
+                        onChange={(e) => handleChange('description', e.target.value)}
                         className="mt-1 w-full rounded-md border p-2"
                     />
                 </div>
@@ -61,8 +73,8 @@ const CreateCarrera: React.FC = () => {
                     <label className="block text-sm font-medium">Créditos totales</label>
                     <input
                         type="number"
-                        value={carrera.creditosTotales}
-                        onChange={(e) => handleChange('creditosTotales', Number(e.target.value))}
+                        value={career.totalCredits}
+                        onChange={(e) => handleChange('totalCredits', Number(e.target.value))}
                         className="mt-1 w-full rounded-md border p-2"
                     />
                 </div>
@@ -87,4 +99,4 @@ const CreateCarrera: React.FC = () => {
     );
 };
 
-export default CreateCarrera;
+export default CreateCareer;

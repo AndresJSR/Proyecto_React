@@ -1,4 +1,4 @@
-import { Career } from '../models/Career'
+import { Career } from '../../models/Career'
 
 interface Props {
   careers: Career[]

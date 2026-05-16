@@ -2,31 +2,34 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import TablaAcademica from '../../components/TablaAcademica';
-import useCarreras from '../../hooks/useCarreras';
-import { Carrera } from '../../models/Career';
-import { carreraService } from '../../services/careerService';
+import useCarreras from '../../hooks/useCareer';
+import { Career } from '../../models/Career';
+import { careerService } from '../../services/careerService';
 
-const ListCarreras: React.FC = () => {
+const ListCareers: React.FC = () => {
     const navigate = useNavigate();
-    const { carreras, loading, error, refresh } = useCarreras();
+    const { careers, loading, error, refresh } = useCarreras();
 
-    const handleAction = async (action: string, item: Carrera) => {
+    const handleAction = async (action: string, item: any) => {
+        const career = item as Career;
         if (action === 'edit') {
-            navigate(`/carreras/edit/${item.id}`);
+            navigate(`/carreras/edit/${career.id}`);
         }
-        if (action === 'delete' && item.id) {
+        if (action === 'delete' && career.id) {
             const result = await Swal.fire({
                 title: '¿Eliminar carrera?',
-                text: `Carrera: ${item.nombre}`,
+                text: `Carrera: ${item.name}`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, eliminar',
             });
             if (result.isConfirmed) {
-                const success = await carreraService.deleteCarrera(item.id);
-                if (success) {
+                try {
+                    await careerService.deleteCareer(item.id);
                     await Swal.fire('Eliminada', 'La carrera fue eliminada.', 'success');
                     refresh();
+                } catch (err) {
+                    await Swal.fire('Error', 'No se pudo eliminar la carrera.', 'error');
                 }
             }
         }
@@ -46,8 +49,8 @@ const ListCarreras: React.FC = () => {
             {loading && <p>Cargando carreras...</p>}
             {error && <p className="text-red-500">{error}</p>}
             <TablaAcademica
-                datos={carreras}
-                columnas={['id', 'nombre', 'codigo', 'creditosTotales']}
+                datos={careers}
+                columnas={['id', 'name', 'code', 'description']}
                 acciones={[{ name: 'edit', label: 'Editar' }, { name: 'delete', label: 'Eliminar' }]}
                 onAction={handleAction}
             />
@@ -55,4 +58,4 @@ const ListCarreras: React.FC = () => {
     );
 };
 
-export default ListCarreras;
+export default ListCareers;

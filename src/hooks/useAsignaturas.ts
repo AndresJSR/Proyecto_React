@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Asignatura } from '../models/Asignatura';
-import { asignaturaService } from '../services/asignaturaService';
+import { asignaturaService } from '../services/subjectService';
 
 const useAsignaturas = () => {
     const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);

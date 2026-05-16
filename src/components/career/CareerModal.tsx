@@ -2,7 +2,7 @@ import CareerForm from './CareerForm'
 
 import {
     CreateCareerDto
-} from '../models/Career'
+} from '../../models/Career'
 
 interface Props {
   open: boolean

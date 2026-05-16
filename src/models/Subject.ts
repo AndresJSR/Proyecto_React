@@ -1,21 +1,39 @@
-import { Group } from './Group';
-import { StudyPlan } from './StudyPlan';
-import { Evaluation } from './Evaluation';
+//version darling
+import { Group } from './Group'
+import { StudyPlan } from './StudyPlan'
+import { Evaluation } from './Evaluation'
 
 export interface Subject {
-  id?: string;
+  id: string
 
-  name?: string;
-  code?: string;
-  description?: string;
+  name: string
+  code: string
+  description?: string
 
-  credits?: number;
-  is_active?: boolean;
+  credits: number
+  is_active: boolean
 
-  created_at?: string;
-  updated_at?: string;
+  created_at: string
+  updated_at: string
 
-  groups?: Group[];
-  study_plans?: StudyPlan[];
-  evaluations?: Evaluation[];
+  groups?: Group[]
+  study_plans?: StudyPlan[]
+  evaluations?: Evaluation[]
+}
+export interface CreateSubjectDto {
+  name: string
+  code: string
+  description?: string
+  credits: number
+}
+export interface UpdateSubjectDto {
+  name?: string
+  code?: string
+  description?: string
+  credits?: number
+  is_active?: boolean
+}
+export interface SubjectFilters {
+  is_active?: boolean
+  search?: string
 }

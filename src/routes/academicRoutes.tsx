@@ -1,9 +1,9 @@
 import { lazy } from 'react';
 
-const ListCarreras = lazy(() => import('../pages/carreras/ListCarreras'));
-const CreateCarrera = lazy(() => import('../pages/carreras/CreateCarrera'));
-const ListSemestres = lazy(() => import('../pages/semestres/ListSemestres'));
-const CreateSemestre = lazy(() => import('../pages/semestres/CreateSemestre'));
+const ListCarreras = lazy(() => import('../pages/careers/ListCarrers'));
+const CreateCarrera = lazy(() => import('../pages/careers/CreateCareers'));
+const ListSemestres = lazy(() => import('../pages/semester/ListSemester'));
+const CreateSemestre = lazy(() => import('../pages/semester/CreateSemester'));
 const ListAsignaturas = lazy(() => import('../pages/asignaturas/ListAsignaturas'));
 const CreateAsignatura = lazy(() => import('../pages/asignaturas/CreateAsignatura'));
 const ListGrupos = lazy(() => import('../pages/grupos/ListGrupos'));
