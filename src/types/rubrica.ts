@@ -21,6 +21,7 @@ export interface RubricCriterio {
   name: string;
   description: string;
   weight: number;
+  scales?: Scale[];
 }
 
 export interface RubricFormState {
@@ -28,4 +29,11 @@ export interface RubricFormState {
   title: string;
   description: string;
   criterios: RubricCriterio[];
+}
+
+export interface Scale {
+  id?: string;
+  name?: string;
+  description?: string;
+  value?: number;
 }

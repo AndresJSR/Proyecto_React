@@ -1,7 +1,6 @@
 interface RubricaFooterActionsProps {
   totalPeso: number;
   canPublish: boolean;
-  criteriosCount: number;
   activeStep: number;
   isSubmitting: boolean;
   onCancel: () => void;
@@ -13,7 +12,6 @@ interface RubricaFooterActionsProps {
 const RubricaFooterActions = ({
   totalPeso,
   canPublish,
-  criteriosCount,
   activeStep,
   isSubmitting,
   onCancel,

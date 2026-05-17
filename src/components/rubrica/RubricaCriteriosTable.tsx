@@ -3,7 +3,7 @@ import { RubricCriterio } from '../../types/rubrica';
 
 interface RubricaCriteriosTableProps {
   criterios: RubricCriterio[];
-  onUpdate: (id: string, field: keyof RubricCriterio, value: string | number) => void;
+  onUpdate: (id: string, field: keyof RubricCriterio, value: RubricCriterio[keyof RubricCriterio]) => void;
   onDelete: (id: string) => void;
   onAdd: () => void;
   onMove: (fromIndex: number, toIndex: number) => void;
@@ -11,6 +11,8 @@ interface RubricaCriteriosTableProps {
 
 const RubricaCriteriosTable = ({ criterios, onUpdate, onDelete, onAdd, onMove }: RubricaCriteriosTableProps) => {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [scalesModalFor, setScalesModalFor] = useState<string | null>(null);
+  const [localScales, setLocalScales] = useState<any[]>([]);
 
   const handleDragStart = (index: number) => {
     setDragIndex(index);
@@ -100,7 +102,7 @@ const RubricaCriteriosTable = ({ criterios, onUpdate, onDelete, onAdd, onMove }:
                 <td className="px-3 py-4 align-top">
                   <input
                     type="text"
-                    value={criterio.descripcion}
+                    value={criterio.description}
                     onChange={(event) => onUpdate(criterio.id, 'description', event.target.value)}
                     className="w-full rounded-md border border-stroke bg-gray px-3 py-2 text-sm text-black transition focus:border-primary focus:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                     placeholder="Descripción breve"
@@ -131,6 +133,18 @@ const RubricaCriteriosTable = ({ criterios, onUpdate, onDelete, onAdd, onMove }:
                     </button>
                     <button
                       type="button"
+                      onClick={() => {
+                        setLocalScales(criterio.scales ? [...criterio.scales] : []);
+                        setScalesModalFor(criterio.id);
+                      }}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-stroke bg-white text-black transition hover:bg-gray dark:border-strokedark dark:bg-boxdark dark:text-white dark:hover:bg-meta-4"
+                      aria-label="Escalas"
+                      title="Escalas"
+                    >
+                      ⚖️
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => onDelete(criterio.id)}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-stroke bg-white text-black transition hover:bg-red-100 dark:border-strokedark dark:bg-boxdark dark:text-white dark:hover:bg-meta-4"
                       aria-label="Eliminar criterio"
@@ -144,6 +158,84 @@ const RubricaCriteriosTable = ({ criterios, onUpdate, onDelete, onAdd, onMove }:
           </tbody>
         </table>
       </div>
+
+      {scalesModalFor && (
+        <dialog open className="rounded-md p-4">
+          <h3 className="font-medium text-lg">Escalas</h3>
+          <div className="mt-3 space-y-2">
+            {localScales.map((s, i) => (
+              <div key={i} className="flex gap-2">
+                <input
+                  type="text"
+                  value={s.name}
+                  onChange={(e) => {
+                    const next = [...localScales];
+                    next[i] = { ...next[i], name: e.target.value };
+                    setLocalScales(next);
+                  }}
+                  placeholder="Nombre"
+                  className="rounded border px-2"
+                />
+                <input
+                  type="text"
+                  value={s.description}
+                  onChange={(e) => {
+                    const next = [...localScales];
+                    next[i] = { ...next[i], description: e.target.value };
+                    setLocalScales(next);
+                  }}
+                  placeholder="Descripción"
+                  className="rounded border px-2"
+                />
+                <input
+                  type="number"
+                  value={s.value}
+                  onChange={(e) => {
+                    const next = [...localScales];
+                    next[i] = { ...next[i], value: Number(e.target.value) };
+                    setLocalScales(next);
+                  }}
+                  placeholder="Valor"
+                  className="w-20 rounded border px-2"
+                />
+                <button
+                  type="button"
+                  onClick={() => setLocalScales((prev) => prev.filter((_, idx) => idx !== i))}
+                  className="px-2"
+                >
+                  🗑️
+                </button>
+              </div>
+            ))}
+
+            <div className="mt-2">
+              <button
+                type="button"
+                onClick={() => setLocalScales((prev) => [...prev, { id: Date.now().toString(), name: '', description: '', value: 0 }])}
+                className="rounded-md bg-primary px-3 py-1 text-sm text-white"
+              >
+                Agregar escala
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 flex justify-end gap-2">
+            <button type="button" onClick={() => setScalesModalFor(null)} className="px-3 py-1 rounded border">Cancelar</button>
+            <button
+              type="button"
+              onClick={() => {
+                if (scalesModalFor) {
+                  onUpdate(scalesModalFor, 'scales', localScales as any);
+                }
+                setScalesModalFor(null);
+              }}
+              className="px-3 py-1 rounded bg-primary text-white"
+            >
+              Guardar
+            </button>
+          </div>
+        </dialog>
+      )}
     </section>
   );
 };

@@ -133,7 +133,6 @@ const RubricaCreatePage = () => {
         <RubricaFooterActions
           totalPeso={totalPeso}
           canPublish={canPublish}
-          criteriosCount={criterios.length}
           activeStep={activeStep}
           isSubmitting={isSubmitting}
           onCancel={() => navigate(-1)}

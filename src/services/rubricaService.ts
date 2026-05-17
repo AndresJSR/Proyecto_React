@@ -68,13 +68,16 @@ export async function getSubjects(): Promise<Subject[]> {
 }
 
 export async function createRubric(
-  payload: RubricCreatePayload
+  payload: RubricCreatePayload,
+  subject_id?: string
 ): Promise<{ id: string; title: string; description: string }> {
+  const body = { ...payload, subject_id };
+
   return requestJson<{ id: string; title: string; description: string }>(
     '/api/evaluation/rubrics',
     {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify(body),
     }
   );
 }
@@ -86,8 +89,34 @@ export async function createCriterion(payload: CriterionCreatePayload): Promise<
   });
 }
 
+export interface ScaleCreatePayload {
+  criterion_id: string;
+  name: string;
+  description?: string;
+  value?: number;
+}
+
+export async function createScale(payload: ScaleCreatePayload) {
+  return requestJson<any>('/api/evaluation/scales', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function publishRubric(rubricId: string): Promise<void> {
   await requestVoid(`/api/evaluation/rubrics/${rubricId}/publish`, {
     method: 'PATCH',
+  });
+}
+
+export async function deleteRubrica(id: string | number): Promise<void> {
+  await requestVoid(`/api/evaluation/rubrics/${id}/`, {
+    method: 'DELETE',
+  });
+}
+
+export async function archivarRubrica(id: string | number): Promise<void> {
+  await requestVoid(`/api/evaluation/rubrics/${id}/archive/`, {
+    method: 'POST',
   });
 }
