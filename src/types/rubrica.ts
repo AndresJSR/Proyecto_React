@@ -31,6 +31,12 @@ export interface RubricFormState {
   criterios: RubricCriterio[];
 }
 
+export interface AsociarRubricaFormState {
+  evaluation_id: string;
+  rubric_id: string;
+  subject_id: string;
+}
+
 export interface Scale {
   id?: string;
   name?: string;

@@ -364,6 +364,43 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Crear Rúbrica
                             </NavLink>
                           </li>
+                          <li>
+                            <NavLink
+                              to="/evaluaciones/asociar-rubrica"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              <svg
+                                className="h-4 w-4 fill-current"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M5.5 4.5H14.5C15.3284 4.5 16 5.17157 16 6V14C16 14.8284 15.3284 15.5 14.5 15.5H5.5C4.67157 15.5 4 14.8284 4 14V6C4 5.17157 4.67157 4.5 5.5 4.5Z"
+                                  stroke="currentColor"
+                                  strokeWidth="1.4"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                <path
+                                  d="M7 8H13"
+                                  stroke="currentColor"
+                                  strokeWidth="1.4"
+                                  strokeLinecap="round"
+                                />
+                                <path
+                                  d="M7 11H11"
+                                  stroke="currentColor"
+                                  strokeWidth="1.4"
+                                  strokeLinecap="round"
+                                />
+                              </svg>
+                              Asociar rúbrica
+                            </NavLink>
+                          </li>
                         </ul>
                       </div>
                       {/* <!-- Dropdown Menu End --> */}
