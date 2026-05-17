@@ -8,7 +8,8 @@ import SignUp from './pages/Authentication/SignUp';
 import Loader from './common/Loader';
 import routes from './routes';
 
-import ProtectedRoute from "../src/components/Auth/ProtectedRoute";
+import ProtectedRoute from './components/Auth/ProtectedRoute';
+import RoleRoute from './components/Auth/RoleRoute';
 
 const DefaultLayout = lazy(() => import('./layout/DefaultLayout'));
 
@@ -28,6 +29,7 @@ function App() {
         reverseOrder={false}
         containerClassName="overflow-auto"
       />
+
       <Routes>
         <Route path="/auth/signin" element={<SignIn />} />
         <Route path="/auth/signup" element={<SignUp />} />
@@ -35,19 +37,28 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<DefaultLayout />}>
             <Route index element={<ECommerce />} />
-            {routes.map((routes, index) => {
-              const { path, component: Component } = routes;
-              return (
-                <Route
-                  key={index}
-                  path={path}
-                  element={
-                    <Suspense fallback={<Loader />}>
-                      <Component/>
-                    </Suspense>
-                  }
-                />
+
+            {routes.map((route, index) => {
+              const { path, component: Component, allowedRoles } = route;
+
+              const pageElement = (
+                <Suspense fallback={<Loader />}>
+                  <Component />
+                </Suspense>
               );
+
+              if (allowedRoles && allowedRoles.length > 0) {
+                return (
+                  <Route
+                    key={index}
+                    element={<RoleRoute allowedRoles={allowedRoles} />}
+                  >
+                    <Route path={path} element={pageElement} />
+                  </Route>
+                );
+              }
+
+              return <Route key={index} path={path} element={pageElement} />;
             })}
           </Route>
         </Route>
@@ -57,5 +68,3 @@ function App() {
 }
 
 export default App;
-
-
