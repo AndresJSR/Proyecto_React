@@ -1,8 +1,8 @@
 import {
-    Career,
-    CareerFilters,
-    CreateCareerDto,
-    UpdateCareerDto
+  Career,
+  CareerFilters,
+  CreateCareerDto,
+  UpdateCareerDto
 } from '../models/Career'
 
 import { careerService } from '../services/careerService'
@@ -18,7 +18,8 @@ class CareerBusiness {
       return await careerService.createCareer({
         name: payload.name.trim(),
         code: payload.code.trim().toUpperCase(),
-        description: payload.description?.trim()
+        description: payload.description?.trim(),
+        is_active: payload.is_active
       })
 
     } catch (error: any) {

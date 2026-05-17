@@ -13,6 +13,7 @@ export interface CreateCareerDto {
   name: string
   code: string
   description?: string
+  is_active?: boolean
 }
 //interface Update representa PUT /api/academic/careers/:id
 export interface UpdateCareerDto {

@@ -13,61 +13,71 @@ export default function CareerTable({
 }: Props) {
 
   return (
-    <table>
+    <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <table className="w-full">
 
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Code</th>
-          <th>Description</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
+        <thead className="border-b bg-gray-50">
+          <tr>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Código</th>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Nombre</th>
+            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Descripción</th>
+            <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Estado</th>
+            <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Acciones</th>
+          </tr>
+        </thead>
 
-      <tbody>
+        <tbody>
 
-        {
-          careers.map((career) => (
+          {
+            careers.map((career) => (
 
-            <tr key={career.id}>
+              <tr key={career.id} className="border-b hover:bg-gray-50 transition">
 
-              <td>{career.name}</td>
+                <td className="px-6 py-4 text-sm text-gray-900 font-medium">{career.code}</td>
 
-              <td>{career.code}</td>
+                <td className="px-6 py-4 text-sm text-gray-900">{career.name}</td>
 
-              <td>{career.description}</td>
+                <td className="px-6 py-4 text-sm text-gray-600">{career.description || '-'}</td>
 
-              <td>
-                {
-                  career.is_active
-                    ? 'Active'
-                    : 'Inactive'
-                }
-              </td>
+                <td className="px-6 py-4 text-center">
+                  <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                    career.is_active
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {
+                      career.is_active
+                        ? 'Activo'
+                        : 'Inactivo'
+                    }
+                  </span>
+                </td>
 
-              <td>
+                <td className="px-6 py-4 text-center">
+                  <div className="flex justify-center gap-2">
+                    <button
+                      onClick={() => onEdit(career)}
+                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    >
+                      ✏️
+                    </button>
 
-                <button
-                  onClick={() => onEdit(career)}
-                >
-                  Edit
-                </button>
+                    <button
+                      onClick={() => onDelete(career.id)}
+                      className="text-red-600 hover:text-red-800 text-sm font-medium"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </td>
 
-                <button
-                  onClick={() => onDelete(career.id)}
-                >
-                  Delete
-                </button>
+              </tr>
+            ))
+          }
 
-              </td>
+        </tbody>
 
-            </tr>
-          ))
-        }
-
-      </tbody>
-
-    </table>
+      </table>
+    </div>
   )
 }

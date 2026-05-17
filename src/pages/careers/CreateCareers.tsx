@@ -24,7 +24,8 @@ const CreateCareer = () => {
     useState<CreateCareerDto>({
       name: '',
       code: '',
-      description: ''
+      description: '',
+      is_active: true
     })
 
   const handleChange = (

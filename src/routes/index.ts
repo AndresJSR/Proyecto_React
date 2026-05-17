@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import academicRoutes from './academicRoutes';
 
 const Calendar = lazy(() => import('../pages/Calendar'));
 const Chart = lazy(() => import('../pages/Chart'));
@@ -100,5 +101,5 @@ const coreRoutes = [
   }
 ];
 
-const routes = [...coreRoutes];
+const routes = [...coreRoutes, ...academicRoutes];
 export default routes;
