@@ -195,7 +195,41 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 }}
               </SidebarLinkGroup>
               {/* <!-- Menu Item Dashboard --> */}
-
+              <li>
+                <NavLink
+                  to="/users/list"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                    pathname.includes('users') && 'bg-graydark dark:bg-meta-4'
+                  }`}
+                >
+                  <svg
+                    className="fill-current"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M16 11C17.6569 11 19 9.65685 19 8C19 6.34315 17.6569 5 16 5C14.3431 5 13 6.34315 13 8C13 9.65685 14.3431 11 16 11Z"
+                      fill=""
+                    />
+                    <path
+                      d="M8 11C9.65685 11 11 9.65685 11 8C11 6.34315 9.65685 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65685 6.34315 11 8 11Z"
+                      fill=""
+                    />
+                    <path
+                      d="M8 13C5.23858 13 3 15.2386 3 18V19H13V18C13 15.2386 10.7614 13 8 13Z"
+                      fill=""
+                    />
+                    <path
+                      d="M16 13C15.3065 13 14.6462 13.1416 14.0466 13.3973C15.2596 14.4846 16 16.0625 16 18V19H21V18C21 15.2386 18.7614 13 16 13Z"
+                      fill=""
+                    />
+                  </svg>
+                  Usuarios
+                </NavLink>
+              </li>
               {/* <!-- Menu Item Calendar --> */}
               <li>
                 <NavLink
