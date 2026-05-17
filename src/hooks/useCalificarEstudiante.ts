@@ -4,7 +4,6 @@ import { Enrollment } from '../models/Enrollment';
 import { Evaluation } from '../models/Evaluation';
 import { Grade } from '../models/Grade';
 import { Rubric } from '../models/Rubric';
-import { Student } from '../models/Student';
 import { Criterion } from '../models/Criterion';
 import { Scale } from '../models/Scale';
 import {

@@ -433,6 +433,80 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Form Layout
                             </NavLink>
                           </li>
+                        </ul>
+                      </div>
+                      {/* <!-- Dropdown Menu End --> */}
+                    </React.Fragment>
+                  );
+                }}
+              </SidebarLinkGroup>
+              {/* <!-- Menu Item Forms --> */}
+
+              {/* <!-- Menu Item Rúbricas --> */}
+              <SidebarLinkGroup
+                activeCondition={
+                  pathname.includes('rubricas') || pathname.includes('asociar-rubrica')
+                }
+              >
+                {(handleClick, open) => {
+                  return (
+                    <React.Fragment>
+                      <NavLink
+                        to="#"
+                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                          (pathname.includes('rubricas') || pathname.includes('asociar-rubrica')) &&
+                          'bg-graydark dark:bg-meta-4'
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          sidebarExpanded
+                            ? handleClick()
+                            : setSidebarExpanded(true);
+                        }}
+                      >
+                        <svg
+                          className="fill-current"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 18 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3.25 2.75H14.75C15.4404 2.75 16 3.30964 16 4V14C16 14.6904 15.4404 15.25 14.75 15.25H3.25C2.55964 15.25 2 14.6904 2 14V4C2 3.30964 2.55964 2.75 3.25 2.75Z"
+                            stroke="currentColor"
+                            strokeWidth="1.4"
+                            strokeLinejoin="round"
+                          />
+                          <path d="M5.5 6.5H12.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                          <path d="M5.5 9H9.75" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                          <path d="M5.5 11.5H11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                        </svg>
+                        Rúbricas
+                        <svg
+                          className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
+                            open && 'rotate-180'
+                          }`}
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            clipRule="evenodd"
+                            d="M4.41107 6.9107C4.73651 6.58527 5.26414 6.58527 5.58958 6.9107L10.0003 11.3214L14.4111 6.91071C14.7365 6.58527 15.2641 6.58527 15.5896 6.91071C15.915 7.23614 15.915 7.76378 15.5896 8.08922L10.5896 13.0892C10.2641 13.4147 9.73651 13.4147 9.41107 13.0892L4.41107 8.08922C4.08563 7.76378 4.08563 7.23614 4.41107 6.9107Z"
+                            fill=""
+                          />
+                        </svg>
+                      </NavLink>
+                      <div
+                        className={`translate transform overflow-hidden ${
+                          !open && 'hidden'
+                        }`}
+                      >
+                        <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
                           <li>
                             <NavLink
                               to="/rubricas/create"
@@ -441,7 +515,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 (isActive && '!text-white')
                               }
                             >
-                              Crear Rúbrica
+                              Crear rúbrica
                             </NavLink>
                           </li>
                           <li>
@@ -452,43 +526,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 (isActive && '!text-white')
                               }
                             >
-                              <svg
-                                className="h-4 w-4 fill-current"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M5.5 4.5H14.5C15.3284 4.5 16 5.17157 16 6V14C16 14.8284 15.3284 15.5 14.5 15.5H5.5C4.67157 15.5 4 14.8284 4 14V6C4 5.17157 4.67157 4.5 5.5 4.5Z"
-                                  stroke="currentColor"
-                                  strokeWidth="1.4"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M7 8H13"
-                                  stroke="currentColor"
-                                  strokeWidth="1.4"
-                                  strokeLinecap="round"
-                                />
-                                <path
-                                  d="M7 11H11"
-                                  stroke="currentColor"
-                                  strokeWidth="1.4"
-                                  strokeLinecap="round"
-                                />
-                              </svg>
                               Asociar rúbrica
                             </NavLink>
                           </li>
                         </ul>
                       </div>
-                      {/* <!-- Dropdown Menu End --> */}
                     </React.Fragment>
                   );
                 }}
               </SidebarLinkGroup>
-              {/* <!-- Menu Item Forms --> */}
+              {/* <!-- Menu Item Rúbricas --> */}
 
               {/* <!-- Menu Item Tables --> */}
               <li>

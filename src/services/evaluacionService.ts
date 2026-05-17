@@ -44,20 +44,6 @@ const requestJson = async <T>(url: string, init: RequestInit): Promise<T> => {
   return body.data;
 };
 
-const requestVoid = async (url: string, init: RequestInit): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}${url}`, {
-    ...init,
-    headers: {
-      ...getAuthHeaders(),
-      ...(init.headers || {}),
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(await getErrorMessage(response));
-  }
-};
-
 export async function getEvaluations(): Promise<Evaluation[]> {
   return requestJson<Evaluation[]>('/api/evaluation/evaluations', {
     method: 'GET',
