@@ -253,6 +253,52 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </li>
               {/* <!-- Menu Item Profile --> */}
 
+              {/* <!-- Menu Item Calificaciones --> */}
+              <li>
+                <NavLink
+                  to="/evaluaciones"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                    pathname.includes('evaluaciones') && 'bg-graydark dark:bg-meta-4'
+                  }`}
+                >
+                  <svg
+                    className="fill-current"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 18 18"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M3.25 2.75H14.75C15.4404 2.75 16 3.30964 16 4V14C16 14.6904 15.4404 15.25 14.75 15.25H3.25C2.55964 15.25 2 14.6904 2 14V4C2 3.30964 2.55964 2.75 3.25 2.75Z"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M5.5 6.5H12.5"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M5.5 9H9.75"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M5.5 11.5H11"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  Calificaciones
+                </NavLink>
+              </li>
+              {/* <!-- Menu Item Calificaciones --> */}
+
               {/* <!-- Menu Item Forms --> */}
               <SidebarLinkGroup
                 activeCondition={

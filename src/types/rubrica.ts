@@ -37,6 +37,25 @@ export interface AsociarRubricaFormState {
   subject_id: string;
 }
 
+export interface GradeDetailPayload {
+  scale_id: string;
+  comment?: string;
+}
+
+export interface GradePayload {
+  enrollment_id: string;
+  rubric_id: string;
+  details: GradeDetailPayload[];
+  status: 'DRAFT' | 'SENT';
+  observations?: string;
+}
+
+export interface CriterionSelection {
+  criterion_id: string;
+  scale_id: string;
+  comment: string;
+}
+
 export interface Scale {
   id?: string;
   name?: string;
