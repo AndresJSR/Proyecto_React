@@ -69,15 +69,12 @@ export async function getSubjects(): Promise<Subject[]> {
 
 export async function createRubric(
   payload: RubricCreatePayload,
-  subject_id?: string
 ): Promise<{ id: string; title: string; description: string }> {
-  const body = { ...payload, subject_id };
-
   return requestJson<{ id: string; title: string; description: string }>(
     '/api/evaluation/rubrics',
     {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     }
   );
 }
@@ -119,4 +116,12 @@ export async function archivarRubrica(id: string | number): Promise<void> {
   await requestVoid(`/api/evaluation/rubrics/${id}/archive/`, {
     method: 'POST',
   });
+}
+
+export async function getRubricas(): Promise<{ id: string; title: string; description: string; is_public: boolean; is_archived: boolean; created_at: string }[]> {
+  return requestJson('/api/evaluation/rubrics', { method: 'GET' });
+}
+
+export async function getRubricaById(id: string): Promise<any> {
+  return requestJson(`/api/evaluation/rubrics/${id}`, { method: 'GET' });
 }

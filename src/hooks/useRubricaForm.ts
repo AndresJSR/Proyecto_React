@@ -88,56 +88,51 @@ const useRubricaForm = () => {
   const isPesoValido = totalPeso === 100;
   const canPublish = criterios.length > 0 && isPesoValido;
 
-  const persistRubric = async (publish: boolean) => {
-    setError(null);
+ const persistRubric = async (publish: boolean) => {
+  setError(null);
 
-    // Validar que se haya seleccionado asignatura
-    if (!formState.subject_id) {
-      const msg = 'Debes seleccionar una asignatura';
-      setError(msg);
-      throw new Error(msg);
-    }
+  if (!formState.title.trim()) {
+    const msg = 'El título de la rúbrica es obligatorio';
+    setError(msg);
+    throw new Error(msg);
+  }
 
-    // Validar suma de pesos al publicar
-    if (publish && !isPesoValido) {
-      const msg = 'La suma de los pesos debe ser exactamente 100% para publicar';
-      setError(msg);
-      throw new Error(msg);
-    }
+  if (publish && !isPesoValido) {
+    const msg = 'La suma de los pesos debe ser exactamente 100% para publicar';
+    setError(msg);
+    throw new Error(msg);
+  }
 
-    const rubric = await createRubric(
-      {
-        title: formState.title,
-        description: formState.description,
-      },
-      formState.subject_id
-    );
+  // El backend NO acepta subject_id en Rubric — solo title y description
+  const rubric = await createRubric({
+    title: formState.title,
+    description: formState.description,
+  });
 
-    // Crear criterios y sus escalas (si las tiene)
-    for (const criterio of criterios) {
-      const created = await createCriterion({
-        rubric_id: rubric.id,
-        name: criterio.name,
-        description: criterio.description,
-        weight: criterio.weight,
-      });
+  for (const criterio of criterios) {
+    const created = await createCriterion({
+      rubric_id: rubric.id,
+      name: criterio.name,
+      description: criterio.description,
+      weight: criterio.weight,
+    });
 
-      if (criterio.scales && criterio.scales.length > 0) {
-        for (const scale of criterio.scales) {
-          await createScale({
-            criterion_id: created.id,
-            name: scale.name || '',
-            description: scale.description,
-            value: scale.value,
-          });
-        }
+    if (criterio.scales && criterio.scales.length > 0) {
+      for (const scale of criterio.scales) {
+        await createScale({
+          criterion_id: created.id,
+          name: scale.name || '',
+          description: scale.description,
+          value: scale.value,
+        });
       }
     }
+  }
 
-    if (publish) {
-      await publishRubric(rubric.id);
-    }
-  };
+  if (publish) {
+    await publishRubric(rubric.id);
+  }
+};
 
   const handleGuardarBorrador = async () => {
     try {

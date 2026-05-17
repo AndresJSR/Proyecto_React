@@ -1,19 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumb';
 import RubricaStepper from '../../components/rubrica/RubricaStepper';
 import RubricaInfoSection from '../../components/rubrica/RubricaInfoSection';
 import RubricaCriteriosTable from '../../components/rubrica/RubricaCriteriosTable';
 import RubricaFooterActions from '../../components/rubrica/RubricaFooterActions';
+import RubricaRevision from '../../components/rubrica/RubricaRevision';
 import useRubricaForm from '../../hooks/useRubricaForm';
 import { getSubjects } from '../../services/rubricaService';
 import { Subject } from '../../types/rubrica';
+
+const STEPS = [
+  'Información',
+  'Criterios',
+  'Revisión',
+  'Publicar',
+];
 
 const RubricaCreatePage = () => {
   const navigate = useNavigate();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [subjectsLoading, setSubjectsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const {
     activeStep,
     setActiveStep,
@@ -34,53 +43,59 @@ const RubricaCreatePage = () => {
 
   useEffect(() => {
     let isMounted = true;
-
     const loadSubjects = async () => {
       try {
         const data = await getSubjects();
-
-        if (isMounted) {
-          setSubjects(data);
-        }
-      } catch (error) {
-        console.error('Error al cargar asignaturas:', error);
+        if (isMounted) setSubjects(data);
+      } catch (e) {
+        console.error('Error al cargar asignaturas:', e);
       } finally {
-        if (isMounted) {
-          setSubjectsLoading(false);
-        }
+        if (isMounted) setSubjectsLoading(false);
       }
     };
-
     loadSubjects();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, []);
 
   const handleRevisarContinuar = () => {
-    setActiveStep((prevStep) => Math.min(prevStep + 1, 3));
+    // Paso 0 → 1: validar info básica
+    if (activeStep === 0) {
+      if (!info.subject_id || !info.title.trim()) {
+        setError('Debes completar la asignatura y el título antes de continuar.');
+        return;
+      }
+    }
+    // Paso 1 → 2: validar criterios
+    if (activeStep === 1) {
+      if (criterios.length === 0) {
+        setError('Debes agregar al menos un criterio.');
+        return;
+      }
+      if (totalPeso !== 100) {
+        setError('La suma de los pesos debe ser exactamente 100% antes de continuar.');
+        return;
+      }
+    }
+    setError(null);
+    setActiveStep((prev) => Math.min(prev + 1, 3));
+  };
+
+  const handleBack = () => {
+    setError(null);
+    setActiveStep((prev) => Math.max(prev - 1, 0));
   };
 
   const handleSubmitGuardarBorrador = async () => {
     setIsSubmitting(true);
-
-    try {
-      await handleGuardarBorrador();
-    } finally {
-      setIsSubmitting(false);
-    }
+    try { await handleGuardarBorrador(); } finally { setIsSubmitting(false); }
   };
 
   const handleSubmitPublicar = async () => {
     setIsSubmitting(true);
-
-    try {
-      await handlePublicar();
-    } finally {
-      setIsSubmitting(false);
-    }
+    try { await handlePublicar(); } finally { setIsSubmitting(false); }
   };
+
+  const selectedSubject = subjects.find((s) => s.id === info.subject_id);
 
   return (
     <div className="space-y-6 px-4 pb-6 sm:px-6 lg:px-8">
@@ -96,39 +111,63 @@ const RubricaCreatePage = () => {
       </div>
 
       <div className="space-y-6">
-        <RubricaStepper
-          activeStep={activeStep}
-          steps={['Información de la rúbrica', 'Criterios', 'Revisión', 'Publicar o guardar']}
-        />
+        <RubricaStepper activeStep={activeStep} steps={STEPS} />
 
-        <RubricaInfoSection
-          info={info}
-          onChange={handleInfoChange}
-          subjects={subjects}
-          subjectsLoading={subjectsLoading}
-        />
-
-        {error !== null && (
+        {/* Alerta de error */}
+        {error && (
           <div className="flex items-center justify-between rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-500/40 dark:bg-red-950/30 dark:text-red-200">
             <span>{error}</span>
             <button
               type="button"
               onClick={() => setError(null)}
               className="ml-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-lg font-semibold transition hover:bg-red-100 dark:hover:bg-red-900/40"
-              aria-label="Cerrar alerta"
             >
               ×
             </button>
           </div>
         )}
 
-        <RubricaCriteriosTable
-          criterios={criterios}
-          onUpdate={updateCriterio}
-          onDelete={deleteCriterio}
-          onAdd={addCriterio}
-          onMove={moveCriterio}
-        />
+        {/* PASO 0 — Información */}
+        {activeStep === 0 && (
+          <RubricaInfoSection
+            info={info}
+            onChange={handleInfoChange}
+            subjects={subjects}
+            subjectsLoading={subjectsLoading}
+          />
+        )}
+
+        {/* PASO 1 — Criterios */}
+        {activeStep === 1 && (
+          <RubricaCriteriosTable
+            criterios={criterios}
+            onUpdate={updateCriterio}
+            onDelete={deleteCriterio}
+            onAdd={addCriterio}
+            onMove={moveCriterio}
+          />
+        )}
+
+        {/* PASO 2 — Revisión */}
+        {activeStep === 2 && (
+          <RubricaRevision
+            info={info}
+            criterios={criterios}
+            totalPeso={totalPeso}
+            selectedSubject={selectedSubject}
+          />
+        )}
+
+        {/* PASO 3 — Publicar o guardar */}
+        {activeStep === 3 && (
+          <RubricaRevision
+            info={info}
+            criterios={criterios}
+            totalPeso={totalPeso}
+            selectedSubject={selectedSubject}
+            publishMode
+          />
+        )}
 
         <RubricaFooterActions
           totalPeso={totalPeso}
@@ -136,6 +175,7 @@ const RubricaCreatePage = () => {
           activeStep={activeStep}
           isSubmitting={isSubmitting}
           onCancel={() => navigate(-1)}
+          onBack={handleBack}
           onGuardarBorrador={handleSubmitGuardarBorrador}
           onPublicar={handleSubmitPublicar}
           onRevisarContinuar={handleRevisarContinuar}

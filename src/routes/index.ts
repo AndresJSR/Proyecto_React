@@ -15,6 +15,7 @@ const Buttons = lazy(() => import('../pages/UiElements/Buttons'));
 const Demo = lazy(() => import('../pages/Demo'));
 const ImageEditor = lazy(() => import('../pages/ImageEditor'));
 const RubricaCreate = lazy(() => import('../pages/Rubricas/Create'));
+const MisRubricas = lazy(() => import('../pages/Rubricas/MisRubricas'));
 const Evaluaciones = lazy(() => import('../pages/Evaluaciones/Index'));
 const AsociarRubrica = lazy(() => import('../pages/Evaluaciones/AsociarRubrica'));
 const CalificarEstudiante = lazy(() => import('../pages/Evaluaciones/CalificarEstudiante'));
@@ -142,6 +143,11 @@ const coreRoutes = [
     path: '/image-editor',
     title: 'Image Editor',
     component: ImageEditor,
+  },
+  {
+    path: '/rubricas/mis-rubricas',
+    title: 'Mis Rúbricas',
+    component: MisRubricas,
   },
 ];
 
