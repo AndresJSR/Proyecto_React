@@ -14,6 +14,11 @@ const Alerts = lazy(() => import('../pages/UiElements/Alerts'));
 const Buttons = lazy(() => import('../pages/UiElements/Buttons'));
 const Demo = lazy(() => import('../pages/Demo'));
 const ImageEditor = lazy(() => import('../pages/ImageEditor'));
+const RubricaCreate = lazy(() => import('../pages/Rubricas/Create'));
+const MisRubricas = lazy(() => import('../pages/Rubricas/MisRubricas'));
+const Evaluaciones = lazy(() => import('../pages/Evaluaciones/Index'));
+const AsociarRubrica = lazy(() => import('../pages/Evaluaciones/AsociarRubrica'));
+const CalificarEstudiante = lazy(() => import('../pages/Evaluaciones/CalificarEstudiante'));
 const UserList = lazy(() => import('../pages/Users/ListUsers'));
 const UserCreate = lazy(() => import('../pages/Users/Create'));
 const UserUpdate = lazy(() => import('../pages/Users/Update'));
@@ -115,9 +120,34 @@ const coreRoutes = [
     component: Buttons,
   },
   {
+    path: '/rubricas/create',
+    title: 'Crear Rúbrica',
+    component: RubricaCreate,
+  },
+  {
+    path: '/evaluaciones',
+    title: 'Evaluaciones',
+    component: Evaluaciones,
+  },
+  {
+    path: '/evaluaciones/asociar-rubrica',
+    title: 'Asociar Rúbrica',
+    component: AsociarRubrica,
+  },
+  {
+    path: '/evaluaciones/:evaluationId/:groupId/calificar',
+    title: 'Calificar Estudiante',
+    component: CalificarEstudiante,
+  },
+  {
     path: '/image-editor',
     title: 'Image Editor',
     component: ImageEditor,
+  },
+  {
+    path: '/rubricas/mis-rubricas',
+    title: 'Mis Rúbricas',
+    component: MisRubricas,
   },
 ];
 
