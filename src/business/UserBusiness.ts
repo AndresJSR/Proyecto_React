@@ -1,3 +1,4 @@
+import { UserFormValues } from '../components/users/UserFormValidator';
 import { User } from '../models/User';
 import { UserRole } from '../models/UserRole';
 
@@ -9,7 +10,8 @@ export interface UserTableRow {
   role?: string;
   status?: string;
   created_at?: string;
-  //career?:string;
+  is_active?: boolean;
+  career?: string;
 }
 
 class UserBusiness {
@@ -32,13 +34,10 @@ class UserBusiness {
     switch (role) {
       case UserRole.ADMIN:
         return 'Administrador';
-
       case UserRole.TEACHER:
         return 'Docente';
-
       case UserRole.STUDENT:
         return 'Estudiante';
-
       default:
         return 'Desconocido';
     }
@@ -50,8 +49,15 @@ class UserBusiness {
 
   formatUserCreatedAt(date?: string): string {
     if (!date) return '';
-
     return new Date(date).toLocaleDateString();
+  }
+
+  getUserCareer(user: User): string {
+    if (user.role !== UserRole.STUDENT) {
+      return 'No aplica';
+    }
+
+    return 'No disponible';
   }
 
   mapUserToTableRow(user: User): UserTableRow {
@@ -60,15 +66,65 @@ class UserBusiness {
       code: user.code,
       name: this.getUserFullName(user),
       email: user.email,
-      //career: 
+      career: this.getUserCareer(user),
       role: this.getUserRoleLabel(user.role),
       status: this.getUserStatusLabel(user),
+      is_active: user.is_active,
       created_at: this.formatUserCreatedAt(user.created_at),
     };
   }
 
   mapUsersToTableRows(users: User[]): UserTableRow[] {
     return users.map((user) => this.mapUserToTableRow(user));
+  }
+
+  buildUpdateUserPayload(values: UserFormValues) {
+    const payload: Record<string, any> = {
+      email: values.email,
+      code: values.code,
+      role: values.role,
+      is_active: values.is_active,
+    };
+
+    if (values.password) {
+      payload.password = values.password;
+    }
+
+    if (values.role === UserRole.TEACHER || values.role === UserRole.STUDENT) {
+      payload.first_name = values.first_name;
+      payload.last_name = values.last_name;
+      payload.identification = values.identification;
+    }
+
+    if (values.role === UserRole.TEACHER) {
+      payload.phone = values.phone;
+      payload.specialty = values.specialty;
+    }
+
+    return payload;
+  }
+
+  buildCreateUserPayload(values: UserFormValues) {
+    const payload: Record<string, any> = {
+      email: values.email,
+      password: values.password,
+      code: values.code,
+      role: values.role,
+      is_active: values.is_active,
+    };
+
+    if (values.role === UserRole.TEACHER || values.role === UserRole.STUDENT) {
+      payload.first_name = values.first_name;
+      payload.last_name = values.last_name;
+      payload.identification = values.identification;
+    }
+
+    if (values.role === UserRole.TEACHER) {
+      payload.phone = values.phone;
+      payload.specialty = values.specialty;
+    }
+
+    return payload;
   }
 }
 
