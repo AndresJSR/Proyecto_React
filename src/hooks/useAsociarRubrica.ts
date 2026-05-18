@@ -1,16 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import fireToast from './fireToast';
-import { associateRubric, getEvaluations, getPublishedRubrics, getSubjects } from '../services/evaluacionService';
+import { getEvaluations, getPublishedRubrics, getSubjects } from '../services/evaluacionService';
 import { Evaluation } from '../models/Evaluation';
 import { Rubric } from '../models/Rubric';
 import { Subject } from '../models/Subject';
 import { AsociarRubricaFormState } from '../types/rubrica';
-
-const initialFormState: AsociarRubricaFormState = {
-  evaluation_id: '',
-  rubric_id: '',
-  subject_id: '',
-};
+import {
+  INITIAL_ASOCIAR_FORM,
+  ejecutarAsociacion,
+  validarAsociacion,
+} from '../business/RubricaBusiness';
 
 const useAsociarRubrica = () => {
   const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
@@ -20,7 +19,7 @@ const useAsociarRubrica = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(0);
-  const [formState, setFormState] = useState<AsociarRubricaFormState>(initialFormState);
+  const [formState, setFormState] = useState<AsociarRubricaFormState>(INITIAL_ASOCIAR_FORM);
 
   useEffect(() => {
     let isMounted = true;
@@ -47,83 +46,63 @@ const useAsociarRubrica = () => {
         }
       } catch (loadError) {
         if (isMounted) {
-          const message = loadError instanceof Error ? loadError.message : 'Error al cargar los datos.';
-          setError(message);
+          setError(loadError instanceof Error ? loadError.message : 'Error al cargar los datos.');
         }
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     };
 
     loadData();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, []);
 
   const selectedEvaluation = useMemo(
-    () => evaluations.find((evaluation) => evaluation.id === formState.evaluation_id),
-    [evaluations, formState.evaluation_id]
+    () => evaluations.find((e) => e.id === formState.evaluation_id),
+    [evaluations, formState.evaluation_id],
   );
 
   const selectedRubric = useMemo(
-    () => rubrics.find((rubric) => rubric.id === formState.rubric_id),
-    [rubrics, formState.rubric_id]
+    () => rubrics.find((r) => r.id === formState.rubric_id),
+    [rubrics, formState.rubric_id],
   );
 
   const selectedSubject = useMemo(
-    () => subjects.find((subject) => subject.id === formState.subject_id),
-    [subjects, formState.subject_id]
+    () => subjects.find((s) => s.id === formState.subject_id),
+    [subjects, formState.subject_id],
   );
 
   const canConfirm = Boolean(
-    formState.evaluation_id && formState.rubric_id && formState.subject_id
+    formState.evaluation_id && formState.rubric_id && formState.subject_id,
   );
 
-  const handleSelectEvaluation = (id: string) => {
-    setFormState((prevState) => ({
-      ...prevState,
-      evaluation_id: id,
-    }));
-  };
+  const handleSelectEvaluation = (id: string) =>
+    setFormState((prev) => ({ ...prev, evaluation_id: id }));
 
-  const handleSelectRubric = (id: string) => {
-    setFormState((prevState) => ({
-      ...prevState,
-      rubric_id: id,
-    }));
-  };
+  const handleSelectRubric = (id: string) =>
+    setFormState((prev) => ({ ...prev, rubric_id: id }));
 
-  const handleSelectSubject = (id: string) => {
-    setFormState((prevState) => ({
-      ...prevState,
-      subject_id: id,
-    }));
-  };
+  const handleSelectSubject = (id: string) =>
+    setFormState((prev) => ({ ...prev, subject_id: id }));
 
-  const handleNextStep = () => {
-    setActiveStep((prevStep) => Math.min(prevStep + 1, 2));
-  };
+  const handleNextStep = () =>
+    setActiveStep((prev) => Math.min(prev + 1, 2));
 
-  const handlePrevStep = () => {
-    setActiveStep((prevStep) => Math.max(prevStep - 1, 0));
-  };
+  const handlePrevStep = () =>
+    setActiveStep((prev) => Math.max(prev - 1, 0));
 
   const handleConfirm = async () => {
-    if (!canConfirm) {
-      const msg = 'Debes seleccionar una evaluación, una rúbrica y una asignatura.';
-      setError(msg);
-      throw new Error(msg);
+    const validationError = validarAsociacion(formState);
+    if (validationError) {
+      setError(validationError);
+      throw new Error(validationError);
     }
 
     setIsSubmitting(true);
     setError(null);
 
     try {
-      await associateRubric(formState.evaluation_id, formState.rubric_id);
+      await ejecutarAsociacion(formState);
       fireToast();
     } catch (confirmError) {
       const message =

@@ -5,16 +5,23 @@ import { Evaluation } from '../models/Evaluation';
 import { Grade } from '../models/Grade';
 import { Rubric } from '../models/Rubric';
 import { Criterion } from '../models/Criterion';
-import { Scale } from '../models/Scale';
+import { GradeDetail } from '../models/GradeDetail';
+import { CriterionSelection } from '../types/rubrica';
 import {
   getEnrollmentsByGroup,
   getEvaluation,
   getGradeByEnrollmentAndRubric,
   getRubricWithCriteria,
-  saveGrade,
 } from '../services/calificacionService';
-import { CriterionSelection, GradeDetailPayload, GradePayload } from '../types/rubrica';
-import { GradeDetail } from '../models/GradeDetail';
+import {
+  ScaleMap,
+  buildGradePayload,
+  buildScaleMap,
+  calcularPuntajeTotal,
+  contarProgreso,
+  ejecutarGuardarCalificacion,
+  todosLosCriteriosSeleccionados,
+} from '../business/RubricaBusiness';
 
 type GradeWithDetails = Grade & { details?: GradeDetail[] };
 
@@ -35,6 +42,7 @@ const useCalificarEstudiante = ({ evaluationId, groupId }: UseCalificarEstudiant
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // ── Carga inicial ──────────────────────────────────────────────────────────
   useEffect(() => {
     let isMounted = true;
 
@@ -54,6 +62,10 @@ const useCalificarEstudiante = ({ evaluationId, groupId }: UseCalificarEstudiant
 
         const rubricData = await getRubricWithCriteria(evaluationData.rubric_id);
 
+        if (!enrollmentsData.length) {
+          throw new Error('No hay estudiantes inscritos en este grupo.');
+        }
+
         if (isMounted) {
           setEnrollments(enrollmentsData);
           setEvaluation(evaluationData);
@@ -62,88 +74,42 @@ const useCalificarEstudiante = ({ evaluationId, groupId }: UseCalificarEstudiant
           setActiveStep(0);
           setGradeStatus(null);
         }
-
-        if (!enrollmentsData.length) {
-          throw new Error('No hay estudiantes inscritos en este grupo.');
-        }
       } catch (loadError) {
         if (isMounted) {
-          const message = loadError instanceof Error ? loadError.message : 'Error al cargar los datos.';
-          setError(message);
+          setError(loadError instanceof Error ? loadError.message : 'Error al cargar los datos.');
         }
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     };
 
     loadInitialData();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [evaluationId, groupId]);
 
-  const currentEnrollment = useMemo(
-    () => enrollments[currentIndex],
-    [enrollments, currentIndex]
+  // ── Derivados ──────────────────────────────────────────────────────────────
+  const currentEnrollment = useMemo(() => enrollments[currentIndex], [enrollments, currentIndex]);
+  const currentStudent = useMemo(() => currentEnrollment?.student, [currentEnrollment]);
+  const criteria: Criterion[] = useMemo(() => rubric?.criteria || [], [rubric]);
+
+  const scaleMap: ScaleMap = useMemo(() => buildScaleMap(criteria), [criteria]);
+
+  const totalScore = useMemo(
+    () => calcularPuntajeTotal(criteria, selections, scaleMap),
+    [criteria, selections, scaleMap],
   );
 
-  const currentStudent = useMemo(
-    () => currentEnrollment?.student,
-    [currentEnrollment]
+  const allCriteriaSelected = useMemo(
+    () => todosLosCriteriosSeleccionados(criteria, selections),
+    [criteria, selections],
   );
 
-  const criteria = useMemo(() => rubric?.criteria || [], [rubric]);
+  const progressCount = useMemo(
+    () => contarProgreso(criteria, selections),
+    [criteria, selections],
+  );
 
-  const scaleMap = useMemo(() => {
-    const map = new Map<string, { criterion: Criterion; scale: Scale }>();
-
-    for (const criterion of criteria) {
-      for (const scale of criterion.scales || []) {
-        if (scale.id) {
-          map.set(scale.id, { criterion, scale });
-        }
-      }
-    }
-
-    return map;
-  }, [criteria]);
-
-  const totalScore = useMemo(() => {
-    return criteria.reduce((accumulator, criterion) => {
-      const selection = selections[criterion.id || ''];
-
-      if (!selection?.scale_id) {
-        return accumulator;
-      }
-
-      const selectedScale = scaleMap.get(selection.scale_id)?.scale;
-      const scaleValue = selectedScale?.value ?? 0;
-      const criterionWeight = criterion.weight ?? 0;
-
-      return accumulator + (scaleValue * criterionWeight) / 100;
-    }, 0);
-  }, [criteria, selections, scaleMap]);
-
-  const allCriteriaSelected = useMemo(() => {
-    if (!criteria.length) {
-      return false;
-    }
-
-    return criteria.every((criterion) => Boolean(selections[criterion.id || '']?.scale_id));
-  }, [criteria, selections]);
-
-  const progressCount = useMemo(() => {
-    const done = criteria.filter((criterion) => Boolean(selections[criterion.id || '']?.scale_id)).length;
-
-    return {
-      done,
-      total: criteria.length,
-    };
-  }, [criteria, selections]);
-
+  // ── Carga de calificación del estudiante actual ────────────────────────────
   useEffect(() => {
     let isMounted = true;
 
@@ -162,12 +128,10 @@ const useCalificarEstudiante = ({ evaluationId, groupId }: UseCalificarEstudiant
 
         const grade = (await getGradeByEnrollmentAndRubric(
           currentEnrollment.id,
-          rubric.id
+          rubric.id,
         )) as GradeWithDetails | null;
 
-        if (!isMounted) {
-          return;
-        }
+        if (!isMounted) return;
 
         if (!grade?.details?.length) {
           setGradeStatus(grade?.status === 'SENT' ? 'SENT' : 'DRAFT');
@@ -177,17 +141,11 @@ const useCalificarEstudiante = ({ evaluationId, groupId }: UseCalificarEstudiant
         const nextSelections: Record<string, CriterionSelection> = {};
 
         for (const detail of grade.details) {
-          if (!detail.scale_id) {
-            continue;
-          }
+          if (!detail.scale_id) continue;
 
           const scaleMatch = scaleMap.get(detail.scale_id);
-
-          if (!scaleMatch?.criterion.id) {
-            continue;
-          }
-
-          const criterionId = scaleMatch.criterion.id;
+          const criterionId = scaleMatch?.criterion.id;
+          if (!criterionId) continue;
 
           nextSelections[criterionId] = {
             criterion_id: criterionId,
@@ -200,77 +158,63 @@ const useCalificarEstudiante = ({ evaluationId, groupId }: UseCalificarEstudiant
         setGradeStatus(grade.status === 'SENT' ? 'SENT' : 'DRAFT');
       } catch (loadError) {
         if (isMounted) {
-          const message = loadError instanceof Error ? loadError.message : 'Error al cargar la calificación.';
-          setError(message);
+          setError(
+            loadError instanceof Error ? loadError.message : 'Error al cargar la calificación.',
+          );
         }
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     };
 
     loadCurrentGrade();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [currentEnrollment?.id, rubric?.id, scaleMap]);
 
+  // ── Handlers UI ───────────────────────────────────────────────────────────
   const handleSelectScale = (criterionId: string, scaleId: string) => {
-    setSelections((prevSelections) => ({
-      ...prevSelections,
+    setSelections((prev) => ({
+      ...prev,
       [criterionId]: {
         criterion_id: criterionId,
         scale_id: scaleId,
-        comment: prevSelections[criterionId]?.comment || '',
+        comment: prev[criterionId]?.comment || '',
       },
     }));
   };
 
   const handleCommentChange = (criterionId: string, comment: string) => {
-    setSelections((prevSelections) => ({
-      ...prevSelections,
+    setSelections((prev) => ({
+      ...prev,
       [criterionId]: {
         criterion_id: criterionId,
-        scale_id: prevSelections[criterionId]?.scale_id || '',
+        scale_id: prev[criterionId]?.scale_id || '',
         comment,
       },
     }));
   };
 
-  const handlePrevStudent = () => {
-    setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-  };
+  const handlePrevStudent = () =>
+    setCurrentIndex((prev) => Math.max(prev - 1, 0));
 
-  const handleNextStudent = () => {
-    setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, Math.max(enrollments.length - 1, 0)));
-  };
+  const handleNextStudent = () =>
+    setCurrentIndex((prev) => Math.min(prev + 1, Math.max(enrollments.length - 1, 0)));
 
-  const buildGradeDetails = (): GradeDetailPayload[] => {
-    return criteria
-      .map((criterion) => selections[criterion.id || ''])
-      .filter((selection): selection is CriterionSelection => Boolean(selection?.scale_id))
-      .map((selection) => ({
-        scale_id: selection.scale_id,
-        comment: selection.comment?.trim() ? selection.comment : undefined,
-      }));
-  };
-
+  // ── Persistencia ──────────────────────────────────────────────────────────
   const persistGrade = async (status: 'DRAFT' | 'SENT') => {
     if (!currentEnrollment?.id || !rubric?.id) {
       throw new Error('No se pudo determinar la evaluación actual.');
     }
 
-    const payload: GradePayload = {
-      enrollment_id: currentEnrollment.id,
-      rubric_id: rubric.id,
-      details: buildGradeDetails(),
+    const payload = buildGradePayload(
+      currentEnrollment.id,
+      rubric.id,
+      criteria,
+      selections,
       status,
-      observations: undefined,
-    };
+    );
 
-    return saveGrade(payload);
+    return ejecutarGuardarCalificacion(payload);
   };
 
   const handleSaveDraft = async () => {
@@ -281,11 +225,11 @@ const useCalificarEstudiante = ({ evaluationId, groupId }: UseCalificarEstudiant
       await persistGrade('DRAFT');
       setGradeStatus('DRAFT');
       toast.success('Calificación guardada como borrador.');
-    } catch (saveError) {
-      const message = saveError instanceof Error ? saveError.message : 'No se pudo guardar el borrador.';
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'No se pudo guardar el borrador.';
       setError(message);
       toast.error(message);
-      throw saveError;
+      throw err;
     } finally {
       setIsSubmitting(false);
     }
@@ -306,11 +250,11 @@ const useCalificarEstudiante = ({ evaluationId, groupId }: UseCalificarEstudiant
       await persistGrade('SENT');
       setGradeStatus('SENT');
       toast.success('Calificación enviada correctamente.');
-    } catch (sendError) {
-      const message = sendError instanceof Error ? sendError.message : 'No se pudo enviar la calificación.';
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'No se pudo enviar la calificación.';
       setError(message);
       toast.error(message);
-      throw sendError;
+      throw err;
     } finally {
       setIsSubmitting(false);
     }
