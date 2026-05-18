@@ -3,6 +3,7 @@ import { UserRole } from '../models/UserRole';
 import DeactivateUser from '../pages/Users/DeactivateUser';
 import ViewUserPage from '../pages/Users/ViewUser';
 
+
 const Calendar = lazy(() => import('../pages/Calendar'));
 const Chart = lazy(() => import('../pages/Chart'));
 const FormElements = lazy(() => import('../pages/Form/FormElements'));
