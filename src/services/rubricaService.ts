@@ -1,10 +1,10 @@
-import { api } from '../interceptors/authInterceptor';
 import {
   CriterionCreatePayload,
   RubricCreatePayload,
   RubricCriterio,
   Subject,
 } from '../types/rubrica';
+import { api } from '../interceptors/authInterceptor';
 
 interface ApiResponse<T> {
   data: T;
@@ -17,11 +17,11 @@ export async function getSubjects(): Promise<Subject[]> {
 }
 
 export async function createRubric(
-  payload: RubricCreatePayload,
+  payload: RubricCreatePayload
 ): Promise<{ id: string; title: string; description: string }> {
   const response = await api.post<ApiResponse<{ id: string; title: string; description: string }>>(
     '/api/evaluation/rubrics',
-    payload,
+    payload
   );
   return response.data.data;
 }
@@ -29,7 +29,7 @@ export async function createRubric(
 export async function createCriterion(payload: CriterionCreatePayload): Promise<RubricCriterio> {
   const response = await api.post<ApiResponse<RubricCriterio>>(
     '/api/evaluation/criteria',
-    payload,
+    payload
   );
   return response.data.data;
 }
@@ -51,11 +51,11 @@ export async function publishRubric(rubricId: string): Promise<void> {
 }
 
 export async function deleteRubrica(id: string | number): Promise<void> {
-  await api.delete(`/api/evaluation/rubrics/${id}/`);
+  await api.delete(`/api/evaluation/rubrics/${id}`);
 }
 
 export async function archivarRubrica(id: string | number): Promise<void> {
-  await api.post(`/api/evaluation/rubrics/${id}/archive/`);
+  await api.put(`/api/evaluation/rubrics/${id}`, { is_archived: true });
 }
 
 export async function getRubricas(): Promise<{
