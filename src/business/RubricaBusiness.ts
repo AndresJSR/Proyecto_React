@@ -1,15 +1,18 @@
 import { Rubric } from '../models/Rubric';
 import { Group } from '../models/Group';
 import { Evaluation } from '../models/Evaluation';
-import { RubricCriterio, RubricFormState } from '../types/rubrica';
+import { Criterion } from '../models/Criterion';
+import { Scale } from '../models/Scale';
+import { RubricCriterio, RubricFormState, GradePayload, CriterionSelection } from '../types/rubrica';
 import {
   createCriterion,
   createRubric,
   createScale,
   publishRubric,
 } from '../services/rubricaService';
+import { saveGrade } from '../services/calificacionService';
 
-// ─── Constantes iniciales ────────────────────────────────────────────────────
+// ─── Constantes iniciales ─────────────────────────────────────────────────────
 
 export const INITIAL_CRITERIOS: RubricCriterio[] = [
   { id: Date.now().toString() + '-1', name: 'Funcionalidad',        description: '', weight: 40 },
@@ -25,7 +28,7 @@ export const INITIAL_RUBRICA_FORM: RubricFormState = {
   criterios: [],
 };
 
-// ─── Funciones puras ─────────────────────────────────────────────────────────
+// ─── Funciones puras — formulario de rúbrica ──────────────────────────────────
 
 export const buildNewCriterio = (): RubricCriterio => ({
   id: Date.now().toString(),
@@ -60,9 +63,7 @@ export const moveCriterioInList = (
   return next;
 };
 
-export const validarRubricaParaGuardar = (
-  form: RubricFormState
-): string | null => {
+export const validarRubricaParaGuardar = (form: RubricFormState): string | null => {
   if (!form.subject_id) return 'Debes seleccionar una asignatura';
   if (!form.title?.trim()) return 'El título de la rúbrica es obligatorio';
   return null;
@@ -74,9 +75,9 @@ export const validarRubricaParaPublicar = (
 ): string | null => {
   const errorBase = validarRubricaParaGuardar(form);
   if (errorBase) return errorBase;
+  if (criterios.length === 0) return 'Debes agregar al menos un criterio';
   if (!isPesoValido(criterios))
     return 'La suma de los pesos debe ser exactamente 100% para publicar';
-  if (criterios.length === 0) return 'Debes agregar al menos un criterio';
   return null;
 };
 
@@ -85,10 +86,11 @@ export const persistRubric = async (
   criterios: RubricCriterio[],
   publish: boolean
 ): Promise<void> => {
-    const rubric = await createRubric({
+  const rubric = await createRubric({
     title: form.title,
     description: form.description,
-    });
+  });
+
   for (const criterio of criterios) {
     const created = await createCriterion({
       rubric_id: rubric.id,
@@ -114,7 +116,71 @@ export const persistRubric = async (
   }
 };
 
-// ─── Clase con lógica de filtrado por profesor ───────────────────────────────
+// ─── Tipos y funciones para calificación ─────────────────────────────────────
+
+export type ScaleMap = Map<string, { scale: Scale; criterion: Criterion }>;
+
+export const buildScaleMap = (criteria: Criterion[]): ScaleMap => {
+  const map: ScaleMap = new Map();
+  for (const criterion of criteria) {
+    for (const scale of criterion.scales || []) {
+      if (scale.id) {
+        map.set(scale.id, { scale, criterion });
+      }
+    }
+  }
+  return map;
+};
+
+export const calcularPuntajeTotal = (
+  criteria: Criterion[],
+  selections: Record<string, CriterionSelection>,
+  scaleMap: ScaleMap
+): number => {
+  let total = 0;
+  for (const criterion of criteria) {
+    const sel = selections[criterion.id || ''];
+    if (!sel?.scale_id) continue;
+    const entry = scaleMap.get(sel.scale_id);
+    if (entry) {
+      total += (entry.scale.value ?? 0) * ((criterion.weight ?? 0) / 100);
+    }
+  }
+  return Math.round(total * 100) / 100;
+};
+
+export const todosLosCriteriosSeleccionados = (
+  criteria: Criterion[],
+  selections: Record<string, CriterionSelection>
+): boolean => criteria.every((c) => c.id && selections[c.id]?.scale_id);
+
+export const contarProgreso = (
+  criteria: Criterion[],
+  selections: Record<string, CriterionSelection>
+): number => criteria.filter((c) => c.id && selections[c.id]?.scale_id).length;
+
+export const buildGradePayload = (
+  enrollmentId: string,
+  rubricId: string,
+  criteria: Criterion[],
+  selections: Record<string, CriterionSelection>,
+  status: 'DRAFT' | 'SENT'
+): GradePayload => ({
+  enrollment_id: enrollmentId,
+  rubric_id: rubricId,
+  status,
+  details: criteria
+    .filter((c) => c.id && selections[c.id]?.scale_id)
+    .map((c) => ({
+      scale_id: selections[c.id!].scale_id,
+      comment: selections[c.id!].comment || undefined,
+    })),
+});
+
+export const ejecutarGuardarCalificacion = async (payload: GradePayload) =>
+  saveGrade(payload);
+
+// ─── Clase con lógica de filtrado por profesor ────────────────────────────────
 
 class RubricaBusiness {
   filtrarRubricasDelProfesor(
