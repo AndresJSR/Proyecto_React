@@ -35,6 +35,7 @@ const ListStudyPlans = lazy(() => import('../pages/StudyPlan/ListStudyPlan'));
 const CreateStudyPlan = lazy(() => import('../pages/StudyPlan/CreateStudyPlan'));
 const StudyPlanDashboard = lazy(() => import('../pages/StudyPlan/StudyPlanDashboardPage'));
 const StudyPlanVersions = lazy(() => import('../pages/StudyPlan/VersionHistory'));
+const PlanEstudios = lazy(() => import('../pages/PlanEstudios/PlanEstudios'));
 const AcademicPage = lazy(() => import('../pages/Academic'));
 const ListRegistrations = lazy(() => import('../pages/Registration/ListRegistration'));
 const CreateRegistration = lazy(() => import('../pages/Registration/CreateRegistration'));
@@ -235,6 +236,12 @@ const routes = [
     path: '/admin/plan-estudios',
     title: 'Plan de Estudios',
     component: StudyPlanDashboard,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/plan-estudios',
+    title: 'Plan de estudios',
+    component: PlanEstudios,
     allowedRoles: ADMIN,
   },
   {
