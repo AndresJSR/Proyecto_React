@@ -1,36 +1,45 @@
-import CardFour from '../../components/CardFour.tsx';
-import CardOne from '../../components/CardOne.tsx';
-import CardThree from '../../components/CardThree.tsx';
-import CardTwo from '../../components/CardTwo.tsx';
-import ChartOne from '../../components/ChartOne.tsx';
-import ChartThree from '../../components/ChartThree.tsx';
-import ChartTwo from '../../components/ChartTwo.tsx';
-import ChatCard from '../../components/ChatCard.tsx';
-import MapOne from '../../components/MapOne.tsx';
-import TableOne from '../../components/TableOne.tsx';
+import Breadcrumb from '../../components/Breadcrumb.tsx'
+import CardFour from '../../components/CardFour.tsx'
+import CardOne from '../../components/CardOne.tsx'
+import CardThree from '../../components/CardThree.tsx'
+import CardTwo from '../../components/CardTwo.tsx'
+import ChartFour from '../../components/ChartFour.tsx'
+import ChartOne from '../../components/ChartOne.tsx'
+import ChartThree from '../../components/ChartThree.tsx'
+import ChartTwo from '../../components/ChartTwo.tsx'
 
 const ECommerce = () => {
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-        <CardOne />
-        <CardTwo />
-        <CardThree />
-        <CardFour />
+      <Breadcrumb pageName="Dashboard" />
+
+      <div className="grid grid-cols-12 gap-4 md:gap-6 2xl:gap-7.5">
+        <div className="col-span-12 xl:col-span-3">
+          <CardOne />
+        </div>
+        <div className="col-span-12 xl:col-span-3">
+          <CardTwo />
+        </div>
+        <div className="col-span-12 xl:col-span-3">
+          <CardFour />
+        </div>
+        <div className="col-span-12 xl:col-span-3">
+          <CardThree />
+        </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
-        <ChartOne />
-        <ChartTwo />
-        <ChartThree />
-        <MapOne />
+      <div className="grid grid-cols-12 gap-4 md:gap-6 2xl:gap-7.5 mt-4">
         <div className="col-span-12 xl:col-span-8">
-          <TableOne />
+          <ChartFour />
         </div>
-        <ChatCard />
+        <div className="col-span-12 xl:col-span-4 grid gap-4">
+          <ChartOne />
+          <ChartTwo />
+          <ChartThree />
+        </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default ECommerce;
+export default ECommerce

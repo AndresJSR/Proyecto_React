@@ -1,25 +1,55 @@
-import { Teacher } from './Teacher';
-import { Subject } from './Subject';
-import { Semester } from './Semester';
-import { Enrollment } from './Enrollment';
-import { Evaluation } from './Evaluation';
+//mi version darling
+import { Teacher } from './Teacher'
+import { Subject } from './Subject'
+import { Semester } from './Semester'
+import { Enrollment } from './Enrollment'
+import { Evaluation } from './Evaluation'
 
 export interface Group {
-  id?: string;
-  teacher_id?: string;
-  subject_id?: string;
-  semester_id?: string;
+  id: string
 
-  name?: string;
-  group_code?: string;
-  capacity?: number;
+  teacher_id: string
+  subject_id: string
+  semester_id: string
 
-  created_at?: string;
-  updated_at?: string;
+  name: string
+  group_code: string
+  capacity: number
 
-  teacher?: Teacher;
-  subject?: Subject;
-  semester?: Semester;
-  enrollments?: Enrollment[];
-  evaluations?: Evaluation[];
+  created_at: string
+  updated_at: string
+
+  teacher?: Teacher
+  subject?: Subject
+  semester?: Semester
+
+  enrollments?: Enrollment[]
+  evaluations?: Evaluation[]
+}
+
+export interface CreateGroupDto {
+  teacher_id: string
+  subject_id: string
+  semester_id: string
+
+  name: string
+  group_code: string
+  capacity: number
+}
+
+export interface UpdateGroupDto {
+  teacher_id?: string
+  subject_id?: string
+  semester_id?: string
+
+  name?: string
+  group_code?: string
+  capacity?: number
+}
+
+export interface GroupFilters {
+  teacher_id?: string
+  subject_id?: string
+  semester_id?: string
+  search?: string
 }

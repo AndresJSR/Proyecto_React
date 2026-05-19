@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { Provider } from 'react-redux';
+import { Outlet } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { Outlet } from 'react-router-dom';
-import { Provider } from 'react-redux';
 import { store } from '../store/store';
 const DefaultLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

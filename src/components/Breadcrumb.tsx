@@ -7,9 +7,10 @@ interface BreadcrumbProps {
     to?: string;
   }>;
   showBackButton?: boolean;
+  hideTitle?: boolean;
 }
 
-const Breadcrumb = ({ pageName, items, showBackButton = false }: BreadcrumbProps) => {
+const Breadcrumb = ({ pageName, items, showBackButton = false, hideTitle = false }: BreadcrumbProps) => {
   const navigate = useNavigate();
   const trail = items && items.length > 0 ? items : [{ label: 'Dashboard', to: '/' }, { label: pageName }];
 
@@ -26,9 +27,11 @@ const Breadcrumb = ({ pageName, items, showBackButton = false }: BreadcrumbProps
           </button>
         )}
 
-        <h2 className="text-title-md2 font-semibold text-black dark:text-white">
-          {pageName}
-        </h2>
+        {!hideTitle && (
+          <h2 className="text-title-md2 font-semibold text-black dark:text-white">
+            {pageName}
+          </h2>
+        )}
       </div>
 
       <nav>

@@ -4,32 +4,57 @@ import DeactivateUser from '../pages/Users/DeactivateUser';
 import ViewUserPage from '../pages/Users/ViewUser';
 
 // ── Páginas compartidas ───────────────────────────────────────────────────────
-const Profile  = lazy(() => import('../pages/Profile'));
+const Profile = lazy(() => import('../pages/Profile'));
 const Settings = lazy(() => import('../pages/Settings'));
 const Calendar = lazy(() => import('../pages/Calendar'));
 
-// ── Admin ─────────────────────────────────────────────────────────────────────
-const UserList   = lazy(() => import('../pages/Users/ListUsers'));
+// ── Admin: Usuarios y Roles ───────────────────────────────────────────────────
+const UserList = lazy(() => import('../pages/Users/ListUsers'));
 const UserCreate = lazy(() => import('../pages/Users/Create'));
 const UserUpdate = lazy(() => import('../pages/Users/Update'));
-const RoleList   = lazy(() => import('../pages/Roles/List'));
+const RoleList = lazy(() => import('../pages/Roles/List'));
+
+// ── Admin: Académico ──────────────────────────────────────────────────────────
+const ListCarreras = lazy(() => import('../pages/careers/ListCarrers'));
+const CreateCarrera = lazy(() => import('../pages/careers/CreateCareers'));
+const EditCarrera = lazy(() => import('../pages/careers/EditCareer'));
+const DetailCarrera = lazy(() => import('../pages/careers/DetailCareer'));
+const ListSemestres = lazy(() => import('../pages/semester/ListSemester'));
+const CreateSemestre = lazy(() => import('../pages/semester/CreateSemester'));
+const EditSemestre = lazy(() => import('../pages/semester/EditSemester'));
+const DetailSemestre = lazy(() => import('../pages/semester/DetailSemester'));
+const SubjectDashboard = lazy(() => import('../pages/Subjects/SubjectDashboardPage'));
+const ListAsignaturas = lazy(() => import('../pages/Subjects/ListSubject'));
+const CreateAsignatura = lazy(() => import('../pages/Subjects/CreaterSubject'));
+const ListGrupos = lazy(() => import('../pages/Group/ListGroup'));
+const CreateGrupo = lazy(() => import('../pages/Group/CreateGroup'));
+const ListMatriculas = lazy(() => import('../pages/enrollment/ListEnrollment'));
+const CreateMatricula = lazy(() => import('../pages/enrollment/CreateEnrollment'));
+const ListInscripciones = lazy(() => import('../pages/inscripciones/ListInscripciones'));
+const CreateInscripcion = lazy(() => import('../pages/inscripciones/CreateInscripcion'));
+const ListStudyPlans = lazy(() => import('../pages/StudyPlan/ListStudyPlan'));
+const CreateStudyPlan = lazy(() => import('../pages/StudyPlan/CreateStudyPlan'));
+const StudyPlanDashboard = lazy(() => import('../pages/StudyPlan/StudyPlanDashboardPage'));
+const StudyPlanVersions = lazy(() => import('../pages/StudyPlan/VersionHistory'));
+const AcademicPage = lazy(() => import('../pages/Academic'));
+const ListRegistrations = lazy(() => import('../pages/Registration/ListRegistration'));
+const CreateRegistration = lazy(() => import('../pages/Registration/CreateRegistration'));
 
 // ── Profesor ──────────────────────────────────────────────────────────────────
-const RubricaCreate      = lazy(() => import('../pages/Rubricas/Create'));
-const MisRubricas        = lazy(() => import('../pages/Rubricas/MisRubricas'));
-const Evaluaciones       = lazy(() => import('../pages/Evaluaciones/Index'));
-const CrearEvaluacion    = lazy(() => import('../pages/Evaluaciones/CrearEvaluacion'));
-const AsociarRubrica     = lazy(() => import('../pages/Evaluaciones/AsociarRubrica'));
+const RubricaCreate = lazy(() => import('../pages/Rubricas/Create'));
+const MisRubricas = lazy(() => import('../pages/Rubricas/MisRubricas'));
+const Evaluaciones = lazy(() => import('../pages/Evaluaciones/Index'));
+const CrearEvaluacion = lazy(() => import('../pages/Evaluaciones/CrearEvaluacion'));
+const AsociarRubrica = lazy(() => import('../pages/Evaluaciones/AsociarRubrica'));
 const CalificarEstudiante = lazy(() => import('../pages/Evaluaciones/CalificarEstudiante'));
 
-const ADMIN   = [UserRole.ADMIN];
+const ADMIN = [UserRole.ADMIN];
 const TEACHER = [UserRole.TEACHER];
 const STUDENT = [UserRole.STUDENT];
 const ALL_ROLES = [UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT];
 
-const coreRoutes = [
-
-  // ── Compartidas (todos los roles autenticados) ──────────────────────────────
+const routes = [
+  // ── Compartidas ─────────────────────────────────────────────────────────────
   {
     path: '/profile',
     title: 'Perfil',
@@ -43,7 +68,7 @@ const coreRoutes = [
     allowedRoles: ALL_ROLES,
   },
 
-  // ── Administrador ───────────────────────────────────────────────────────────
+  // ── Admin: Usuarios y Roles ──────────────────────────────────────────────────
   {
     path: '/users/list',
     title: 'Usuarios',
@@ -81,7 +106,197 @@ const coreRoutes = [
     allowedRoles: ADMIN,
   },
 
-  // ── Profesor ────────────────────────────────────────────────────────────────
+  // ── Admin: Carreras ──────────────────────────────────────────────────────────
+  {
+    path: '/admin/carreras',
+    title: 'Carreras',
+    component: ListCarreras,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/carreras/list',
+    title: 'Carreras',
+    component: ListCarreras,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/carreras/create',
+    title: 'Crear Carrera',
+    component: CreateCarrera,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/carreras/edit/:id',
+    title: 'Editar Carrera',
+    component: EditCarrera,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/carreras/detail/:id',
+    title: 'Detalle de Carrera',
+    component: DetailCarrera,
+    allowedRoles: ADMIN,
+  },
+
+  // ── Admin: Semestres ─────────────────────────────────────────────────────────
+  {
+    path: '/admin/semestres',
+    title: 'Semestres',
+    component: ListSemestres,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/semestres/list',
+    title: 'Semestres',
+    component: ListSemestres,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/semestres/create',
+    title: 'Crear Semestre',
+    component: CreateSemestre,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/semestres/edit/:id',
+    title: 'Editar Semestre',
+    component: EditSemestre,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/semestres/detail/:id',
+    title: 'Detalle de Semestre',
+    component: DetailSemestre,
+    allowedRoles: ADMIN,
+  },
+
+  // ── Admin: Asignaturas ───────────────────────────────────────────────────────
+  {
+    path: '/admin/asignaturas',
+    title: 'Asignaturas',
+    component: SubjectDashboard,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/asignaturas/list',
+    title: 'Asignaturas',
+    component: SubjectDashboard,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/asignaturas/create',
+    title: 'Crear Asignatura',
+    component: CreateAsignatura,
+    allowedRoles: ADMIN,
+  },
+
+  // ── Admin: Grupos ────────────────────────────────────────────────────────────
+  {
+    path: '/admin/grupos',
+    title: 'Grupos',
+    component: ListGrupos,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/grupos/list',
+    title: 'Grupos',
+    component: ListGrupos,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/grupos/create',
+    title: 'Crear Grupo',
+    component: CreateGrupo,
+    allowedRoles: ADMIN,
+  },
+
+  // ── Admin: Matrículas ────────────────────────────────────────────────────────
+  {
+    path: '/admin/matriculas',
+    title: 'Matrículas',
+    component: ListMatriculas,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/enrollments/list',
+    title: 'Matrículas',
+    component: ListMatriculas,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/enrollments/create',
+    title: 'Crear Matrícula',
+    component: CreateMatricula,
+    allowedRoles: ADMIN,
+  },
+
+  // ── Admin: Planes de Estudio ─────────────────────────────────────────────────
+  {
+    path: '/admin/plan-estudios',
+    title: 'Plan de Estudios',
+    component: StudyPlanDashboard,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/study-plans/list',
+    title: 'Planes de Estudio',
+    component: ListStudyPlans,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/study-plans/dashboard',
+    title: 'Dashboard Planes',
+    component: StudyPlanDashboard,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/study-plans/create',
+    title: 'Crear Plan de Estudio',
+    component: CreateStudyPlan,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/study-plans/versions',
+    title: 'Historial de versiones',
+    component: StudyPlanVersions,
+    allowedRoles: ADMIN,
+  },
+
+  // ── Admin: Inscripciones y Registros ─────────────────────────────────────────
+  {
+    path: '/inscripciones/list',
+    title: 'Inscripciones',
+    component: ListInscripciones,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/inscripciones/create',
+    title: 'Crear Inscripción',
+    component: CreateInscripcion,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/registrations/list',
+    title: 'Registros',
+    component: ListRegistrations,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/registrations/create',
+    title: 'Crear Registro',
+    component: CreateRegistration,
+    allowedRoles: ADMIN,
+  },
+
+  // ── Admin: Académico (dashboard general) ─────────────────────────────────────
+  {
+    path: '/academic',
+    title: 'Académico',
+    component: AcademicPage,
+    allowedRoles: ADMIN,
+  },
+
+  // ── Profesor ─────────────────────────────────────────────────────────────────
   {
     path: '/rubricas/create',
     title: 'Crear Rúbrica',
@@ -119,19 +334,13 @@ const coreRoutes = [
     allowedRoles: TEACHER,
   },
 
-  // ── Estudiante ──────────────────────────────────────────────────────────────
+  // ── Estudiante ───────────────────────────────────────────────────────────────
   {
     path: '/calendar',
     title: 'Calendario',
     component: Calendar,
     allowedRoles: STUDENT,
   },
-
-  // ── Profesor + Estudiante ───────────────────────────────────────────────────
-  // (rutas de rúbricas de solo lectura que el estudiante también puede ver)
-  // Agrega aquí las páginas que compartan ambos roles cuando las crees.
 ];
-
-const routes = [...coreRoutes];
 
 export default routes;
