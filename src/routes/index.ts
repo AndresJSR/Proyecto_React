@@ -50,6 +50,7 @@ const CalificarEstudiante = lazy(() => import('../pages/Evaluaciones/CalificarEs
 const MisAsignaturas = lazy(() => import('../pages/MisAsignaturas/MisAsignaturas'));
 const MisEvaluaciones = lazy(() => import('../pages/MisEvaluaciones/MisEvaluaciones'));
 const ConsultarRubrica = lazy(() => import('../pages/MisEvaluaciones/ConsultarRubrica'));
+const MisNotas = lazy(() => import('../pages/MisNotas/MisNotas'));
 
 const ADMIN = [UserRole.ADMIN];
 const TEACHER = [UserRole.TEACHER];
@@ -366,6 +367,12 @@ const routes = [
     path: '/mis-evaluaciones/:id/rubrica',
     title: 'Consultar rúbrica',
     component: ConsultarRubrica,
+    allowedRoles: STUDENT,
+  },
+  {
+    path: '/mis-notas',
+    title: 'Mis notas',
+    component: MisNotas,
     allowedRoles: STUDENT,
   },
 ];
