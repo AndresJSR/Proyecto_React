@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumb';
-import { getRubricas, deleteRubrica, archivarRubrica } from '../../services/rubricaService';
+import { getRubricas, deleteRubrica, archivarRubrica, publishRubric } from '../../services/rubricaService';
 
 interface RubricaItem {
   id: string;
@@ -25,8 +25,12 @@ const MisRubricasPage = () => {
   const [rubricas, setRubricas] = useState<RubricaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [actionLoading, setActionLoading] = useState<string | null>(null); // id en proceso
-  const [confirmDialog, setConfirmDialog] = useState<{ id: string; type: 'delete' | 'archive'; title: string } | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    id: string;
+    type: 'delete' | 'archive' | 'publish';
+    title: string;
+  } | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -67,6 +71,26 @@ const MisRubricasPage = () => {
       setActionLoading(null);
       setConfirmDialog(null);
     }
+  };
+
+  const handlePublicar = async (id: string) => {
+    setActionLoading(id);
+    try {
+      await publishRubric(id);
+      setRubricas((prev) => prev.map((r) => r.id === id ? { ...r, is_public: true } : r));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error al publicar');
+    } finally {
+      setActionLoading(null);
+      setConfirmDialog(null);
+    }
+  };
+
+  const handleConfirm = () => {
+    if (!confirmDialog) return;
+    if (confirmDialog.type === 'delete') handleDelete(confirmDialog.id);
+    else if (confirmDialog.type === 'archive') handleArchivar(confirmDialog.id);
+    else handlePublicar(confirmDialog.id);
   };
 
   const activas = rubricas.filter((r) => !r.is_archived);
@@ -122,7 +146,7 @@ const MisRubricasPage = () => {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full text-sm text-left text-black dark:text-white">
+                <table className="min-w-full text-left text-sm text-black dark:text-white">
                   <thead>
                     <tr className="border-b border-stroke dark:border-strokedark">
                       <th className="px-6 py-3 font-medium text-meta-3 dark:text-meta-2">Título</th>
@@ -136,41 +160,53 @@ const MisRubricasPage = () => {
                     {activas.map((r) => (
                       <tr key={r.id} className="border-b border-stroke last:border-0 hover:bg-gray-50 dark:border-strokedark dark:hover:bg-meta-4">
                         <td className="px-6 py-4 font-medium">{r.title}</td>
-                        <td className="px-6 py-4 text-meta-3 dark:text-meta-2 max-w-xs truncate">{r.description || '—'}</td>
+                        <td className="px-6 py-4 max-w-xs truncate text-meta-3 dark:text-meta-2">{r.description || '—'}</td>
                         <td className="px-6 py-4">{estadoBadge(r)}</td>
-                        <td className="px-6 py-4 text-meta-3 dark:text-meta-2 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap text-meta-3 dark:text-meta-2">
                           {new Date(r.created_at).toLocaleDateString('es-CO')}
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            {/* Solo borradores pueden eliminarse; publicadas se archivan */}
-                            {r.is_public ? (
-                              <button
-                                onClick={() => setConfirmDialog({ id: r.id, type: 'archive', title: r.title })}
-                                disabled={actionLoading === r.id}
-                                className="rounded border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-50"
-                              >
-                                Archivar
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => setConfirmDialog({ id: r.id, type: 'delete', title: r.title })}
-                                disabled={actionLoading === r.id}
-                                className="rounded border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
-                              >
-                                Eliminar
-                              </button>
+                          <div className="flex flex-wrap items-center gap-2">
+
+                            {/* BORRADOR: publicar + eliminar */}
+                            {!r.is_public && (
+                              <>
+                                <button
+                                  onClick={() => setConfirmDialog({ id: r.id, type: 'publish', title: r.title })}
+                                  disabled={actionLoading === r.id}
+                                  className="rounded border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-50 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300"
+                                >
+                                  Publicar
+                                </button>
+                                <button
+                                  onClick={() => setConfirmDialog({ id: r.id, type: 'delete', title: r.title })}
+                                  disabled={actionLoading === r.id}
+                                  className="rounded border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                                >
+                                  Eliminar
+                                </button>
+                              </>
                             )}
 
-                            {/* Asociar a evaluación — solo publicadas */}
+                            {/* PUBLICADA: archivar + asociar */}
                             {r.is_public && (
-                              <button
-                                onClick={() => navigate('/evaluaciones/asociar-rubrica')}
-                                className="rounded border border-stroke bg-white px-3 py-1 text-xs font-medium text-black transition hover:bg-gray dark:border-strokedark dark:bg-boxdark dark:text-white"
-                              >
-                                Asociar
-                              </button>
+                              <>
+                                <button
+                                  onClick={() => setConfirmDialog({ id: r.id, type: 'archive', title: r.title })}
+                                  disabled={actionLoading === r.id}
+                                  className="rounded border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 transition hover:bg-amber-100 disabled:opacity-50"
+                                >
+                                  Archivar
+                                </button>
+                                <button
+                                  onClick={() => navigate('/evaluaciones/asociar-rubrica')}
+                                  className="rounded border border-stroke bg-white px-3 py-1 text-xs font-medium text-black transition hover:bg-gray dark:border-strokedark dark:bg-boxdark dark:text-white"
+                                >
+                                  Asociar
+                                </button>
+                              </>
                             )}
+
                           </div>
                         </td>
                       </tr>
@@ -181,17 +217,17 @@ const MisRubricasPage = () => {
             )}
           </section>
 
-          {/* Archivadas (colapsable) */}
+          {/* Archivadas */}
           {archivadas.length > 0 && (
             <details className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              <summary className="cursor-pointer px-6 py-4 text-sm font-medium text-meta-3 dark:text-meta-2 select-none">
+              <summary className="cursor-pointer select-none px-6 py-4 text-sm font-medium text-meta-3 dark:text-meta-2">
                 Rúbricas archivadas ({archivadas.length})
               </summary>
               <div className="overflow-x-auto border-t border-stroke dark:border-strokedark">
-                <table className="min-w-full text-sm text-left text-black dark:text-white">
+                <table className="min-w-full text-left text-sm text-black dark:text-white">
                   <tbody>
                     {archivadas.map((r) => (
-                      <tr key={r.id} className="border-b border-stroke last:border-0 dark:border-strokedark opacity-60">
+                      <tr key={r.id} className="border-b border-stroke last:border-0 opacity-60 dark:border-strokedark">
                         <td className="px-6 py-3 font-medium">{r.title}</td>
                         <td className="px-6 py-3 text-meta-3 dark:text-meta-2">{r.description || '—'}</td>
                         <td className="px-6 py-3">{estadoBadge(r)}</td>
@@ -214,12 +250,20 @@ const MisRubricasPage = () => {
         <div className="fixed inset-0 z-99999 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-sm rounded-sm border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
             <h3 className="text-base font-semibold text-black dark:text-white">
-              {confirmDialog.type === 'delete' ? 'Eliminar rúbrica' : 'Archivar rúbrica'}
+              {confirmDialog.type === 'delete' && 'Eliminar rúbrica'}
+              {confirmDialog.type === 'archive' && 'Archivar rúbrica'}
+              {confirmDialog.type === 'publish' && 'Publicar rúbrica'}
             </h3>
             <p className="mt-2 text-sm text-meta-3 dark:text-meta-2">
-              {confirmDialog.type === 'delete'
-                ? <>¿Eliminar <strong>"{confirmDialog.title}"</strong>? Esta acción no se puede deshacer.</>
-                : <>¿Archivar <strong>"{confirmDialog.title}"</strong>? La rúbrica quedará inactiva pero no se perderán sus datos.</>}
+              {confirmDialog.type === 'delete' && (
+                <>¿Eliminar <strong>"{confirmDialog.title}"</strong>? Esta acción no se puede deshacer.</>
+              )}
+              {confirmDialog.type === 'archive' && (
+                <>¿Archivar <strong>"{confirmDialog.title}"</strong>? Quedará inactiva pero no se perderán sus datos.</>
+              )}
+              {confirmDialog.type === 'publish' && (
+                <>¿Publicar <strong>"{confirmDialog.title}"</strong>? Una vez publicada no podrá editarse ni eliminarse, solo archivarse.</>
+              )}
             </p>
             <div className="mt-5 flex justify-end gap-3">
               <button
@@ -229,19 +273,23 @@ const MisRubricasPage = () => {
                 Cancelar
               </button>
               <button
-                onClick={() =>
-                  confirmDialog.type === 'delete'
-                    ? handleDelete(confirmDialog.id)
-                    : handleArchivar(confirmDialog.id)
-                }
+                onClick={handleConfirm}
                 disabled={actionLoading === confirmDialog.id}
                 className={`rounded px-4 py-2 text-sm font-medium text-white transition disabled:opacity-60 ${
-                  confirmDialog.type === 'delete' ? 'bg-red-600 hover:bg-red-700' : 'bg-amber-500 hover:bg-amber-600'
+                  confirmDialog.type === 'delete'
+                    ? 'bg-red-600 hover:bg-red-700'
+                    : confirmDialog.type === 'archive'
+                    ? 'bg-amber-500 hover:bg-amber-600'
+                    : 'bg-emerald-600 hover:bg-emerald-700'
                 }`}
               >
                 {actionLoading === confirmDialog.id
                   ? 'Procesando...'
-                  : confirmDialog.type === 'delete' ? 'Eliminar' : 'Archivar'}
+                  : confirmDialog.type === 'delete'
+                  ? 'Eliminar'
+                  : confirmDialog.type === 'archive'
+                  ? 'Archivar'
+                  : 'Publicar'}
               </button>
             </div>
           </div>

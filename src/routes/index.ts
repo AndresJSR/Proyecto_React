@@ -18,13 +18,13 @@ const RoleList   = lazy(() => import('../pages/Roles/List'));
 const RubricaCreate      = lazy(() => import('../pages/Rubricas/Create'));
 const MisRubricas        = lazy(() => import('../pages/Rubricas/MisRubricas'));
 const Evaluaciones       = lazy(() => import('../pages/Evaluaciones/Index'));
+const CrearEvaluacion    = lazy(() => import('../pages/Evaluaciones/CrearEvaluacion'));
 const AsociarRubrica     = lazy(() => import('../pages/Evaluaciones/AsociarRubrica'));
 const CalificarEstudiante = lazy(() => import('../pages/Evaluaciones/CalificarEstudiante'));
 
 const ADMIN   = [UserRole.ADMIN];
 const TEACHER = [UserRole.TEACHER];
 const STUDENT = [UserRole.STUDENT];
-const TEACHER_STUDENT = [UserRole.TEACHER, UserRole.STUDENT];
 const ALL_ROLES = [UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT];
 
 const coreRoutes = [
@@ -98,6 +98,12 @@ const coreRoutes = [
     path: '/evaluaciones',
     title: 'Evaluaciones',
     component: Evaluaciones,
+    allowedRoles: TEACHER,
+  },
+  {
+    path: '/evaluaciones/crear',
+    title: 'Crear Evaluación',
+    component: CrearEvaluacion,
     allowedRoles: TEACHER,
   },
   {

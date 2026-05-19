@@ -9,6 +9,14 @@ interface ApiResponse<T> {
   message?: string;
 }
 
+export interface EvaluacionCreatePayload {
+  subject_id: string;
+  group_id: string;
+  name: string;
+  description?: string;
+  weight: number;
+}
+
 export async function getEvaluations(): Promise<Evaluation[]> {
   const response = await api.get<ApiResponse<Evaluation[]>>('/api/evaluation/evaluations');
   return response.data.data;
@@ -36,5 +44,10 @@ export async function associateRubric(
   const response = await api.patch<ApiResponse<Evaluation>>(
     `/api/evaluation/evaluations/${evaluationId}/associate-rubric/${rubricId}`
   );
+  return response.data.data;
+}
+
+export async function createEvaluation(payload: EvaluacionCreatePayload): Promise<Evaluation> {
+  const response = await api.post<ApiResponse<Evaluation>>('/api/evaluation/evaluations', payload);
   return response.data.data;
 }
