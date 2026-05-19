@@ -1,8 +1,8 @@
 import React from 'react'
 
 import {
-  CreateStudyPlanDto,
-  UpdateStudyPlanDto
+    CreateStudyPlanDto,
+    UpdateStudyPlanDto
 } from '../../models/StudyPlan'
 
 interface Props {
@@ -29,8 +29,8 @@ const StudyPlanForm: React.FC<Props> = ({
   return (
     <div className="space-y-4">
       <div>
-        <label className="mb-1 block">
-          Name
+        <label className="mb-1 block text-sm font-medium">
+          Nombre del plan / asignatura
         </label>
 
         <input
@@ -44,8 +44,8 @@ const StudyPlanForm: React.FC<Props> = ({
       </div>
 
       <div>
-        <label className="mb-1 block">
-          Career ID
+        <label className="mb-1 block text-sm font-medium">
+          Carrera (ID)
         </label>
 
         <input
@@ -62,8 +62,8 @@ const StudyPlanForm: React.FC<Props> = ({
       </div>
 
       <div>
-        <label className="mb-1 block">
-          Subject ID
+        <label className="mb-1 block text-sm font-medium">
+          Asignatura (ID)
         </label>
 
         <input
@@ -80,8 +80,8 @@ const StudyPlanForm: React.FC<Props> = ({
       </div>
 
       <div>
-        <label className="mb-1 block">
-          Year
+        <label className="mb-1 block text-sm font-medium">
+          Año del plan
         </label>
 
         <input
@@ -98,8 +98,8 @@ const StudyPlanForm: React.FC<Props> = ({
       </div>
 
       <div>
-        <label className="mb-1 block">
-          Suggested Semester
+        <label className="mb-1 block text-sm font-medium">
+          Semestre sugerido
         </label>
 
         <input

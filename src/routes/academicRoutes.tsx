@@ -2,8 +2,13 @@ import { lazy } from 'react';
 
 const ListCarreras = lazy(() => import('../pages/careers/ListCarrers'));
 const CreateCarrera = lazy(() => import('../pages/careers/CreateCareers'));
+const EditCarrera = lazy(() => import('../pages/careers/EditCareer'));
+const DetailCarrera = lazy(() => import('../pages/careers/DetailCareer'));
 const ListSemestres = lazy(() => import('../pages/Semester/ListSemester'));
 const CreateSemestre = lazy(() => import('../pages/Semester/CreateSemester'));
+const EditSemestre = lazy(() => import('../pages/Semester/EditSemester'));
+const DetailSemestre = lazy(() => import('../pages/Semester/DetailSemester'));
+const SubjectDashboard = lazy(() => import('../pages/Subjects/SubjectDashboardPage'));
 const ListAsignaturas = lazy(() => import('../pages/Subjects/ListSubject'));
 const CreateAsignatura = lazy(() => import('../pages/Subjects/CreaterSubject'));
 const ListGrupos = lazy(() => import('../pages/Group/ListGroup'));
@@ -14,6 +19,9 @@ const ListInscripciones = lazy(() => import('../pages/inscripciones/ListInscripc
 const CreateInscripcion = lazy(() => import('../pages/inscripciones/CreateInscripcion'));
 const ListStudyPlans = lazy(() => import('../pages/StudyPlan/ListStudyPlan'));
 const CreateStudyPlan = lazy(() => import('../pages/StudyPlan/CreateStudyPlan'));
+const StudyPlanDashboard = lazy(() => import('../pages/StudyPlan/StudyPlanDashboardPage'));
+const StudyPlanVersions = lazy(() => import('../pages/StudyPlan/VersionHistory.tsx'));
+const AcademicPage = lazy(() => import('../pages/Academic'));
 const ListRegistrations = lazy(() => import('../pages/Registration/ListRegistration'));
 const CreateRegistration = lazy(() => import('../pages/Registration/CreateRegistration'));
 
@@ -29,6 +37,16 @@ const academicRoutes = [
     component: CreateCarrera,
   },
   {
+    path: '/carreras/edit/:id',
+    title: 'Editar Carrera',
+    component: EditCarrera,
+  },
+  {
+    path: '/carreras/detail/:id',
+    title: 'Detalle de Carrera',
+    component: DetailCarrera,
+  },
+  {
     path: '/semestres/list',
     title: 'Semestres',
     component: ListSemestres,
@@ -39,9 +57,19 @@ const academicRoutes = [
     component: CreateSemestre,
   },
   {
+    path: '/semestres/edit/:id',
+    title: 'Editar Semestre',
+    component: EditSemestre,
+  },
+  {
+    path: '/semestres/detail/:id',
+    title: 'Detalle de Semestre',
+    component: DetailSemestre,
+  },
+  {
     path: '/asignaturas/list',
     title: 'Asignaturas',
-    component: ListAsignaturas,
+    component: SubjectDashboard,
   },
   {
     path: '/asignaturas/create',
@@ -84,9 +112,19 @@ const academicRoutes = [
     component: ListStudyPlans,
   },
   {
+    path: '/study-plans/dashboard',
+    title: 'Dashboard Planes',
+    component: StudyPlanDashboard,
+  },
+  {
     path: '/study-plans/create',
     title: 'Crear Plan de Estudio',
     component: CreateStudyPlan,
+  },
+  {
+    path: '/study-plans/versions',
+    title: 'Historial de versiones',
+    component: StudyPlanVersions,
   },
   {
     path: '/registrations/list',
@@ -97,6 +135,11 @@ const academicRoutes = [
     path: '/registrations/create',
     title: 'Crear Registro',
     component: CreateRegistration,
+  },
+  {
+    path: '/academic',
+    title: 'Académico',
+    component: AcademicPage,
   },
 ];
 

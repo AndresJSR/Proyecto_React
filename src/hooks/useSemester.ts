@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 
 import {
-  Semester,
-  CreateSemesterDto
+    CreateSemesterDto,
+    Semester,
+    UpdateSemesterDto
 } from '../models/Semester'
 
 import {
-  semesterBusiness
+    semesterBusiness
 } from '../business/SemesterBusiness'
 
 export const useSemester = () => {
@@ -66,6 +67,33 @@ export const useSemester = () => {
     }
   }
 
+  const updateSemester = async (
+    id: string,
+    payload: UpdateSemesterDto
+  ) => {
+
+    try {
+
+      setLoading(true)
+
+      await semesterBusiness.updateSemester(
+        id,
+        payload
+      )
+
+      await loadSemesters()
+
+    } catch (err: any) {
+
+      setError(err.message)
+      throw err
+
+    } finally {
+
+      setLoading(false)
+    }
+  }
+
   const deleteSemester = async (
     id: string
   ) => {
@@ -98,6 +126,7 @@ export const useSemester = () => {
     loading,
     error,
     createSemester,
+    updateSemester,
     deleteSemester,
     loadSemesters
   }

@@ -1,7 +1,10 @@
 import React from 'react'
 import {
-  CreateSemesterDto,
-  UpdateSemesterDto
+    Career
+} from '../../models/Career'
+import {
+    CreateSemesterDto,
+    UpdateSemesterDto
 } from '../../models/Semester'
 
 interface Props {
@@ -12,13 +15,17 @@ interface Props {
   ) => void
   onSubmit: () => void
   isEdit?: boolean
+  careers?: Career[]
+  loading?: boolean
 }
 
 const SemesterForm: React.FC<Props> = ({
   formData,
   onChange,
   onSubmit,
-  isEdit = false
+  isEdit = false,
+  careers,
+  loading = false
 }) => {
   return (
     <div className="space-y-4">
@@ -39,8 +46,27 @@ const SemesterForm: React.FC<Props> = ({
       </div>
 
       <div>
-        <label className="block mb-1">
-          Código
+        <label className="block mb-1">          Carrera asociada
+        </label>
+
+        <select
+          value={formData.career_id || ''}
+          onChange={(e) =>
+            onChange('career_id', e.target.value)
+          }
+          className="w-full border rounded p-2"
+        >
+          <option value="">Seleccione una carrera</option>
+          {careers?.map((career) => (
+            <option key={career.id} value={career.id}>
+              {career.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="block mb-1">          Código
         </label>
 
         <input
@@ -101,14 +127,12 @@ const SemesterForm: React.FC<Props> = ({
       )}
 
       <button
+        type="button"
         onClick={onSubmit}
-        className="bg-blue-600 text-white px-4 py-2 rounded"
+        disabled={loading}
+        className="border border-blue-600 bg-transparent text-blue-600 px-4 py-2 rounded hover:bg-blue-50 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {
-          isEdit
-            ? 'Actualizar semestre'
-            : 'Crear semestre'
-        }
+        {loading ? (isEdit ? 'Actualizando...' : 'Guardando...') : isEdit ? 'Actualizar semestre' : 'Crear semestre'}
       </button>
 
     </div>

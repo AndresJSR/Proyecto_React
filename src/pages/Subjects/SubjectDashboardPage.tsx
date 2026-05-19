@@ -16,7 +16,7 @@ interface Filters {
   credits: string
 }
 
-const ListSubject = () => {
+const SubjectDashboardPage: React.FC = () => {
   const { subjects, loading, fetchSubjects, createSubject, updateSubject, archiveSubject } = useSubject()
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null)
   const [filters, setFilters] = useState<Filters>({
@@ -38,17 +38,20 @@ const ListSubject = () => {
   }, [])
 
   const filteredSubjects = subjects.filter((subject) => {
+    // Filtro por búsqueda
     const searchLower = filters.search.toLowerCase()
     const matchesSearch =
       !filters.search ||
       subject.name.toLowerCase().includes(searchLower) ||
       subject.code.toLowerCase().includes(searchLower)
 
+    // Filtro por estado
     const matchesStatus =
       filters.status === 'all' ||
       (filters.status === 'active' && subject.is_active) ||
       (filters.status === 'inactive' && !subject.is_active)
 
+    // Filtro por créditos mínimos
     const matchesCredits =
       !filters.credits ||
       subject.credits >= Number(filters.credits)
@@ -120,14 +123,14 @@ const ListSubject = () => {
             <h1 className="text-3xl font-bold text-gray-900">Asignaturas</h1>
             <p className="mt-2 text-sm text-gray-600">Catálogo de asignaturas disponibles en el sistema</p>
           </div>
-          <button
-            type="button"
-            onClick={() => setCreateModalOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-slate-900/20 transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:border-slate-600 dark:bg-slate-900 dark:hover:bg-slate-800"
-          >
-            <span>+</span>
-            Nueva asignatura
-          </button>
+         <button
+  type="button"
+  onClick={() => setCreateModalOpen(true)}
+  className="flex items-center gap-2 rounded-lg bg-gray-800 px-4 py-2 font-medium text-white hover:bg-gray-900"
+>
+  <span>+</span>
+  Nueva asignatura
+</button>
         </div>
       </div>
 
@@ -225,4 +228,4 @@ const ListSubject = () => {
   )
 }
 
-export default ListSubject
+export default SubjectDashboardPage

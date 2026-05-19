@@ -1,10 +1,10 @@
 import api from './api'
 
 import {
-  Career,
-  CreateCareerDto,
-  UpdateCareerDto,
-  CareerFilters
+    Career,
+    CareerFilters,
+    CreateCareerDto,
+    UpdateCareerDto
 } from '../models/Career'
 
 const BASE_URL = '/academic'
@@ -48,9 +48,9 @@ export const careerService = {
   },
 
   async deleteCareer(id: string): Promise<void> {
-    await api.delete(
-      `${BASE_URL}/careers/${id}`
-    )
+    await careerService.updateCareer(id, {
+      is_active: false
+    })
   },
 
   async searchCareers(

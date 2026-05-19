@@ -1,7 +1,7 @@
 //version darling
+import { Evaluation } from './Evaluation'
 import { Group } from './Group'
 import { StudyPlan } from './StudyPlan'
-import { Evaluation } from './Evaluation'
 
 export interface Subject {
   id: string
@@ -25,6 +25,7 @@ export interface CreateSubjectDto {
   code: string
   description?: string
   credits: number
+  is_active?: boolean
 }
 export interface UpdateSubjectDto {
   name?: string

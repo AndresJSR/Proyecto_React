@@ -15,7 +15,8 @@ const CreateSubject = () => {
       name: '',
       code: '',
       description: '',
-      credits: 0
+      credits: 0,
+      is_active: true
     })
 
   const handleChange = (
@@ -42,7 +43,8 @@ const CreateSubject = () => {
         name: '',
         code: '',
         description: '',
-        credits: 0
+        credits: 0,
+        is_active: true
       })
     } catch (error) {
       console.error(error)

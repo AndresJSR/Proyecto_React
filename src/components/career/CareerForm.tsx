@@ -3,8 +3,8 @@
 import React from 'react'
 
 import {
-    CreateCareerDto,
-    UpdateCareerDto
+  CreateCareerDto,
+  UpdateCareerDto
 } from '../../models/Career'
 
 interface Props {
@@ -109,7 +109,9 @@ const CareerForm: React.FC<Props> = ({
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-green-600 px-6 py-2 font-medium text-white hover:bg-green-700 disabled:bg-gray-400"
+          //className="rounded-lg bg-green-600 px-6 py-2 font-medium text-white hover:bg-green-700 disabled:bg-gray-400"
+         // className="rounded-lg bg-gray px-6 py-2 font-medium text-yellow-400"
+        className="border border-yellow-400 rounded-lg bg-gray-800 px-6 py-2 font-medium text-yellow-400"
         >
           {loading
             ? 'Guardando...'

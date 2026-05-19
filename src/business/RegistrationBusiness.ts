@@ -1,8 +1,8 @@
 // src/business/RegistrationBusiness.ts
 
 import {
-  CreateRegistrationDto,
-  UpdateRegistrationDto
+    CreateRegistrationDto,
+    UpdateRegistrationDto
 } from '../models/Registration'
 
 import { registrationService } from '../services/registrationService'
@@ -24,6 +24,37 @@ class RegistrationBusiness {
       )
     }
 
+    if (!data.admission_period?.trim()) {
+      throw new Error(
+        'Admission period is required'
+      )
+    }
+
+    if (!data.academic_status?.trim()) {
+      throw new Error(
+        'Academic status is required'
+      )
+    }
+
+    const registrations =
+      await registrationService.getRegistrations()
+
+    const duplicateRegistration =
+      registrations.some(
+        (registration) =>
+          registration.student_id ===
+            data.student_id &&
+          registration.career_id ===
+            data.career_id &&
+          registration.is_active
+      )
+
+    if (duplicateRegistration) {
+      throw new Error(
+        'Student is already registered in this career'
+      )
+    }
+
     return await registrationService.createRegistration(
       data
     )
@@ -33,6 +64,10 @@ class RegistrationBusiness {
     id: string,
     data: UpdateRegistrationDto
   ) {
+    if (!id) {
+      throw new Error('Registration id is required')
+    }
+
     return await registrationService.updateRegistration(
       id,
       data
@@ -40,6 +75,10 @@ class RegistrationBusiness {
   }
 
   async deleteRegistration(id: string) {
+    if (!id) {
+      throw new Error('Registration id is required')
+    }
+
     await registrationService.deleteRegistration(
       id
     )

@@ -3,10 +3,10 @@
 import api from './api'
 
 import {
-  StudyPlan,
-  CreateStudyPlanDto,
-  UpdateStudyPlanDto,
-  StudyPlanFilters
+    CreateStudyPlanDto,
+    StudyPlan,
+    StudyPlanFilters,
+    UpdateStudyPlanDto
 } from '../models/StudyPlan'
 
 const BASE_URL = '/academic'
@@ -22,6 +22,7 @@ export const studyPlanService = {
 
     return response.data.data
   },
+
 
   async getStudyPlans(): Promise<
     StudyPlan[]
@@ -71,6 +72,31 @@ export const studyPlanService = {
       {
         params: filters
       }
+    )
+
+    return response.data.data
+  },
+
+  async getSubjectsByPlan(planId: string) {
+    const response = await api.get(
+      `${BASE_URL}/study-plans/${planId}/subjects`
+    )
+
+    return response.data.data
+  },
+
+  async addSubjectToPlan(planId: string, payload: { subject_id: string; suggested_semester: number; credits: number }) {
+    const response = await api.post(
+      `${BASE_URL}/study-plans/${planId}/subjects`,
+      payload
+    )
+
+    return response.data.data
+  },
+
+  async removeSubjectFromPlan(planId: string, subjectId: string) {
+    const response = await api.delete(
+      `${BASE_URL}/study-plans/${planId}/subjects/${subjectId}`
     )
 
     return response.data.data

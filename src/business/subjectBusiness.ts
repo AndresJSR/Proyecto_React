@@ -1,10 +1,13 @@
 import {
-  Subject,
   CreateSubjectDto,
-  UpdateSubjectDto,
-  SubjectFilters
+  Subject,
+  SubjectFilters,
+  UpdateSubjectDto
 } from '../models/Subject'
 
+import { groupService } from '../services/groupService'
+import { semesterService } from '../services/semesterService'
+import { studyPlanService } from '../services/studyPlanService'
 import { subjectService } from '../services/subjectService'
 
 export const subjectBusiness = {
@@ -12,6 +15,7 @@ export const subjectBusiness = {
     payload: CreateSubjectDto
   ): Promise<Subject> {
     this.validateSubject(payload)
+    await this.ensureUniqueSubjectCode(payload.code)
 
     return await subjectService.createSubject(
       payload
@@ -48,6 +52,13 @@ export const subjectBusiness = {
 
     this.validateUpdateSubject(payload)
 
+    if (payload.code) {
+      await this.ensureUniqueSubjectCode(
+        payload.code,
+        id
+      )
+    }
+
     return await subjectService.updateSubject(
       id,
       payload
@@ -72,6 +83,29 @@ export const subjectBusiness = {
     return await subjectService.searchSubjects(
       filters
     )
+  },
+
+  async ensureUniqueSubjectCode(
+    code: string,
+    currentId?: string
+  ): Promise<void> {
+    const subjects =
+      await subjectService.getSubjects()
+    const normalizedCode = code
+      .trim()
+      .toLowerCase()
+
+    const duplicate = subjects.some(
+      (subject) =>
+        subject.code
+          .trim()
+          .toLowerCase() === normalizedCode &&
+        subject.id !== currentId
+    )
+
+    if (duplicate) {
+      throw new Error('Subject code already exists')
+    }
   },
 
   validateSubject(
@@ -127,6 +161,82 @@ export const subjectBusiness = {
       throw new Error(
         'Credits must be greater than zero'
       )
+    }
+  },
+
+  async canEditSubject(id: string): Promise<boolean> {
+    try {
+      // Obtener todos los grupos con esta asignatura
+      const groups = await groupService.getGroups()
+      const subjectGroups = groups.filter(g => g.subject_id === id)
+
+      if (subjectGroups.length === 0) {
+        return true
+      }
+
+      // Obtener semestres activos
+      const allSemesters = await semesterService.getSemesters()
+      const activeSemesters = allSemesters.filter(s => s.is_active)
+
+      // Verificar si hay grupos activos en semestres vigentes
+      const hasActiveGroups = subjectGroups.some(g =>
+        activeSemesters.some(s => s.id === g.semester_id)
+      )
+
+      return !hasActiveGroups
+    } catch (error) {
+      console.error('Error checking if subject can be edited:', error)
+      return true
+    }
+  },
+
+  async canArchiveSubject(id: string): Promise<{ canArchive: boolean; reason?: string }> {
+    try {
+      // Verificar grupos activos
+      const groups = await groupService.getGroups()
+      const subjectGroups = groups.filter(g => g.subject_id === id)
+
+      if (subjectGroups.length > 0) {
+        const allSemesters = await semesterService.getSemesters()
+        const activeSemesters = allSemesters.filter(s => s.is_active)
+
+        const activeGroups = subjectGroups.filter(g =>
+          activeSemesters.some(s => s.id === g.semester_id)
+        )
+
+        if (activeGroups.length > 0) {
+          const semesterNames = [...new Set(
+            activeGroups
+              .map(g => allSemesters.find(s => s.id === g.semester_id)?.name)
+              .filter(Boolean)
+          )].join(', ')
+
+          return {
+            canArchive: false,
+            reason: `La asignatura tiene ${activeGroups.length} grupo(s) activo(s) en el semestre vigente (${semesterNames}).`
+          }
+        }
+      }
+
+      // Verificar planes de estudio publicados
+      const studyPlans = await studyPlanService.getStudyPlans()
+      const publishedPlans = studyPlans.filter(
+        sp => sp.subject_id === id && sp.is_published
+      )
+
+      if (publishedPlans.length > 0) {
+        const planNames = publishedPlans.map(p => p.name).join(', ')
+        return {
+          canArchive: false,
+          reason: `La asignatura está incluida en plan(es) de estudio vigente(s): ${planNames}.`
+        }
+      }
+
+      return { canArchive: true }
+    } catch (error) {
+      console.error('Error checking if subject can be archived:', error)
+      // Si hay error, permitir el archivo por ahora
+      return { canArchive: true }
     }
   }
 }

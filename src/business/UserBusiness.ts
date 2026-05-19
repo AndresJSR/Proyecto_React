@@ -11,7 +11,6 @@ export interface UserTableRow {
   created_at?: string;
   //career?:string;
 }
-
 class UserBusiness {
   getUserFullName(user: User): string {
     if (user.profile) {
@@ -31,6 +30,7 @@ class UserBusiness {
   getUserRoleLabel(role?: UserRole): string {
     switch (role) {
       case UserRole.ADMIN:
+        
         return 'Administrador';
 
       case UserRole.TEACHER:

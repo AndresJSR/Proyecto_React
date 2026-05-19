@@ -120,6 +120,10 @@ export const useSubject = () => {
     }
   }
 
+  const archiveSubject = async (id: string) => {
+    return updateSubject(id, { is_active: false })
+  }
+
   return {
     subjects,
     loading,
@@ -131,6 +135,8 @@ export const useSubject = () => {
 
     updateSubject,
 
-    deleteSubject
+    deleteSubject,
+
+    archiveSubject
   }
 }
