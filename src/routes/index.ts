@@ -24,7 +24,6 @@ const CreateSemestre = lazy(() => import('../pages/semester/CreateSemester'));
 const EditSemestre = lazy(() => import('../pages/semester/EditSemester'));
 const DetailSemestre = lazy(() => import('../pages/semester/DetailSemester'));
 const SubjectDashboard = lazy(() => import('../pages/Subjects/SubjectDashboardPage'));
-const ListAsignaturas = lazy(() => import('../pages/Subjects/ListSubject'));
 const CreateAsignatura = lazy(() => import('../pages/Subjects/CreaterSubject'));
 const ListGrupos = lazy(() => import('../pages/Group/ListGroup'));
 const CreateGrupo = lazy(() => import('../pages/Group/CreateGroup'));
@@ -36,6 +35,7 @@ const ListStudyPlans = lazy(() => import('../pages/StudyPlan/ListStudyPlan'));
 const CreateStudyPlan = lazy(() => import('../pages/StudyPlan/CreateStudyPlan'));
 const StudyPlanDashboard = lazy(() => import('../pages/StudyPlan/StudyPlanDashboardPage'));
 const StudyPlanVersions = lazy(() => import('../pages/StudyPlan/VersionHistory'));
+const PlanEstudios = lazy(() => import('../pages/PlanEstudios/PlanEstudios'));
 const AcademicPage = lazy(() => import('../pages/Academic'));
 const ListRegistrations = lazy(() => import('../pages/Registration/ListRegistration'));
 const CreateRegistration = lazy(() => import('../pages/Registration/CreateRegistration'));
@@ -47,6 +47,7 @@ const Evaluaciones = lazy(() => import('../pages/Evaluaciones/Index'));
 const CrearEvaluacion = lazy(() => import('../pages/Evaluaciones/CrearEvaluacion'));
 const AsociarRubrica = lazy(() => import('../pages/Evaluaciones/AsociarRubrica'));
 const CalificarEstudiante = lazy(() => import('../pages/Evaluaciones/CalificarEstudiante'));
+const MisAsignaturas = lazy(() => import('../pages/MisAsignaturas/MisAsignaturas'));
 
 const ADMIN = [UserRole.ADMIN];
 const TEACHER = [UserRole.TEACHER];
@@ -238,6 +239,12 @@ const routes = [
     allowedRoles: ADMIN,
   },
   {
+    path: '/plan-estudios',
+    title: 'Plan de estudios',
+    component: PlanEstudios,
+    allowedRoles: ADMIN,
+  },
+  {
     path: '/study-plans/list',
     title: 'Planes de Estudio',
     component: ListStudyPlans,
@@ -339,6 +346,12 @@ const routes = [
     path: '/calendar',
     title: 'Calendario',
     component: Calendar,
+    allowedRoles: STUDENT,
+  },
+  {
+    path: '/mis-asignaturas',
+    title: 'Mis asignaturas',
+    component: MisAsignaturas,
     allowedRoles: STUDENT,
   },
 ];

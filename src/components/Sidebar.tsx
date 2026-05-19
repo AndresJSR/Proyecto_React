@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { BookOpen } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Logo from '../images/logo/logo.svg';
@@ -107,12 +108,6 @@ const IcoBook = () => (
   <svg className="fill-current" width="18" height="18" viewBox="0 0 24 24" fill="none">
     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-  </svg>
-);
-const IcoClipboard = () => (
-  <svg className="fill-current" width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-    <rect x="9" y="3" width="6" height="4" rx="1" ry="1" stroke="currentColor" strokeWidth="2" fill="none"/>
   </svg>
 );
 const IcoGrid = () => (
@@ -247,8 +242,8 @@ const AdminMenu = ({ pathname }: { pathname: string }) => (
           </NavLink>
         </li>
         <li>
-          <NavLink to="/admin/plan-estudios" className={linkClass(pathname, '/admin/plan-estudios')}>
-            <IcoClipboard />
+          <NavLink to="/plan-estudios" className={linkClass(pathname, '/plan-estudios')}>
+            <BookOpen size={18} />
             Plan de estudios
           </NavLink>
         </li>

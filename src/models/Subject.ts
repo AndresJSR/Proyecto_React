@@ -4,7 +4,7 @@ import { Group } from './Group'
 import { StudyPlan } from './StudyPlan'
 
 export interface Subject {
-  id: string
+  id: number | string
 
   name: string
   code: string
