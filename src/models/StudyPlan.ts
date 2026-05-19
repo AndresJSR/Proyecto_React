@@ -2,10 +2,10 @@ import { Career } from './Career'
 import { Subject } from './Subject'
 
 export interface StudyPlan {
-  id: string
+  id: number | string
 
-  career_id: string
-  subject_id: string
+  career_id: number | string
+  subject_id: number | string
 
   name: string
   year: number

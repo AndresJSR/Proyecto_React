@@ -24,7 +24,6 @@ const CreateSemestre = lazy(() => import('../pages/semester/CreateSemester'));
 const EditSemestre = lazy(() => import('../pages/semester/EditSemester'));
 const DetailSemestre = lazy(() => import('../pages/semester/DetailSemester'));
 const SubjectDashboard = lazy(() => import('../pages/Subjects/SubjectDashboardPage'));
-const ListAsignaturas = lazy(() => import('../pages/Subjects/ListSubject'));
 const CreateAsignatura = lazy(() => import('../pages/Subjects/CreaterSubject'));
 const ListGrupos = lazy(() => import('../pages/Group/ListGroup'));
 const CreateGrupo = lazy(() => import('../pages/Group/CreateGroup'));
@@ -47,6 +46,7 @@ const Evaluaciones = lazy(() => import('../pages/Evaluaciones/Index'));
 const CrearEvaluacion = lazy(() => import('../pages/Evaluaciones/CrearEvaluacion'));
 const AsociarRubrica = lazy(() => import('../pages/Evaluaciones/AsociarRubrica'));
 const CalificarEstudiante = lazy(() => import('../pages/Evaluaciones/CalificarEstudiante'));
+const MisAsignaturas = lazy(() => import('../pages/MisAsignaturas/MisAsignaturas'));
 
 const ADMIN = [UserRole.ADMIN];
 const TEACHER = [UserRole.TEACHER];
@@ -339,6 +339,12 @@ const routes = [
     path: '/calendar',
     title: 'Calendario',
     component: Calendar,
+    allowedRoles: STUDENT,
+  },
+  {
+    path: '/mis-asignaturas',
+    title: 'Mis asignaturas',
+    component: MisAsignaturas,
     allowedRoles: STUDENT,
   },
 ];
