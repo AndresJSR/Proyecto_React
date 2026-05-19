@@ -22,6 +22,7 @@ const PlanEstudios = () => {
     selectedPlanId,
     planSubjects,
     availableSubjects,
+    filteredSubjects,
     searchQuery,
     subjectsBySemester,
     totalCredits,

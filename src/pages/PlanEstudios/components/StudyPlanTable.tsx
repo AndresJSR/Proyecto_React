@@ -52,13 +52,14 @@ const StudyPlanTable = ({ subjectsBySemester, planName, isPublished, totalSubjec
             ) : (
               semesters.map((semester) => (
                 <Fragment key={semester}>
-                  <tr key={`semester-${semester}`} className="bg-green-50/60">
+                  <tr className="bg-green-50/60">
                     <td colSpan={5} className="px-4 py-3 text-sm font-semibold text-green-800">
                       Semestre {semester}
                     </td>
-                </Fragment>
+                  </tr>
+
                   {subjectsBySemester[semester].map((subject) => (
-                    <tr key={subject.subject_id + '-' + semester} className="border-t transition hover:bg-gray-50">
+                    <tr key={`${subject.subject_id}-${semester}`} className="border-t transition hover:bg-gray-50">
                       <td className="px-4 py-3 text-sm text-gray-600">{subject.suggested_semester}</td>
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">{subject.subject_code}</td>
                       <td className="px-4 py-3 text-sm text-gray-900">{subject.subject_name}</td>
@@ -83,7 +84,7 @@ const StudyPlanTable = ({ subjectsBySemester, planName, isPublished, totalSubjec
                       </td>
                     </tr>
                   ))}
-                </>
+                </Fragment>
               ))
             )}
           </tbody>
