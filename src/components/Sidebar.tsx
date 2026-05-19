@@ -484,7 +484,7 @@ const StudentMenu = ({ pathname }: { pathname: string }) => (
       <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">RECURSOS</h3>
       <ul className="mb-6 flex flex-col gap-1.5">
         <li>
-          <NavLink to="/rubricas/create" className={linkClass(pathname, '/rubricas')}>
+          <NavLink to="/mis-evaluaciones" className={linkClass(pathname, '/mis-evaluaciones')}>
             <IcoDoc />
             Rubricas
           </NavLink>
