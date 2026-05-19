@@ -1,17 +1,29 @@
-import { Registration } from './Registration';
-import { StudyPlan } from './StudyPlan';
-
 export interface Career {
-  id?: string;
+  id: number | string
+  name: string
+  code: string
+  description?: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
 
-  name?: string;
-  code?: string;
-  description?: string;
-  is_active?: boolean;
-
-  created_at?: string;
-  updated_at?: string;
-
-  registrations?: Registration[];
-  study_plans?: StudyPlan[];
+//CreateCareerDto representa POST /api/academic/careers
+export interface CreateCareerDto {
+  name: string
+  code: string
+  description?: string
+  is_active?: boolean
+}
+//interface Update representa PUT /api/academic/careers/:id
+export interface UpdateCareerDto {
+  name?: string
+  code?: string
+  description?: string
+  is_active?: boolean
+}
+//interface careersFilters represnta GET /api/academic/careers/search
+export interface CareerFilters {
+  is_active?: boolean
+  search?: string
 }

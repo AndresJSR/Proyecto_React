@@ -50,6 +50,10 @@ class AuthService {
       throw new Error('La cuenta autenticada no tiene email.');
     }
 
+    const firebaseToken = await firebaseUser.getIdToken();
+
+    storage.setItem(this.firebaseTokenKey, firebaseToken);
+
     const users = await userService.searchUsers({
       email: firebaseUser.email,
     });
@@ -68,11 +72,7 @@ class AuthService {
       throw new Error('El usuario se encuentra inactivo.');
     }
 
-    const firebaseToken = await firebaseUser.getIdToken();
-
     storage.setItem(this.userKey, JSON.stringify(backendUser));
-
-    storage.setItem(this.firebaseTokenKey, firebaseToken);
 
     store.dispatch(setUser(backendUser));
 

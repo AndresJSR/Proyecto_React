@@ -2,11 +2,17 @@ import { Link, useNavigate } from 'react-router-dom';
 
 interface BreadcrumbProps {
   pageName: string;
+  items?: Array<{
+    label: string;
+    to?: string;
+  }>;
   showBackButton?: boolean;
+  hideTitle?: boolean;
 }
 
-const Breadcrumb = ({ pageName, showBackButton = false }: BreadcrumbProps) => {
+const Breadcrumb = ({ pageName, items, showBackButton = false, hideTitle = false }: BreadcrumbProps) => {
   const navigate = useNavigate();
+  const trail = items && items.length > 0 ? items : [{ label: 'Dashboard', to: '/' }, { label: pageName }];
 
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -21,18 +27,24 @@ const Breadcrumb = ({ pageName, showBackButton = false }: BreadcrumbProps) => {
           </button>
         )}
 
-        <h2 className="text-title-md2 font-semibold text-black dark:text-white">
-          {pageName}
-        </h2>
+        {!hideTitle && (
+          <h2 className="text-title-md2 font-semibold text-black dark:text-white">
+            {pageName}
+          </h2>
+        )}
       </div>
 
       <nav>
         <ol className="flex items-center gap-2">
-          <li>
-            <Link to="/">Dashboard /</Link>
-          </li>
+          {trail.map((item, index) => {
+            const isLast = index === trail.length - 1;
 
-          <li className="text-primary">{pageName}</li>
+            return (
+              <li key={`${item.label}-${index}`} className={isLast ? 'text-primary' : ''}>
+                {item.to && !isLast ? <Link to={item.to}>{item.label} /</Link> : item.label}
+              </li>
+            );
+          })}
         </ol>
       </nav>
     </div>
