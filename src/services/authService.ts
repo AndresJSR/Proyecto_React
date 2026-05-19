@@ -21,6 +21,10 @@ class AuthService {
   async loginWithGoogle(): Promise<User> {
     const provider = new GoogleAuthProvider();
 
+    provider.setCustomParameters({
+      prompt: 'select_account',
+    });
+
     return this.loginWithProvider(provider);
   }
 
@@ -34,12 +38,10 @@ class AuthService {
 
     return this.loginWithProvider(provider);
   }
-
   private async loginWithProvider(
     provider: GoogleAuthProvider | GithubAuthProvider,
   ): Promise<User> {
     const result = await signInWithPopup(firebaseAuth, provider);
-
     const firebaseUser = result.user;
     console.log('Firebase email:', firebaseUser.email);
     if (!firebaseUser.email) {
