@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import toast from 'react-hot-toast'
 
 import { RootState } from '../store/store'
 import { Group } from '../models/Group'
+import { GroupCardData, groupBusiness } from '../business/GroupBusiness'
 import { groupService } from '../services/groupService'
-import { groupBusiness } from '../business/GroupBusiness'
 
 interface UseGruposDocenteResult {
   groups: Group[]
+  groupCards: GroupCardData[]
   isLoading: boolean
   error: string | null
 }
@@ -33,9 +34,7 @@ const useGruposDocente = (): UseGruposDocenteResult => {
         setGroups(filtered)
       } catch (err) {
         const msg =
-          err instanceof Error
-            ? err.message
-            : 'Error al cargar los grupos'
+          err instanceof Error ? err.message : 'Error al cargar los grupos'
         setError(msg)
         toast.error(msg)
       } finally {
@@ -46,7 +45,12 @@ const useGruposDocente = (): UseGruposDocenteResult => {
     fetchGrupos()
   }, [user?.id])
 
-  return { groups, isLoading, error }
+  const groupCards = useMemo(
+    () => groupBusiness.mapGroupsToCards(groups),
+    [groups]
+  )
+
+  return { groups, groupCards, isLoading, error }
 }
 
 export default useGruposDocente
