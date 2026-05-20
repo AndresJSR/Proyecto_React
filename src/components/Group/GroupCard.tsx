@@ -124,7 +124,7 @@ const GroupCard = ({ card, onVerDetalle }: GroupCardProps) => {
             </div>
             {/* Acción */}
             <button
-                onClick={() => onVerDetalle(card.id)}
+                onClick={() => onVerDetalle(String(card.id))}
                 className="w-full rounded-lg bg-primary py-2 text-sm font-medium text-white transition hover:bg-opacity-90"
             >
                 Ver detalle

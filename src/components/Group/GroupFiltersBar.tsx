@@ -1,5 +1,5 @@
 import { Search, X } from 'lucide-react'
-import { GroupUIFilters } from '../../business/GroupBusiness'
+import {  GroupFilters as GroupUIFilters } from '../../business/GroupBusiness'
 
 interface GroupFiltersBarProps {
   filters: GroupUIFilters

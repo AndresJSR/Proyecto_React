@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { BookOpen, LayoutGrid, ChevronDown, ChevronUp } from 'lucide-react';import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Logo from '../images/logo/logo.svg';
 import { RootState } from '../store/store';
@@ -208,6 +208,16 @@ const IcoProfile = () => (
     <path d="M10.8283 9.05627H7.17207C4.16269 9.05627 1.71582 11.5313 1.71582 14.5406V16.875C1.71582 17.2125 1.99707 17.5219 2.3627 17.5219C2.72832 17.5219 3.00957 17.2407 3.00957 16.875V14.5406C3.00957 12.2344 4.89394 10.3219 7.22832 10.3219H10.8564C13.1627 10.3219 15.0752 12.2063 15.0752 14.5406V16.875C15.0752 17.2125 15.3564 17.5219 15.7221 17.5219C16.0877 17.5219 16.3689 17.2407 16.3689 16.875V14.5406C16.2846 11.5313 13.8377 9.05627 10.8283 9.05627Z" fill="" />
   </svg>
 );
+const IcoChevronUp = () => (
+  <svg className="fill-current" width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <polyline points="18 15 12 9 6 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+  </svg>
+);
+const IcoChevronDown = () => (
+  <svg className="fill-current" width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <polyline points="6 9 12 15 18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+  </svg>
+);
 
 /* ───────────────────────────── MENÚ ADMINISTRADOR ───────────────────────────── */
 const AdminMenu = ({ pathname }: { pathname: string }) => (
@@ -240,7 +250,7 @@ const AdminMenu = ({ pathname }: { pathname: string }) => (
         </li>
         <li>
           <NavLink to="/study-plans/list" className={linkClass(pathname, '/study-plans')}>
-            <BookOpen size={18} />
+            <IcoBook />
             Plan de estudios
           </NavLink>
         </li>
@@ -346,13 +356,13 @@ const TeacherMenu = ({ pathname }: { pathname: string }) => {
                 }`}
             >
               <span className="flex items-center gap-2.5">
-                <LayoutGrid size={18} />
+                <IcoGrid />
                 Grupos
               </span>
               {isGruposOpen ? (
-                <ChevronUp size={16} className="text-bodydark2" />
+                <IcoChevronUp />
               ) : (
-                <ChevronDown size={16} className="text-bodydark2" />
+                <IcoChevronDown />
               )}
             </button>
 
