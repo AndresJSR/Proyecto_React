@@ -5,6 +5,7 @@ import { Subject } from '../models/Subject';
 import { Group } from '../models/Group';
 import { api } from '../interceptors/authInterceptor';
 
+
 interface ApiResponse<T> {
   data: T;
   message?: string;
@@ -86,5 +87,40 @@ export async function getGradesByGroup(groupId: string): Promise<Grade[]> {
     throw new Error(
       error instanceof Error ? error.message : 'Error al obtener notas del grupo'
     );
+  }
+}
+
+/**
+ * Obtiene las rúbricas asociadas a un grupo, derivándolas a partir de
+ * las evaluaciones del grupo (las rúbricas no tienen group_id directo).
+ * Estrategia:
+ *   1. Obtener evaluaciones del grupo.
+ *   2. Extraer rubric_id únicos de las que tienen rúbrica asociada.
+ *   3. Cargar cada rúbrica en paralelo.
+ */
+export async function getRubricsByGroup(groupId: string): Promise<Rubric[]> {
+  try {
+    const evaluations = await getEvaluationsByGroup(groupId)
+    const rubricIds = [
+      ...new Set(
+        evaluations
+          .map((e) => e.rubric_id)
+          .filter((id): id is string => !!id)
+      ),
+    ]
+    if (rubricIds.length === 0) return []
+
+    const rubrics = await Promise.all(
+      rubricIds.map((id) =>
+        api
+          .get<ApiResponse<Rubric>>(`/api/evaluation/rubrics/${id}`)
+          .then((r) => r.data.data)
+      )
+    )
+    return rubrics
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : 'Error al obtener rúbricas del grupo'
+    )
   }
 }

@@ -1,31 +1,43 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import toast from 'react-hot-toast'
 
 import { RootState } from '../store/store'
 import { Group } from '../models/Group'
-import { GroupCardData, groupBusiness } from '../business/GroupBusiness'
+import {
+  GroupCardData,
+  GroupUIFilters,
+  EMPTY_GROUP_UI_FILTERS,
+  groupBusiness,
+} from '../business/GroupBusiness'
 import { groupService } from '../services/groupService'
 import {
   getEvaluationsByGroup,
   getGradesByGroup,
+  getRubricsByGroup,
 } from '../services/evaluacionService'
 
 interface UseGruposDocenteResult {
-  groups: Group[]
-  groupCards: GroupCardData[]
+  groupCards: GroupCardData[]       // cards filtradas — para el grid
+  allCards: GroupCardData[]         // cards sin filtrar — para el select de semestres
+  groups: Group[]                   // modelo de dominio (por si se necesita en otros hooks)
   isLoading: boolean
   error: string | null
+  filters: GroupUIFilters
+  setFilters: React.Dispatch<React.SetStateAction<GroupUIFilters>>
+  uniqueSemesters: string[]
 }
 
 const useGruposDocente = (): UseGruposDocenteResult => {
   const user = useSelector((state: RootState) => state.user.user)
 
   const [groups, setGroups] = useState<Group[]>([])
-  const [groupCards, setGroupCards] = useState<GroupCardData[]>([])
+  const [enrichedCards, setEnrichedCards] = useState<GroupCardData[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const [filters, setFilters] = useState<GroupUIFilters>(EMPTY_GROUP_UI_FILTERS)
 
+  // ── Carga + enriquecimiento ────────────────────────────────────────────────
   useEffect(() => {
     if (!user?.id) return
 
@@ -34,35 +46,35 @@ const useGruposDocente = (): UseGruposDocenteResult => {
       setError(null)
 
       try {
-        // 1. Cargar grupos del docente filtrados por semestre activo
+        // 1. Grupos del docente filtrados por semestre activo
         const raw = await groupService.getGroupsByTeacher(user.id!)
         const filtered = groupBusiness.filterActiveGroups(raw)
         setGroups(filtered)
 
-        // 2. Construir cards base (hasEvaluations y hasLockedGrades en false)
+        // 2. Cards base (hasEvaluations y hasLockedGrades = false)
         const baseCards = groupBusiness.mapGroupsToCards(filtered)
 
-        // 3. Enriquecer cada card con datos académicos en paralelo
-        const enrichedCards = await Promise.all(
+        // 3. Enriquecer en paralelo; fallo parcial no bloquea el resto
+        const enriched = await Promise.all(
           baseCards.map(async (card) => {
             try {
-              const [evaluations, grades] = await Promise.all([
+              const [evaluations, grades, rubrics] = await Promise.all([
                 getEvaluationsByGroup(card.id),
                 getGradesByGroup(card.id),
+                getRubricsByGroup(card.id),
               ])
-              return groupBusiness.enrichGroupCard(card, evaluations, grades)
+              return groupBusiness.enrichGroupCard(card, evaluations, grades, rubrics)
             } catch (err) {
-              // Fallo parcial: loguear y devolver card con valores por defecto
               console.error(
                 `Error al enriquecer grupo ${card.id} (${card.name}):`,
                 err
               )
-              return card // hasEvaluations=false, hasLockedGrades=false ya establecidos
+              return card
             }
           })
         )
 
-        setGroupCards(enrichedCards)
+        setEnrichedCards(enriched)
       } catch (err) {
         const msg =
           err instanceof Error ? err.message : 'Error al cargar los grupos'
@@ -76,7 +88,33 @@ const useGruposDocente = (): UseGruposDocenteResult => {
     fetchGrupos()
   }, [user?.id])
 
-  return { groups, groupCards, isLoading, error }
+  // ── Derivados síncronos ───────────────────────────────────────────────────
+
+  /** Cards sin filtrar → fuente de verdad para selects y contadores */
+  const allCards = enrichedCards
+
+  /** Opciones únicas de semestre extraídas del total (no del filtrado) */
+  const uniqueSemesters = useMemo(
+    () => groupBusiness.getUniqueSemesters(allCards),
+    [allCards]
+  )
+
+  /** Cards visibles tras aplicar los filtros de UI */
+  const groupCards = useMemo(
+    () => groupBusiness.filterGroups(allCards, filters),
+    [allCards, filters]
+  )
+
+  return {
+    groupCards,
+    allCards,
+    groups,
+    isLoading,
+    error,
+    filters,
+    setFilters,
+    uniqueSemesters,
+  }
 }
 
 export default useGruposDocente
