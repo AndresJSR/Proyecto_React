@@ -1,4 +1,5 @@
 import { Evaluation } from '../models/Evaluation';
+import { Grade } from '../models/Grade';
 import { Rubric } from '../models/Rubric';
 import { Subject } from '../models/Subject';
 import { Group } from '../models/Group';
@@ -50,4 +51,40 @@ export async function associateRubric(
 export async function createEvaluation(payload: EvaluacionCreatePayload): Promise<Evaluation> {
   const response = await api.post<ApiResponse<Evaluation>>('/api/evaluation/evaluations', payload);
   return response.data.data;
+}
+
+/**
+ * Obtiene las evaluaciones registradas para un grupo específico.
+ * Endpoint: GET /api/evaluation/evaluations/search?group_id={groupId}
+ */
+export async function getEvaluationsByGroup(groupId: string): Promise<Evaluation[]> {
+  try {
+    const response = await api.get<ApiResponse<Evaluation[]>>(
+      '/api/evaluation/evaluations/search',
+      { params: { group_id: groupId } }
+    );
+    return response.data.data ?? [];
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : 'Error al obtener evaluaciones del grupo'
+    );
+  }
+}
+
+/**
+ * Obtiene las notas finales asociadas a un grupo específico.
+ * Endpoint: GET /api/evaluation/grades/search?group_id={groupId}
+ */
+export async function getGradesByGroup(groupId: string): Promise<Grade[]> {
+  try {
+    const response = await api.get<ApiResponse<Grade[]>>(
+      '/api/evaluation/grades/search',
+      { params: { group_id: groupId } }
+    );
+    return response.data.data ?? [];
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : 'Error al obtener notas del grupo'
+    );
+  }
 }

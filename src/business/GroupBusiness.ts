@@ -4,7 +4,8 @@ import {
   UpdateGroupDto,
   GroupFilters
 } from '../models/Group'
-
+import { Evaluation } from '../models/Evaluation'
+import { Grade } from '../models/Grade'
 import { groupService } from '../services/groupService'
 
 export interface GroupCardData {
@@ -17,12 +18,12 @@ export interface GroupCardData {
   groupStatus: 'Activo' | 'Sin estudiantes' | 'Cerrado'
   semesterStatus: 'Activo' | 'Cerrado'
   isEditable: boolean
+  hasEvaluations: boolean
+  hasLockedGrades: boolean
 }
 
 class GroupBusiness {
-  async getGroups(
-    filters?: GroupFilters
-  ): Promise<Group[]> {
+  async getGroups(filters?: GroupFilters): Promise<Group[]> {
     const groups = await groupService.getGroups()
 
     if (!filters) return groups
@@ -74,23 +75,18 @@ class GroupBusiness {
 
   /**
    * Filtra grupos dejando solo los que pertenecen a un semestre activo.
-   *
    * Decisión: el endpoint /search?teacher_id ya trae todos los grupos del docente
    * sin distinción de semestre activo. Se filtra aquí en cliente para mostrar
    * solo los relevantes al período vigente.
-   * Si el backend en el futuro añade el filtro server-side, esta función
-   * simplemente devolverá el array intacto sin romper nada.
    */
   filterActiveGroups(groups: Group[]): Group[] {
-    return groups.filter(
-      (group) => group.semester?.is_active === true
-    )
+    return groups.filter((group) => group.semester?.is_active === true)
   }
 
   /**
    * Transforma el array de Group (modelo de dominio) en GroupCardData
-   * (modelo de presentación) para consumo directo por la UI.
-   * Toda la lógica derivada vive aquí, nunca en el componente ni en el hook.
+   * (modelo de presentación). Los campos de enriquecimiento (hasEvaluations,
+   * hasLockedGrades) se inicializan en false; se completan con enrichGroupCard.
    */
   mapGroupsToCards(groups: Group[]): GroupCardData[] {
     return groups.map((group): GroupCardData => {
@@ -116,8 +112,60 @@ class GroupBusiness {
         groupStatus,
         semesterStatus: semesterActive ? 'Activo' : 'Cerrado',
         isEditable: semesterActive,
+        // Se completan en enrichGroupCard tras cargar datos académicos
+        hasEvaluations: false,
+        hasLockedGrades: false,
       }
     })
+  }
+
+  /**
+   * Enriquece un GroupCardData con información académica del grupo:
+   * si tiene evaluaciones registradas y si alguna nota está bloqueada (is_locked).
+   * Función pura: no muta el card original, devuelve uno nuevo.
+   */
+  enrichGroupCard(
+    card: GroupCardData,
+    evaluations: Evaluation[],
+    grades: Grade[]
+  ): GroupCardData {
+    return {
+      ...card,
+      hasEvaluations: evaluations.length > 0,
+      hasLockedGrades: grades.some((grade) => grade.is_locked === true),
+    }
+  }
+
+  /**
+   * Devuelve un resumen legible del estado académico del grupo,
+   * útil para tooltips y atributos de accesibilidad (title).
+   */
+  getGroupStatusSummary(card: GroupCardData): string {
+    const parts: string[] = []
+
+    parts.push(
+      card.semesterStatus === 'Activo' ? 'Semestre activo' : 'Semestre cerrado'
+    )
+
+    if (card.groupStatus === 'Sin estudiantes') {
+      parts.push('Sin estudiantes inscritos')
+    } else if (card.groupStatus === 'Activo') {
+      parts.push(`${card.studentCount} estudiante${card.studentCount !== 1 ? 's' : ''}`)
+    }
+
+    parts.push(
+      card.hasEvaluations
+        ? `${card.hasEvaluations ? 'Con evaluaciones' : 'Sin evaluaciones'}`
+        : 'Sin evaluaciones'
+    )
+
+    if (card.hasLockedGrades) {
+      parts.push('Notas consolidadas')
+    } else {
+      parts.push('Notas pendientes')
+    }
+
+    return parts.join(' · ')
   }
 }
 
