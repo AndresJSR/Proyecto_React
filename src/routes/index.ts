@@ -16,7 +16,7 @@ const RoleList = lazy(() => import('../pages/Roles/List'));
 const StudyPlanDetail = lazy(() => import('../pages/PlanEstudios/StudyPlanDetailPage'));
 const AdminStudyPlans = lazy(() => import('../pages/PlanEstudios/PlanEstudios'));
 const EnrollStudentGroupPage = lazy(() => import('../pages/Inscripciones/EnrollStudentGroupPage'));
-
+const AsignarDocente = lazy(() => import('../pages/Group/AsignarDocente'));
 
 // ── Admin: Académico ──────────────────────────────────────────────────────────
 const ListCarreras = lazy(() => import('../pages/careers/ListCarrers'));
@@ -221,6 +221,12 @@ const routes = [
     component: CreateGrupo,
     allowedRoles: ADMIN,
   },
+  {
+  path: '/admin/groups/assign-teacher',
+  title: 'Asignar Docente a Grupo',
+  component: AsignarDocente,
+  allowedRoles: ADMIN,
+},
 
   // ── Admin: Matrículas ────────────────────────────────────────────────────────
   {
