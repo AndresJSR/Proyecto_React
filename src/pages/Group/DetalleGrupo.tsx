@@ -1,12 +1,13 @@
 import { useParams } from 'react-router-dom'
 
-import useDetalleGrupo from '../../hooks/useDetalleGrupo'
+import { useDetalleGrupo } from '../../hooks/useDetalleGrupo'
 import AcademicInfoCard from '../../components/Group/AcademicInfoCard'
 
 export default function DetalleGrupo() {
   const { id } = useParams<{ id: string }>()
+
   const { group, isLoading, error, academicInfo, isLoadingAcademic } =
-    useDetalleGrupo(id ?? '')
+    useDetalleGrupo(Number(id))
 
   if (isLoading) {
     return (
@@ -22,27 +23,35 @@ export default function DetalleGrupo() {
   if (error || !group) {
     return (
       <div className="p-6">
-        <p className="text-sm text-red-500">{error ?? 'Grupo no encontrado.'}</p>
+        <p className="text-sm text-red-500">
+          {error ?? 'Grupo no encontrado.'}
+        </p>
       </div>
     )
   }
 
   return (
     <div className="p-6 space-y-6">
-      {/* ── Header (Tarea 11) ─────────────────────────────────────────── */}
+      {/* Header */}
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-5">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
           {group.name}
         </h1>
+
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Código: <span className="font-medium">{group.group_code}</span>
-          {' · '}Capacidad:{' '}
+          {' · '}
+          Capacidad:{' '}
           <span className="font-medium">{group.capacity}</span>
         </p>
       </div>
 
-      {/* ── Sección académica ─────────────────────────────────────────── */}
-      {isLoadingAcademic && <AcademicInfoCard skeleton />}
+      {/* Información académica */}
+      {isLoadingAcademic && (
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Cargando información académica...
+        </p>
+      )}
 
       {!isLoadingAcademic && academicInfo && (
         <AcademicInfoCard info={academicInfo} />
@@ -53,8 +62,6 @@ export default function DetalleGrupo() {
           No se pudo cargar la información académica.
         </p>
       )}
-
-      {/* ── TODO: secciones de tareas posteriores ─────────────────────── */}
     </div>
   )
 }

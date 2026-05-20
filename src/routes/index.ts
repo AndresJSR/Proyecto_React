@@ -27,8 +27,8 @@ const SubjectDashboard = lazy(() => import('../pages/Subjects/SubjectDashboardPa
 const CreateAsignatura = lazy(() => import('../pages/Subjects/CreateSubject'));
 const ListGrupos = lazy(() => import('../pages/Group/ListGroup'));
 const CreateGrupo = lazy(() => import('../pages/Group/CreateGroup'));
-const ListMatriculas = lazy(() => import('../pages/Enrollment/ListEnrollment'));
-const CreateMatricula = lazy(() => import('../pages/Enrollment/CreateEnrollment'));
+const ListMatriculas = lazy(() => import('../pages/enrollment/ListEnrollment'));
+const CreateMatricula = lazy(() => import('../pages/enrollment/CreateEnrollment'));
 const ListInscripciones = lazy(() => import('../pages/Registration/ListRegistration'));
 const CreateInscripcion = lazy(() => import('../pages/Registration/CreateRegistration'));
 const CreateStudyPlan = lazy(() => import('../pages/StudyPlan/CreateStudyPlan'));
@@ -338,6 +338,12 @@ const routes = [
     path: '/evaluaciones/:evaluationId/:groupId/calificar',
     title: 'Calificar Estudiante',
     component: CalificarEstudiante,
+    allowedRoles: TEACHER,
+  },
+  {
+    path: '/calificaciones',
+    title: 'Calificaciones',
+    component: MisNotas,
     allowedRoles: TEACHER,
   },
   {
