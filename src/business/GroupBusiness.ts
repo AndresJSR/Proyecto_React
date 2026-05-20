@@ -149,7 +149,7 @@ class GroupBusiness {
     })
   }
 
-  async getGroupById(id: string): Promise<Group | null> {
+  async getGroupById(id: string): Promise<Group> {
     return await groupService.getGroupById(id)
   }
 

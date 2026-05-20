@@ -194,26 +194,29 @@ export const studyPlanService = {
     }
   },
 
-  async getSubjectsByPlan(planId: string): Promise<StudyPlanSubject[]> {
-  return await studyPlanService.getSubjectsByStudyPlan(planId)
+  async getSubjectsByPlan(planId: number | string): Promise<Subject[]> {
+    try {
+      const response = await api.get(`${BASE_URL}/study-plans/${planId}/subjects`)
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
   },
 
-  async addSubjectToPlan(
-    planId: string,
-    payload: { subject_id: string; suggested_semester: number; credits: number }
-  ): Promise<void> {
-    return await studyPlanService.addSubjectToStudyPlan(Number(planId), Number(payload.subject_id), {
-      subject_id: Number(payload.subject_id),
-      suggested_semester: payload.suggested_semester,
-      credits: payload.credits
-    })
+  async addSubjectToPlan(planId: number | string, subjectId: number | string): Promise<void> {
+    try {
+      await api.post(`${BASE_URL}/study-plans/${planId}/subjects/${subjectId}`)
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
   },
 
-  async removeSubjectFromPlan(planId: string, subjectId: string): Promise<void> {
-    return await studyPlanService.removeSubjectFromStudyPlan(
-      Number(planId),
-      Number(subjectId)
-    )
+  async removeSubjectFromPlan(planId: number | string, subjectId: number | string): Promise<void> {
+    try {
+      await api.delete(`${BASE_URL}/study-plans/${planId}/subjects/${subjectId}`)
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
   }
   
 }
