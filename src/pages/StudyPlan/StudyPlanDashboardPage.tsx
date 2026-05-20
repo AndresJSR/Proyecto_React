@@ -11,7 +11,6 @@ import StudyPlanForm from '../../components/StudyPlan/StudyPlanForm'
 import StudyPlanModal from '../../components/StudyPlan/StudyPlanModal'
 import StudyPlanSection from '../../components/StudyPlan/StudyPlanSection'
 import StudyPlanVersionPanel from '../../components/StudyPlan/StudyPlanVersionPanel'
-import useCarreras from '../../hooks/useCareer'
 import useStudyPlans from '../../hooks/useStudyPlans'
 import { StudyPlan } from '../../models/StudyPlan'
 import { StudyPlanVersion } from '../../models/StudyPlanVersion'
@@ -21,11 +20,10 @@ import { subjectService } from '../../services/subjectService'
 
 const StudyPlanDashboardPage: React.FC = () => {
   const navigate = useNavigate()
-  const { studyPlans, refresh: refreshPlans } = useStudyPlans()
-  const { careers } = useCarreras()
+  const { studyPlans, careers, refresh: refreshPlans } = useStudyPlans()
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [subjectSearch, setSubjectSearch] = useState('')
-  const [selectedCareerId, setSelectedCareerId] = useState('')
+  const [selectedCareerId, setSelectedCareerId] = useState<number | null>(null)
   const [versions, setVersions] = useState<StudyPlanVersion[]>([])
   const [selectedVersion, setSelectedVersion] = useState<StudyPlanVersion | null>(null)
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null)
@@ -43,13 +41,13 @@ const StudyPlanDashboardPage: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (careers.length > 0 && !selectedCareerId) {
-      setSelectedCareerId(careers[0].code)
+    if (careers.length > 0 && selectedCareerId === null) {
+      setSelectedCareerId(Number(careers[0].id))
     }
   }, [careers, selectedCareerId])
 
   useEffect(() => {
-    if (selectedCareerId) {
+    if (selectedCareerId !== null) {
       loadVersions(selectedCareerId)
     }
   }, [selectedCareerId])
@@ -74,9 +72,9 @@ const StudyPlanDashboardPage: React.FC = () => {
     }
   }
 
-  const loadVersions = async (careerId: string) => {
+  const loadVersions = async (careerId: number) => {
     try {
-      const data = await studyPlanVersionService.getVersionsByCareer(careerId)
+      const data = await studyPlanVersionService.getVersionsByCareer(String(careerId))
       setVersions(data)
       const published = data.find((version) => version.is_published)
       setSelectedVersion(published || data[0] || null)
@@ -98,7 +96,7 @@ const StudyPlanDashboardPage: React.FC = () => {
   const currentPlanItems = studyPlans
     .filter(
       (plan) =>
-        plan.career_id === selectedCareerId &&
+        Number(plan.career_id) === selectedCareerId &&
         (!selectedVersion || plan.year === selectedVersion.year)
     )
     .map((plan) => ({
@@ -106,10 +104,10 @@ const StudyPlanDashboardPage: React.FC = () => {
       subject: subjects.find((subject) => subject.id === plan.subject_id) || plan.subject
     }))
 
-  const currentCareer = careers.find((career) => career.code === selectedCareerId)
+  const currentCareer = careers.find((career) => Number(career.id) === selectedCareerId)
 
-  const handleSelectCareer = (careerCode: string) => {
-    setSelectedCareerId(careerCode)
+  const handleSelectCareer = (careerCode: string): void => {
+    setSelectedCareerId(Number(careerCode))
     setSelectedVersion(null)
   }
 
@@ -125,7 +123,7 @@ const StudyPlanDashboardPage: React.FC = () => {
   }
 
   const handleAddSubject = async (payload: { subject_id: string; suggested_semester: number; credits: number }) => {
-    if (!selectedCareerId || !selectedVersion) {
+    if (selectedCareerId === null || !selectedVersion) {
       Swal.fire({ icon: 'warning', title: 'Seleccione una carrera y versión antes de agregar' })
       return
     }
@@ -135,7 +133,7 @@ const StudyPlanDashboardPage: React.FC = () => {
 
     try {
       await studyPlanBusiness.createStudyPlan({
-        career_id: selectedCareerId,
+        career_id: String(selectedCareerId),
         subject_id: payload.subject_id,
         name: selectedSubjectCode,
         year: selectedVersion.year,
@@ -182,18 +180,18 @@ const StudyPlanDashboardPage: React.FC = () => {
   }
 
   const handlePublish = async (year: number) => {
-    if (!selectedCareerId) {
+    if (selectedCareerId === null) {
       Swal.fire({ icon: 'warning', title: 'Seleccione una carrera' })
       return
     }
 
     try {
       const version = await studyPlanBusiness.createVersion({
-        career_id: selectedCareerId,
+        career_id: String(selectedCareerId),
         year,
         name: `Versión ${year}`
       })
-      await studyPlanBusiness.publishVersion(version.id, { career_id: selectedCareerId, replace_previous: true })
+      await studyPlanBusiness.publishVersion(version.id, { career_id: String(selectedCareerId), replace_previous: true })
 
       Swal.fire({ icon: 'success', title: 'Versión publicada', text: 'La nueva versión ha reemplazado a la anterior.' })
       setPublishOpen(false)
@@ -224,13 +222,13 @@ const StudyPlanDashboardPage: React.FC = () => {
               <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
                 <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500">Carrera</label>
                 <select
-                  value={selectedCareerId}
+                  value={selectedCareerId ?? ''}
                   onChange={(e) => handleSelectCareer(e.target.value)}
                   className="mt-1 w-full rounded border-gray-200 bg-white px-2 py-2 text-sm text-gray-700"
                 >
                   <option value="">Seleccione una carrera</option>
                   {careerOptions.map((career) => (
-                    <option key={career.id} value={career.code}>{career.name}</option>
+                    <option key={career.id} value={String(career.id)}>{career.name}</option>
                   ))}
                 </select>
               </div>
@@ -305,12 +303,13 @@ const StudyPlanDashboardPage: React.FC = () => {
         title="Editar asignatura del plan"
         onClose={() => setSelectedEditPlan(null)}
       >
-        <StudyPlanForm
-          formData={editFormData}
-          onChange={(field, value) => setEditFormData((prev) => ({ ...prev, [field]: value }))}
-          onSubmit={handleUpdatePlan}
-          loading={false}
-        />
+          <StudyPlanForm
+            formData={editFormData}
+            onChange={(field, value) => setEditFormData((prev) => ({ ...prev, [field]: value }))}
+            onSubmit={handleUpdatePlan}
+            loading={false}
+            careers={careers}
+          />
       </StudyPlanModal>
 
       <DeleteSubjectModal

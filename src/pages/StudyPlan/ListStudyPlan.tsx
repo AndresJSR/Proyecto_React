@@ -16,7 +16,7 @@ import { studyPlanBusiness } from '../../business/StudyPlanBusiness'
 import useStudyPlans from '../../hooks/useStudyPlans'
 
 const ListStudyPlan = () => {
-  const { studyPlans, refresh } = useStudyPlans()
+  const { studyPlans, careers, refresh } = useStudyPlans()
 
   const [loading, setLoading] =
     useState(false)
@@ -32,7 +32,6 @@ const ListStudyPlan = () => {
       CreateStudyPlanDto | UpdateStudyPlanDto
     >({
       career_id: '',
-      subject_id: '',
       name: '',
       year: 2025,
       suggested_semester: 1
@@ -44,7 +43,6 @@ const ListStudyPlan = () => {
 
     setFormData({
       career_id: '',
-      subject_id: '',
       name: '',
       year: 2025,
       suggested_semester: 1
@@ -60,7 +58,6 @@ const ListStudyPlan = () => {
 
     setFormData({
       career_id: studyPlan.career_id,
-      subject_id: studyPlan.subject_id,
       name: studyPlan.name,
       year: studyPlan.year,
       suggested_semester:
@@ -194,6 +191,7 @@ const ListStudyPlan = () => {
           onChange={handleChange}
           onSubmit={handleSubmit}
           loading={loading}
+          careers={careers}
         />
       </StudyPlanModal>
     </div>

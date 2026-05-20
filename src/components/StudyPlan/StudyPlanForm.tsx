@@ -4,6 +4,7 @@ import {
     CreateStudyPlanDto,
     UpdateStudyPlanDto
 } from '../../models/StudyPlan'
+import { Career } from '../../models/Career'
 
 interface Props {
   formData:
@@ -18,13 +19,16 @@ interface Props {
   onSubmit: () => void
 
   loading?: boolean
+
+  careers: Career[]
 }
 
 const StudyPlanForm: React.FC<Props> = ({
   formData,
   onChange,
   onSubmit,
-  loading = false
+  loading = false,
+  careers
 }) => {
   return (
     <div className="space-y-4">
@@ -45,39 +49,24 @@ const StudyPlanForm: React.FC<Props> = ({
 
       <div>
         <label className="mb-1 block text-sm font-medium">
-          Carrera (ID)
+          Carrera
         </label>
 
-        <input
-          type="text"
+        <select
           value={formData.career_id || ''}
-          onChange={(e) =>
-            onChange(
-              'career_id',
-              e.target.value
-            )
-          }
+          onChange={(e) => onChange('career_id', e.target.value)}
           className="w-full rounded border p-2"
-        />
+        >
+          <option value="">-- Selecciona una carrera --</option>
+          {careers.map((career) => (
+            <option key={career.id} value={career.id}>
+              {career.name} ({career.code})
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div>
-        <label className="mb-1 block text-sm font-medium">
-          Asignatura (ID)
-        </label>
-
-        <input
-          type="text"
-          value={formData.subject_id || ''}
-          onChange={(e) =>
-            onChange(
-              'subject_id',
-              e.target.value
-            )
-          }
-          className="w-full rounded border p-2"
-        />
-      </div>
+      {/* subject_id removed: backend does not accept subject_id on study plan creation */}
 
       <div>
         <label className="mb-1 block text-sm font-medium">

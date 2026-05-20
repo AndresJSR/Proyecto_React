@@ -1,4 +1,4 @@
-import api from './api'
+import { api } from '../interceptors/authInterceptor'
 
 import {
     Career,
@@ -7,7 +7,7 @@ import {
     UpdateCareerDto
 } from '../models/Career'
 
-const BASE_URL = '/academic'
+const BASE_URL = '/api/academic'
 
 export const careerService = {
   async createCareer(payload: CreateCareerDto): Promise<Career> {
