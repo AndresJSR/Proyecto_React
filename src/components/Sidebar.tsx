@@ -157,11 +157,6 @@ const IcoBarChart = () => (
     <line x1="6" y1="20" x2="6" y2="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
   </svg>
 );
-const IcoShield = () => (
-  <svg className="fill-current" width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-  </svg>
-);
 const IcoSettings = () => (
   <svg className="fill-current" width="18" height="18" viewBox="0 0 24 24" fill="none">
     <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" fill="none" />
@@ -220,110 +215,172 @@ const IcoChevronDown = () => (
 );
 
 /* ───────────────────────────── MENÚ ADMINISTRADOR ───────────────────────────── */
-const AdminMenu = ({ pathname }: { pathname: string }) => (
-  <>
-    <div>
-      <ul className="mb-6 flex flex-col gap-1.5">
-        <li>
-          <NavLink to="/" className={linkClass(pathname, (p) => p === '/')}>
-            <IcoHome />
-            Inicio
-          </NavLink>
-        </li>
-      </ul>
-    </div>
+const AdminMenu = ({ pathname }: { pathname: string }) => {
+  const location = useLocation();
+  const isGruposActive =
+    location.pathname.startsWith('/admin/grupos') || location.pathname.startsWith('/grupos');
+  const isMatriculasActive =
+    location.pathname.startsWith('/admin/matriculas') ||
+    location.pathname.startsWith('/enrollments') ||
+    location.pathname.startsWith('/inscripciones');
 
-    <div>
-      <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">ACADÉMICO</h3>
-      <ul className="mb-6 flex flex-col gap-1.5">
-        <li>
-          <NavLink to="/admin/carreras" className={linkClass(pathname, '/admin/carreras')}>
-            <IcoGraduate />
-            Carreras
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/admin/asignaturas" className={linkClass(pathname, '/admin/asignaturas')}>
-            <IcoBook />
-            Asignaturas
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/study-plans/list" className={linkClass(pathname, '/study-plans')}>
-            <IcoBook />
-            Plan de estudios
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/admin/grupos" className={linkClass(pathname, '/admin/grupos')}>
-            <IcoGrid />
-            Grupos
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/admin/semestres" className={linkClass(pathname, '/admin/semestres')}>
-            <IcoCalendar />
-            Semestres
-          </NavLink>
-        </li>
-      </ul>
-    </div>
+  const [isGruposOpen, setIsGruposOpen] = useState<boolean>(isGruposActive);
+  const [isMatriculasOpen, setIsMatriculasOpen] = useState<boolean>(isMatriculasActive);
 
-    <div>
-      <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">GESTIÓN</h3>
-      <ul className="mb-6 flex flex-col gap-1.5">
-        <li>
-          <NavLink to="/users/list" className={linkClass(pathname, '/users/list')}>
-            <IcoUsers />
-            Usuarios
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/admin/docentes" className={linkClass(pathname, '/admin/docentes')}>
-            <IcoUser />
-            Docentes
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/admin/estudiantes" className={linkClass(pathname, '/admin/estudiantes')}>
-            <IcoGraduate />
-            Estudiantes
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/admin/matriculas" className={linkClass(pathname, '/admin/matriculas')}>
-            <IcoIdCard />
-            Matrículas
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/admin/reportes" className={linkClass(pathname, '/admin/reportes')}>
-            <IcoBarChart />
-            Reportes
-          </NavLink>
-        </li>
-      </ul>
-    </div>
+  return (
+    <>
+      <div>
+        <ul className="mb-6 flex flex-col gap-1.5">
+          <li>
+            <NavLink to="/" className={linkClass(pathname, (p) => p === '/')}>
+              <IcoHome />
+              Dashboard
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/users/list" className={linkClass(pathname, '/users/list')}>
+              <IcoUsers />
+              Usuarios
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/carreras" className={linkClass(pathname, '/admin/carreras')}>
+              <IcoGraduate />
+              Carreras
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/semestres" className={linkClass(pathname, '/admin/semestres')}>
+              <IcoCalendar />
+              Semestres
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/study-plans/list" className={linkClass(pathname, '/study-plans')}>
+              <IcoBook />
+              Planes de estudio
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/asignaturas" className={linkClass(pathname, '/admin/asignaturas')}>
+              <IcoBook />
+              Asignaturas
+            </NavLink>
+          </li>
 
-    <div>
-      <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">SISTEMA</h3>
-      <ul className="mb-6 flex flex-col gap-1.5">
-        <li>
-          <NavLink to="/admin/auditoria" className={linkClass(pathname, '/admin/auditoria')}>
-            <IcoShield />
-            Auditoría
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/settings" className={linkClass(pathname, '/settings')}>
-            <IcoSettings />
-            Configuración
-          </NavLink>
-        </li>
-      </ul>
-    </div>
-  </>
-);
+          {/* ── Grupos (submenú) ─────────────────────────────────────────── */}
+          <li>
+            <button
+              onClick={() => setIsGruposOpen((prev) => !prev)}
+              className={`group relative flex w-full items-center justify-between gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                isGruposActive || isGruposOpen ? 'bg-graydark dark:bg-meta-4' : ''
+              }`}
+            >
+              <span className="flex items-center gap-2.5">
+                <IcoGrid />
+                Grupos
+              </span>
+              {isGruposOpen ? <IcoChevronUp /> : <IcoChevronDown />}
+            </button>
+
+            {isGruposOpen && (
+              <ul className="mt-1 ml-4 flex flex-col gap-1 border-l border-graydark pl-3">
+                <li>
+                  <NavLink
+                    to="/grupos/create"
+                    className={({ isActive }) =>
+                      `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        isActive ? 'bg-graydark text-white dark:bg-meta-4' : 'text-bodydark1'
+                      }`
+                    }
+                  >
+                    Crear grupo
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/admin/grupos"
+                    className={({ isActive }) =>
+                      `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        isActive ? 'bg-graydark text-white dark:bg-meta-4' : 'text-bodydark1'
+                      }`
+                    }
+                  >
+                    Asignar docente
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/inscripciones/enroll-student-in-group"
+                    className={({ isActive }) =>
+                      `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        isActive ? 'bg-graydark text-white dark:bg-meta-4' : 'text-bodydark1'
+                      }`
+                    }
+                  >
+                    Inscribir estudiantes
+                  </NavLink>
+                </li>
+              </ul>
+            )}
+          </li>
+
+          {/* ── Matrículas (submenú) ─────────────────────────────────────── */}
+          <li>
+            <button
+              onClick={() => setIsMatriculasOpen((prev) => !prev)}
+              className={`group relative flex w-full items-center justify-between gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                isMatriculasActive || isMatriculasOpen ? 'bg-graydark dark:bg-meta-4' : ''
+              }`}
+            >
+              <span className="flex items-center gap-2.5">
+                <IcoIdCard />
+                Matrículas
+              </span>
+              {isMatriculasOpen ? <IcoChevronUp /> : <IcoChevronDown />}
+            </button>
+
+            {isMatriculasOpen && (
+              <ul className="mt-1 ml-4 flex flex-col gap-1 border-l border-graydark pl-3">
+                <li>
+                  <NavLink
+                    to="/enrollments/create"
+                    className={({ isActive }) =>
+                      `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        isActive ? 'bg-graydark text-white dark:bg-meta-4' : 'text-bodydark1'
+                      }`
+                    }
+                  >
+                    Matricular carrera
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/inscripciones/create"
+                    className={({ isActive }) =>
+                      `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        isActive ? 'bg-graydark text-white dark:bg-meta-4' : 'text-bodydark1'
+                      }`
+                    }
+                  >
+                    Inscribir en grupo
+                  </NavLink>
+                </li>
+              </ul>
+            )}
+          </li>
+
+          <li>
+            <NavLink to="/admin/reportes" className={linkClass(pathname, '/admin/reportes')}>
+              <IcoBarChart />
+              Reportes
+            </NavLink>
+          </li>
+        </ul>
+      </div>
+    </>
+  );
+};
 
 /* ───────────────────────────── MENÚ DOCENTE ───────────────────────────── */
 const TeacherMenu = ({ pathname }: { pathname: string }) => {

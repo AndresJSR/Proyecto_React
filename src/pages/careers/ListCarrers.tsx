@@ -16,9 +16,7 @@ import CareerModal from '../../components/Career/CareerModal';
 import CareerTable from '../../components/Career/CareerTable';
 
 import { Career, CreateCareerDto, UpdateCareerDto } from '../../models/Career';
-
 import { Semester } from '../../models/Semester';
-
 import { careerBusiness } from '../../business/CareerBusiness';
 
 interface CareerSectionContentProps {
@@ -29,39 +27,32 @@ const CareerSectionContent = ({
   hideSectionTitle = false,
 }: CareerSectionContentProps) => {
   const [careers, setCareers] = useState<Career[]>([]);
-
   const [loading, setLoading] = useState(false);
-
   const [openModal, setOpenModal] = useState(false);
-
   const [selectedCareer, setSelectedCareer] = useState<Career | null>(null);
-
   const [detailOpen, setDetailOpen] = useState(false);
-
   const [detailCareer, setDetailCareer] = useState<Career | null>(null);
-
   const [detailSemesters, setDetailSemesters] = useState<Semester[]>([]);
-
   const [detailStudentCount, setDetailStudentCount] = useState(0);
-
   const [detailStudyPlanCount, setDetailStudyPlanCount] = useState(0);
-
   const [formData, setFormData] = useState<CreateCareerDto | UpdateCareerDto>({
     name: '',
     code: '',
     description: '',
   });
+  const [archiveOpen, setArchiveOpen] = useState(false);
+  const [archiveCareer, setArchiveCareer] = useState<Career | null>(null);
+  const [archiveActiveSemesters, setArchiveActiveSemesters] = useState
+    { name: string; period: string }[]
+  >([]);
 
   const loadCareers = async () => {
     setLoading(true);
-
     try {
       const data = await careerBusiness.getCareers();
-
       setCareers(data);
     } catch (error) {
       console.error(error);
-
       Swal.fire({
         icon: 'error',
         title: 'Error al cargar carreras',
@@ -78,25 +69,17 @@ const CareerSectionContent = ({
 
   const handleCreate = () => {
     setSelectedCareer(null);
-
-    setFormData({
-      name: '',
-      code: '',
-      description: '',
-    });
-
+    setFormData({ name: '', code: '', description: '' });
     setOpenModal(true);
   };
 
   const handleEdit = (career: Career) => {
     setSelectedCareer(career);
-
     setFormData({
       name: career.name,
       code: career.code,
       description: career.description || '',
     });
-
     setOpenModal(true);
   };
 
@@ -114,17 +97,14 @@ const CareerSectionContent = ({
 
     try {
       await careerBusiness.deleteCareer(id);
-
       await Swal.fire({
         icon: 'success',
         title: 'Carrera archivada',
         text: 'La carrera se archivó correctamente',
       });
-
       loadCareers();
     } catch (error) {
       console.error(error);
-
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -134,10 +114,7 @@ const CareerSectionContent = ({
   };
 
   const handleChange = (field: string, value: string | boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async () => {
@@ -147,7 +124,6 @@ const CareerSectionContent = ({
           selectedCareer.id,
           formData as UpdateCareerDto,
         );
-
         await Swal.fire({
           icon: 'success',
           title: 'Carrera actualizada',
@@ -155,16 +131,13 @@ const CareerSectionContent = ({
         });
       } else {
         await careerBusiness.createCareer(formData as CreateCareerDto);
-
         await Swal.fire({
           icon: 'success',
           title: 'Carrera creada',
           text: 'La carrera se creó correctamente',
         });
       }
-
       setOpenModal(false);
-
       loadCareers();
     } catch (error: any) {
       Swal.fire({
@@ -175,85 +148,58 @@ const CareerSectionContent = ({
     }
   };
 
-  const [archiveOpen, setArchiveOpen] = useState(false);
-
-  const [archiveCareer, setArchiveCareer] = useState<Career | null>(null);
-
-  const [archiveActiveSemesters, setArchiveActiveSemesters] = useState<
-    { name: string; period: string }[]
-  >([]);
-
   const handleArchiveOpen = async (career: Career) => {
     setArchiveCareer(career);
-
     try {
       const semesters = await semesterBusiness.getSemesters();
-
       const active = semesters
         .filter((s) => s.career_id === career.id && s.is_active)
         .slice(0, 3)
-        .map((s) => ({
-          name: s.name,
-          period: `${s.start_date} - ${s.end_date}`,
-        }));
-
+        .map((s) => ({ name: s.name, period: `${s.start_date} - ${s.end_date}` }));
       setArchiveActiveSemesters(active);
     } catch (err) {
       setArchiveActiveSemesters([]);
     }
-
     setArchiveOpen(true);
   };
 
   const handleView = async (career: Career) => {
     setDetailCareer(career);
-
     try {
       const [semesters, registrations, studyPlans] = await Promise.all([
         semesterBusiness.getSemesters(),
         registrationBusiness.getRegistrations(),
         studyPlanBusiness.getStudyPlans(),
       ]);
-
       const associatedSemesters = semesters.filter(
         (semester) => semester.career_id === career.id,
       );
-
       setDetailSemesters(associatedSemesters);
-
       setDetailStudentCount(
         registrations.filter(
-          (registration) =>
-            registration.career_id === career.id && registration.is_active,
+          (r) => r.career_id === career.id && r.is_active,
         ).length,
       );
-
       setDetailStudyPlanCount(
-        studyPlans.filter((studyPlan) => studyPlan.career_id === career.id)
-          .length,
+        studyPlans.filter((sp) => sp.career_id === career.id).length,
       );
     } catch (error) {
       console.error(error);
     }
-
     setDetailOpen(true);
   };
 
   const handleConfirmArchive = async () => {
     if (!archiveCareer) return;
-
     try {
       await careerBusiness.deleteCareer(archiveCareer.id);
-
       Swal.fire({
         icon: 'success',
         title: 'Carrera archivada',
         text: 'La carrera se archivó correctamente',
       });
-
       setArchiveOpen(false);
       setArchiveCareer(null);
-
       loadCareers();
     } catch (error: any) {
       Swal.fire({
@@ -265,17 +211,6 @@ const CareerSectionContent = ({
       });
     }
   };
-
-  const columns = [
-    { key: 'code', label: 'Código' },
-    { key: 'name', label: 'Nombre' },
-    { key: 'description', label: 'Descripción', render: (item: Career) => item.description || '-' },
-    {
-      key: 'is_active',
-      label: 'Estado',
-      render: (item: Career) => (item.is_active ? 'Activo' : 'Inactivo')
-    }
-  ]
 
   return (
     <>
@@ -291,7 +226,6 @@ const CareerSectionContent = ({
               🔍 Filtros
             </button>
           </div>
-
           <button
             type="button"
             onClick={handleCreate}
@@ -310,91 +244,12 @@ const CareerSectionContent = ({
           onArchive={handleArchiveOpen}
           onView={handleView}
         />
-
         {careers.length === 0 && (
           <div className="py-8 text-center text-gray-500">
             No hay carreras registradas
           </div>
         )}
       </div>
-
-      {/* barra de búsqueda */}
-
-      <GenericTable<Career>
-        data={careers}
-        columns={columns}
-        renderActions={(item) => (
-          <ActionDropdown
-            items={[
-              {
-                key: 'edit',
-                label: 'Editar carrera',
-                onClick: () => handleEdit(item),
-                icon: (
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z"
-                    />
-                  </svg>
-                )
-              },
-              {
-                key: 'view',
-                label: 'Ver detalle',
-                onClick: () => handleView(item),
-                icon: (
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7S3.732 16.057 2.458 12z"
-                    />
-                  </svg>
-                )
-              },
-              {
-                key: 'archive',
-                label: 'Archivar carrera',
-                onClick: () => handleArchiveOpen(item),
-                colorClass: 'text-yellow-600',
-                icon: (
-                  <svg className="h-4 w-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4 7h16M8 7v10a2 2 0 002 2h4a2 2 0 002-2V7"
-                    />
-                    <path
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 7V5a3 3 0 016 0v2"
-                    />
-                  </svg>
-                )
-              }
-            ]}
-            align="right"
-          />
-        )}
-      />
-
-      {careers.length === 0 && (
-        <div className="py-8 text-center text-gray-500">No hay carreras registradas</div>
-      )}
-
-      {/* modales */}
 
       <CareerModal
         isOpen={openModal}
@@ -439,14 +294,11 @@ export const CareerSection = () => {
           <p className="text-sm font-semibold uppercase tracking-wide text-green-700">
             Académico
           </p>
-
           <h2 className="mt-1 text-xl font-semibold text-gray-900">Carreras</h2>
-
           <p className="mt-2 text-sm text-gray-600">
             Administra la oferta académica disponible.
           </p>
         </div>
-
         <button
           type="button"
           onClick={() => navigate('/carreras/create')}
@@ -455,7 +307,6 @@ export const CareerSection = () => {
           + Nueva carrera
         </button>
       </div>
-
       <CareerSectionContent hideSectionTitle />
     </section>
   );
@@ -469,7 +320,6 @@ const ListCareer = () => {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Académico</h1>
-
               <p className="mt-2 text-gray-600">
                 Gestiona las carreras y los semestres del sistema.
               </p>
@@ -477,7 +327,6 @@ const ListCareer = () => {
           </div>
         </div>
       </div>
-
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <CareerSection />
       </div>
