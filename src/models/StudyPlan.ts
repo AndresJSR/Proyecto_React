@@ -5,7 +5,7 @@ export interface StudyPlan {
   id: number | string
 
   career_id: number | string
-  subject_id: number | string
+  subject_id: number | string  // relación singular del backend
 
   name: string
   year: number
@@ -18,6 +18,7 @@ export interface StudyPlan {
 
   career?: Career
   subject?: Subject
+  subjects?: Subject[]         // AGREGAR: array para planes con múltiples asignaturas
 }
 
 export interface CreateStudyPlanDto {
