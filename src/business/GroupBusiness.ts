@@ -8,6 +8,11 @@ import { Evaluation } from '../models/Evaluation'
 import { Grade } from '../models/Grade'
 import { groupService } from '../services/groupService'
 import { Rubric } from '../models/Rubric'
+import { Subject } from '../models/Subject'
+import { StudyPlan } from '../models/StudyPlan'
+import { Career } from '../models/Career'
+
+
 
 // ─── Tipos de presentación ────────────────────────────────────────────────────
 
@@ -36,14 +41,86 @@ export interface GroupUIFilters {
   semesterName: string    // '' = todos
   groupStatus: string     // '' = todos
 }
-
+export interface GroupDetailInfo {
+  name: string
+  groupCode: string
+  subjectName: string
+  semesterName: string
+  semesterIsActive: boolean
+  studentCount: number
+  capacity: number | null
+  occupancyLabel: string
+  statusLabel: string
+  statusColor: 'green' | 'yellow' | 'red'
+  isEditable: boolean
+}
 export const EMPTY_GROUP_UI_FILTERS: GroupUIFilters = {
   searchSubject: '',
   searchCode: '',
   semesterName: '',
   groupStatus: '',
 }
+// ─── Tipos para información académica ────────────────────────────────────────
 
+export interface GroupAcademicInfo {
+  subjectName: string
+  subjectCode: string
+  credits: number
+  creditsLabel: string
+  careerName: string
+  studyPlanName: string
+  studyPlanYear: number | null
+  suggestedSemester: number | null
+  suggestedSemesterLabel: string
+}
+
+// ─── Funciones puras de dominio ───────────────────────────────────────────────
+
+/**
+ * Filtra planes de estudio que contienen la asignatura indicada.
+ * Usado cuando el backend retorna todos los planes sin filtrar.
+ */
+export function filterStudyPlansBySubject(
+  plans: StudyPlan[],
+  subjectId: number | string
+): StudyPlan[] {
+  return plans.filter(
+    (p) =>
+      String(p.subject_id) === String(subjectId)
+  )
+}
+
+/**
+ * Construye el objeto GroupAcademicInfo a partir de los datos
+ * ya cargados (subject, planes y carrera).
+ */
+export function buildAcademicInfo(
+  subject: Subject,
+  studyPlans: StudyPlan[],
+  career: Career | null
+): GroupAcademicInfo {
+  const plan = studyPlans[0] ?? null
+
+  const credits = subject.credits ?? 0
+  const creditsLabel = `${credits} crédito${credits !== 1 ? 's' : ''}`
+
+  const suggestedSemester = plan?.suggested_semester ?? null
+  const suggestedSemesterLabel = suggestedSemester
+    ? `Semestre ${suggestedSemester}`
+    : 'No especificado'
+
+  return {
+    subjectName: subject.name,
+    subjectCode: subject.code,
+    credits,
+    creditsLabel,
+    careerName: career?.name ?? 'Carrera no encontrada',
+    studyPlanName: plan?.name ?? 'Plan no asociado',
+    studyPlanYear: plan?.year ?? null,
+    suggestedSemester,
+    suggestedSemesterLabel,
+  }
+}
 // ─── Business ────────────────────────────────────────────────────────────────
 
 class GroupBusiness {
@@ -109,7 +186,14 @@ class GroupBusiness {
   filterActiveGroups(groups: Group[]): Group[] {
     return groups.filter((group) => group.semester?.is_active === true)
   }
-
+  private deriveGroupStatus(
+    semesterActive: boolean,
+    studentCount: number
+  ): { statusLabel: string; statusColor: 'green' | 'yellow' | 'red' } {
+    if (!semesterActive) return { statusLabel: 'Cerrado',          statusColor: 'red'    }
+    if (studentCount === 0) return { statusLabel: 'Sin estudiantes', statusColor: 'yellow' }
+    return                       { statusLabel: 'Activo',           statusColor: 'green'  }
+  }
   /**
    * Transforma Group[] (dominio) en GroupCardData[] (presentación).
    * hasEvaluations y hasLockedGrades se inicializan en false;
@@ -120,14 +204,8 @@ class GroupBusiness {
       const semesterActive = group.semester?.is_active === true
       const studentCount = group.enrollments?.length ?? 0
 
-      let groupStatus: GroupCardData['groupStatus']
-      if (!semesterActive) {
-        groupStatus = 'Cerrado'
-      } else if (studentCount === 0) {
-        groupStatus = 'Sin estudiantes'
-      } else {
-        groupStatus = 'Activo'
-      }
+      const { statusLabel: groupStatusStr } = this.deriveGroupStatus(semesterActive, studentCount)
+      const groupStatus = groupStatusStr as GroupCardData['groupStatus']
 
       return {
         id: group.id,
@@ -259,6 +337,60 @@ enrichGroupCard(
     // Los IDs del proyecto son strings (UUIDs o numéricos como string)
     // Aceptamos cualquier string no vacío y no-whitespace
     return raw.trim() || null
+  }
+  /**
+   * Valida que el docente autenticado sea el propietario del grupo.
+   *
+   * Decisión de modelo: Group.teacher_id referencia User.id directamente
+   * (no Teacher.id), confirmado en src/models/Group.ts donde teacher_id: string
+   * coincide con User.id: string. El backend asigna el grupo al user_id del
+   * docente, no al id de la tabla teachers.
+   *
+   * Retorna el mensaje de error si el acceso no está permitido, o null si es válido.
+   */
+  validateTeacherAccess(group: Group, teacherUserId: string): string | null {
+    if (group.teacher_id !== teacherUserId) {
+      return 'No tienes permiso para ver este grupo.'
+    }
+    return null
+  }
+
+  /**
+   * Wrapper semántico sobre validateTeacherAccess para contextos
+   * donde se necesita un boolean en lugar del mensaje de error.
+   */
+  isGroupOwnedByTeacher(group: Group, teacherUserId: string): boolean {
+    return this.validateTeacherAccess(group, teacherUserId) === null
+  }
+  /**
+   * Transforma un Group (dominio) en GroupDetailInfo (presentación de detalle).
+   * Nota: si el backend no retorna subject/semester anidados en
+   * GET /api/academic/groups/{id}, el hook debe enriquecerlos antes de llamar
+   * esta función (ver useDetalleGrupo).
+   */
+  buildGroupDetailInfo(group: Group): GroupDetailInfo {
+    const semesterActive = group.semester?.is_active === true
+    const studentCount = group.enrollments?.length ?? 0
+    const capacity = group.capacity ?? null
+    const { statusLabel, statusColor } = this.deriveGroupStatus(semesterActive, studentCount)
+
+    const occupancyLabel = capacity != null
+      ? `${studentCount} / ${capacity} estudiantes`
+      : `${studentCount} estudiante${studentCount !== 1 ? 's' : ''}`
+
+    return {
+      name:             group.name,
+      groupCode:        group.group_code,
+      subjectName:      group.subject?.name  ?? 'Sin asignatura',
+      semesterName:     group.semester?.name ?? 'Sin semestre',
+      semesterIsActive: semesterActive,
+      studentCount,
+      capacity,
+      occupancyLabel,
+      statusLabel,
+      statusColor,
+      isEditable: semesterActive,
+    }
   }
 }
 

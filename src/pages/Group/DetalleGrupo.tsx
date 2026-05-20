@@ -1,69 +1,60 @@
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
-import { groupBusiness } from '../../business/GroupBusiness'
-import { useDetalleGrupo } from '../../hooks/useDetalleGrupo'
+import { useParams } from 'react-router-dom'
 
-const DetalleGrupo = () => {
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const rawId = searchParams.get('groupId')
-  const groupId = groupBusiness.validateGroupId(rawId)
+import useDetalleGrupo from '../../hooks/useDetalleGrupo'
+import AcademicInfoCard from '../../components/Group/AcademicInfoCard'
 
-  // Validar antes de llamar al hook
-  if (!groupId) {
+export default function DetalleGrupo() {
+  const { id } = useParams<{ id: string }>()
+  const { group, isLoading, error, academicInfo, isLoadingAcademic } =
+    useDetalleGrupo(id ?? '')
+
+  if (isLoading) {
     return (
-      <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
-        <p className="mb-4 text-sm text-danger">Grupo no encontrado.</p>
-        <button
-          onClick={() => navigate('/teacher/grupos')}
-          className="flex items-center gap-2 text-sm font-medium text-primary hover:underline"
-        >
-          <ArrowLeft size={15} />
-          Volver a Mis grupos
-        </button>
+      <div className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 w-48 bg-gray-200 rounded dark:bg-gray-700" />
+          <div className="h-4 w-64 bg-gray-200 rounded dark:bg-gray-700" />
+        </div>
       </div>
     )
   }
 
-  return <DetalleGrupoContent groupId={groupId} />
-}
-
-/** Componente interno: solo se monta cuando groupId es válido */
-const DetalleGrupoContent = ({ groupId }: { groupId: string }) => {
-  const navigate = useNavigate()
-  const { isLoading, error } = useDetalleGrupo(groupId)
+  if (error || !group) {
+    return (
+      <div className="p-6">
+        <p className="text-sm text-red-500">{error ?? 'Grupo no encontrado.'}</p>
+      </div>
+    )
+  }
 
   return (
-    <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
-      {/* Botón volver */}
-      <button
-        onClick={() => navigate('/teacher/grupos')}
-        className="mb-6 flex items-center gap-2 text-sm font-medium text-bodydark1 hover:text-primary"
-      >
-        <ArrowLeft size={15} />
-        Volver
-      </button>
+    <div className="p-6 space-y-6">
+      {/* ── Header (Tarea 11) ─────────────────────────────────────────── */}
+      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-5">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+          {group.name}
+        </h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Código: <span className="font-medium">{group.group_code}</span>
+          {' · '}Capacidad:{' '}
+          <span className="font-medium">{group.capacity}</span>
+        </p>
+      </div>
 
-      <h2 className="text-title-md2 font-semibold text-black dark:text-white">
-        Detalle del grupo
-      </h2>
+      {/* ── Sección académica ─────────────────────────────────────────── */}
+      {isLoadingAcademic && <AcademicInfoCard skeleton />}
 
-      {isLoading && (
-        <p className="mt-4 text-sm text-bodydark2">Cargando grupo {groupId}...</p>
+      {!isLoadingAcademic && academicInfo && (
+        <AcademicInfoCard info={academicInfo} />
       )}
 
-      {!isLoading && error && (
-        <p className="mt-4 text-sm text-danger">{error}</p>
-      )}
-
-      {!isLoading && !error && (
-        <p className="mt-4 text-sm text-bodydark2">
-          {/* TODO Tarea 11: reemplazar por la vista completa del grupo */}
-          Cargando grupo {groupId}...
+      {!isLoadingAcademic && !academicInfo && (
+        <p className="text-sm text-gray-400 dark:text-gray-500 italic">
+          No se pudo cargar la información académica.
         </p>
       )}
+
+      {/* ── TODO: secciones de tareas posteriores ─────────────────────── */}
     </div>
   )
 }
-
-export default DetalleGrupo
