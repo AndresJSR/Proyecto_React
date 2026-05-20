@@ -1,5 +1,3 @@
-// esta es mi version darling 
-
 import {
   Group,
   CreateGroupDto,
@@ -132,6 +130,21 @@ class GroupBusiness {
   async deleteGroup(id: string): Promise<void> {
     if (!id) throw new Error('Group id is required')
     return await groupService.deleteGroup(id)
+  }
+
+  /**
+   * Filtra grupos dejando solo los que pertenecen a un semestre activo.
+   *
+   * Decisión: el endpoint /search?teacher_id ya trae todos los grupos del docente
+   * sin distinción de semestre activo. Se filtra aquí en cliente para mostrar
+   * solo los relevantes al período vigente.
+   * Si el backend en el futuro añade el filtro server-side, esta función
+   * simplemente devolverá el array intacto sin romper nada.
+   */
+  filterActiveGroups(groups: Group[]): Group[] {
+    return groups.filter(
+      (group) => group.semester?.is_active === true
+    )
   }
 }
 

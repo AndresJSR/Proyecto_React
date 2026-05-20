@@ -50,6 +50,9 @@ const MisAsignaturas = lazy(() => import('../pages/MisAsignaturas/MisAsignaturas
 const MisEvaluaciones = lazy(() => import('../pages/MisEvaluaciones/MisEvaluaciones'));
 const ConsultarRubrica = lazy(() => import('../pages/MisEvaluaciones/ConsultarRubrica'));
 const MisNotas = lazy(() => import('../pages/MisNotas/MisNotas'));
+// ── Profesor: Grupos ──────────────────────────────────────────────────────────
+const MisGrupos = lazy(() => import('../pages/Group/MisGrupos'));
+const DetalleGrupo = lazy(() => import('../pages/Group/DetalleGrupo'));
 
 const ADMIN = [UserRole.ADMIN];
 const TEACHER = [UserRole.TEACHER];
@@ -334,6 +337,19 @@ const routes = [
     path: '/evaluaciones/:evaluationId/:groupId/calificar',
     title: 'Calificar Estudiante',
     component: CalificarEstudiante,
+    allowedRoles: TEACHER,
+  },
+  // ── Profesor: Grupos ──────────────────────────────────────────────────────────
+  {
+    path: '/teacher/grupos',
+    title: 'Mis grupos',
+    component: MisGrupos,
+    allowedRoles: TEACHER,
+  },
+  {
+    path: '/teacher/grupos/detalle',
+    title: 'Detalle del grupo',
+    component: DetalleGrupo,
     allowedRoles: TEACHER,
   },
 

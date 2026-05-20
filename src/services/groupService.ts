@@ -67,6 +67,15 @@ class GroupService {
       throw new Error(getErrorMessage(error))
     }
   }
+
+  /**
+   * Obtiene los grupos asignados a un docente específico.
+   * Endpoint: GET /api/academic/groups/search?teacher_id={teacherId}
+   * Delega en searchGroups para no duplicar la llamada HTTP.
+   */
+  async getGroupsByTeacher(teacherId: string): Promise<Group[]> {
+    return this.searchGroups({ teacher_id: teacherId })
+  }
 }
 
 export const groupService = new GroupService()
