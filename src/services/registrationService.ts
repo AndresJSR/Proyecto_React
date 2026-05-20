@@ -9,7 +9,7 @@ import {
   RegistrationFilters
 } from '../models/Registration'
 
-const BASE_URL = '/academic'
+const BASE_URL = '/api/academic'
 
 export const registrationService = {
   async createRegistration(

@@ -1,4 +1,4 @@
-import { UserFormValues } from '../components/users/UserFormValidator';
+import { UserFormValues } from '../components/Users/UserFormValidator';
 import { User } from '../models/User';
 import { UserRole } from '../models/UserRole';
 
@@ -32,7 +32,6 @@ class UserBusiness {
   getUserRoleLabel(role?: UserRole): string {
     switch (role) {
       case UserRole.ADMIN:
-        
         return 'Administrador';
       case UserRole.TEACHER:
         return 'Docente';
@@ -52,21 +51,21 @@ class UserBusiness {
     return new Date(date).toLocaleDateString();
   }
 
-  getUserCareer(user: User): string {
+  getUserCareer(user: User, careerName?: string): string {
     if (user.role !== UserRole.STUDENT) {
       return 'No aplica';
     }
 
-    return 'No disponible';
+    return careerName ?? 'No disponible';
   }
 
-  mapUserToTableRow(user: User): UserTableRow {
+  mapUserToTableRow(user: User, careerName?: string): UserTableRow {
     return {
       id: user.id,
       code: user.code,
       name: this.getUserFullName(user),
       email: user.email,
-      career: this.getUserCareer(user),
+      career: this.getUserCareer(user, careerName),
       role: this.getUserRoleLabel(user.role),
       status: this.getUserStatusLabel(user),
       is_active: user.is_active,
@@ -74,10 +73,18 @@ class UserBusiness {
     };
   }
 
-  mapUsersToTableRows(users: User[]): UserTableRow[] {
-    return users.map((user) => this.mapUserToTableRow(user));
-  }
+  mapUsersToTableRows(
+    users: User[],
+    careerByStudentId: Record<string, string> = {},
+  ): UserTableRow[] {
+    return users.map((user) => {
+      const studentId = user.profile?.id ? String(user.profile.id) : undefined;
 
+      const careerName = studentId ? careerByStudentId[studentId] : undefined;
+
+      return this.mapUserToTableRow(user, careerName);
+    });
+  }
   buildUpdateUserPayload(values: UserFormValues) {
     const payload: Record<string, any> = {
       email: values.email,
