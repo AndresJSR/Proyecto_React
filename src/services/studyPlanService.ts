@@ -73,14 +73,13 @@ export const studyPlanService = {
     }
   },
 
-  async getSubjectsByStudyPlan(
-    studyPlanId: number
-  ): Promise<StudyPlanSubject[]> {
-    try {
-      const response = await api.get(
-        `${BASE_URL}/study-plans/${studyPlanId}/subjects`
-      )
-
+    async getSubjectsByStudyPlan(
+      studyPlanId: string | number
+    ): Promise<StudyPlanSubject[]> {
+      try {
+        const response = await api.get(
+          `${BASE_URL}/study-plans/${studyPlanId}/subjects`
+        )
       const raw = response.data.data
 
       // Normaliza la respuesta del API al tipo StudyPlanSubject
@@ -182,7 +181,7 @@ export const studyPlanService = {
   },
 
   async getSubjectsByPlan(planId: string): Promise<StudyPlanSubject[]> {
-    return await studyPlanService.getSubjectsByStudyPlan(Number(planId))
+  return await studyPlanService.getSubjectsByStudyPlan(planId)
   },
 
   async addSubjectToPlan(

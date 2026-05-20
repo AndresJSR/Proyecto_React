@@ -35,14 +35,11 @@ const useStudyPlans = () => {
 
       const enrichedPlans = plans.map((plan) => ({
         ...plan,
-        subject: subjects.find(
-          (subject) => subject.id === plan.subject_id
-        ),
-        career: careerList.find(
-          (career) => career.id === plan.career_id
-        )
+        subject: subjects.find((subject) => String(subject.id) === String(plan.subject_id)),
+        career: careerList.find((career) => String(career.id) === String(plan.career_id))
       }))
 
+      console.debug('useStudyPlans: loaded counts', { plans: plans.length, subjects: subjects.length, careers: careerList.length })
       setStudyPlans(enrichedPlans)
 
       setError(null)

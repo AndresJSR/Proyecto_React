@@ -67,19 +67,26 @@ const StudyPlanDashboardPage: React.FC = () => {
   }, [versions, selectedVersion])
 
   useEffect(() => {
-    const loadPlanSubjects = async () => {
-      if (!selectedVersion) return
-
-      try {
-        const data = await studyPlanService.getSubjectsByStudyPlan(String(selectedVersion.id))
-        setPlanSubjects(data)
-      } catch (err) {
-        console.error(err)
-      }
+    if (selectedVersion) {
+      loadPlanSubjects(selectedVersion)
     }
-
-    loadPlanSubjects()
   }, [selectedVersion])
+
+  const loadPlanSubjects = async (version: StudyPlanVersion) => {
+    try {
+      if (version == null || version.id == null) {
+        console.warn('StudyPlanDashboard: loadPlanSubjects called with empty version', version)
+        setPlanSubjects([])
+        return
+      }
+
+      const data = await studyPlanService.getSubjectsByStudyPlan(version.id)
+      console.debug('StudyPlanDashboard: loaded plan subjects for version', version.id, 'count', Array.isArray(data) ? data.length : 0)
+      setPlanSubjects(data)
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   const loadSubjects = async () => {
     try {
@@ -93,6 +100,7 @@ const StudyPlanDashboardPage: React.FC = () => {
   const loadVersions = async (careerId: string) => {
     try {
       const data = await studyPlanVersionService.getVersionsByCareer(careerId)
+      console.debug('StudyPlanDashboard: loaded versions for career', careerId, 'count', Array.isArray(data) ? data.length : 0)
       setVersions(data)
       const published = data.find((version) => version.is_published)
       setSelectedVersion(published || data[0] || null)
@@ -150,7 +158,11 @@ const StudyPlanDashboardPage: React.FC = () => {
       Swal.fire({ icon: 'success', title: 'Asignatura agregada', text: 'Se agregó la asignatura al plan.' })
       setOpenAdd(false)
       setSelectedSubject(null)
+
+      // Refresca tanto los planes como los subjects de la versión actual
       await refreshPlans()
+      await loadPlanSubjects(selectedVersion)
+
       sectionRef.current?.scrollIntoView({ behavior: 'smooth' })
     } catch (error: any) {
       Swal.fire({ icon: 'error', title: 'No se pudo agregar', text: error?.message || 'Ocurrió un error al agregar la asignatura' })
@@ -186,6 +198,7 @@ const StudyPlanDashboardPage: React.FC = () => {
       Swal.fire({ icon: 'success', title: 'Plan actualizado', text: 'Los cambios han sido guardados.' })
       setSelectedEditPlan(null)
       await refreshPlans()
+      if (selectedVersion) await loadPlanSubjects(selectedVersion)
     } catch (error: any) {
       Swal.fire({ icon: 'error', title: 'No se pudo actualizar', text: error?.message || 'Ocurrió un error al guardar los cambios' })
     }
@@ -226,89 +239,89 @@ const StudyPlanDashboardPage: React.FC = () => {
   }
 
   return (
-    <div>
-      <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-black dark:text-white">Plan de estudios</h2>
-          <p className="text-sm text-gray-500">Gestiona las versiones y asignaturas por carrera.</p>
-          {selectedVersion ? (
-            <div className="mt-3 inline-flex items-center gap-3 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-sm text-green-700">
-              <span className="font-semibold">Versión activa:</span>
-              <span>{selectedVersion.year}</span>
-              <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-green-800 shadow-sm">
-                {selectedVersion.is_published ? 'Publicado' : 'Borrador'}
-              </span>
+    <div className="min-h-screen bg-gray-50">
+      <div className="border-b bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Plan de estudios</h1>
+              <p className="mt-2 text-gray-600">Define y versiona las asignaturas por semestre de cada carrera.</p>
+              {selectedVersion ? (
+                <div className="mt-3 inline-flex items-center gap-3 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-sm text-green-700">
+                  <span className="font-semibold">Versión activa:</span>
+                  <span>{selectedVersion.year}</span>
+                  <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-green-800 shadow-sm">{selectedVersion.is_published ? 'Publicado' : 'Borrador'}</span>
+                </div>
+              ) : null}
             </div>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Carrera</label>
-            <select
-              value={selectedCareerId}
-              onChange={(e) => handleSelectCareer(e.target.value)}
-              className="mt-1 w-full rounded-md border border-stroke bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-primary dark:border-strokedark dark:bg-boxdark dark:text-white"
-            >
-              <option value="">Seleccione una carrera</option>
-              {careerOptions.map((career) => (
-                <option key={career.id} value={String(career.id)}>
-                  {career.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setPublishOpen(true)}
-              className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-opacity-90"
-            >
-              Nueva versión
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/study-plans/versions')}
-              className="inline-flex items-center justify-center rounded-md border border-stroke bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-strokedark dark:bg-boxdark dark:text-white"
-            >
-              Historial de versiones
-            </button>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+                <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500">Carrera</label>
+                <select
+                  value={selectedCareerId}
+                  onChange={(e) => handleSelectCareer(e.target.value)}
+                  className="mt-1 w-full rounded border-gray-200 bg-white px-2 py-2 text-sm text-gray-700"
+                >
+                  <option value="">Seleccione una carrera</option>
+                  {careerOptions.map((career) => (
+                    <option key={career.id} value={String(career.id)}>{career.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPublishOpen(true)}
+                  className="rounded-lg bg-green-600 px-4 py-2 text-white text-sm font-medium hover:bg-green-700"
+                >
+                  Nueva versión
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/study-plans/versions')}
+                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-50"
+                >
+                  Historial de versiones
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-12">
-        <div className="lg:col-span-3">
-          <StudyPlanCatalog
-            subjects={filteredSubjects}
-            search={subjectSearch}
-            onSearch={setSubjectSearch}
-            onAdd={handleOpenAddModal}
-          />
-        </div>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-12 gap-6">
+          <div className="col-span-12 lg:col-span-3">
+            <StudyPlanCatalog
+              subjects={filteredSubjects}
+              search={subjectSearch}
+              onSearch={setSubjectSearch}
+              onAdd={handleOpenAddModal}
+            />
+          </div>
 
-        <div className="lg:col-span-6" ref={sectionRef}>
-          <StudyPlanSection
-            subjects={planSubjects}
-            careerName={currentCareer?.name}
-            version={selectedVersion}
-            onEdit={handleEditClick}
-            onDelete={handleDeleteClick}
-          />
-        </div>
+          <div className="col-span-12 lg:col-span-6" ref={sectionRef}>
+            <StudyPlanSection
+              subjects={planSubjects}
+              careerName={currentCareer?.name}
+              version={selectedVersion}
+              onEdit={handleEditClick}
+              onDelete={handleDeleteClick}
+            />
+          </div>
 
-        <div className="space-y-6 lg:col-span-3">
-          <StudyPlanDetailsCard
-            careerName={currentCareer?.name}
-            version={selectedVersion}
-            planItems={planSubjects}
-          />
-          <StudyPlanVersionPanel
-            versions={versions}
-            selectedVersionId={selectedVersion?.id != null ? String(selectedVersion.id) : undefined}
-            onSelectVersion={handleSelectVersion}
-          />
+          <div className="col-span-12 lg:col-span-3 space-y-6">
+            <StudyPlanDetailsCard
+              careerName={currentCareer?.name}
+              version={selectedVersion}
+              planItems={planSubjects}
+            />
+            <StudyPlanVersionPanel
+              versions={versions}
+              selectedVersionId={selectedVersion?.id != null ? String(selectedVersion.id) : undefined}
+              onSelectVersion={handleSelectVersion}
+            />
+          </div>
         </div>
       </div>
 
@@ -340,7 +353,10 @@ const StudyPlanDashboardPage: React.FC = () => {
         onClose={() => setSelectedDeletePlan(null)}
         planId={selectedDeletePlan != null ? String(selectedDeletePlan.id) : undefined}
         subjectId={selectedDeletePlan?.subject_id != null ? String(selectedDeletePlan.subject_id) : undefined}
-        onRemoved={async () => await refreshPlans()}
+        onRemoved={async () => {
+          await refreshPlans()
+          if (selectedVersion) await loadPlanSubjects(selectedVersion)
+        }}
       />
 
       <PublishVersionModal
