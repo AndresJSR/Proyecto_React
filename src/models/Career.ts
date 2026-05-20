@@ -1,5 +1,5 @@
 export interface Career {
-  id: string
+  id: number | string
   name: string
   code: string
   description?: string

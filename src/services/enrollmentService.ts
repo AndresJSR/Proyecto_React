@@ -1,79 +1,156 @@
 // src/services/enrollmentService.ts
 //version darling
 
-import api from './api'
+import { api } from '../interceptors/authInterceptor'
 
-import {
-  Enrollment,
-  CreateEnrollmentDto,
-  UpdateEnrollmentDto,
-  EnrollmentFilters
-} from '../models/Enrollment'
+import { Enrollment, CreateEnrollmentDto, UpdateEnrollmentDto, EnrollmentFilters } from '../models/Enrollment'
+import { Group } from '../models/Group'
+import { Semester } from '../models/Semester'
+import { Subject } from '../models/Subject'
 
-const BASE_URL = '/academic'
+const BASE_URL = '/api/academic'
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return 'Ocurrió un error al ejecutar la operación'
+}
 
 export const enrollmentService = {
   async createEnrollment(
     payload: CreateEnrollmentDto
   ): Promise<Enrollment> {
-    const response = await api.post(
-      `${BASE_URL}/enrollments`,
-      payload
-    )
+    try {
+      const response = await api.post(
+        `${BASE_URL}/enrollments`,
+        payload
+      )
 
-    return response.data.data
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
   },
 
   async getEnrollments(): Promise<
     Enrollment[]
   > {
-    const response = await api.get(
-      `${BASE_URL}/enrollments`
-    )
+    try {
+      const response = await api.get(
+        `${BASE_URL}/enrollments`
+      )
 
-    return response.data.data
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
   },
 
   async getEnrollmentById(
     id: string
   ): Promise<Enrollment> {
-    const response = await api.get(
-      `${BASE_URL}/enrollments/${id}`
-    )
+    try {
+      const response = await api.get(
+        `${BASE_URL}/enrollments/${id}`
+      )
 
-    return response.data.data
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
   },
 
   async updateEnrollment(
     id: string,
     payload: UpdateEnrollmentDto
   ): Promise<Enrollment> {
-    const response = await api.put(
-      `${BASE_URL}/enrollments/${id}`,
-      payload
-    )
+    try {
+      const response = await api.put(
+        `${BASE_URL}/enrollments/${id}`,
+        payload
+      )
 
-    return response.data.data
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
   },
 
   async deleteEnrollment(
     id: string
   ): Promise<void> {
-    await api.delete(
-      `${BASE_URL}/enrollments/${id}`
-    )
+    try {
+      await api.delete(
+        `${BASE_URL}/enrollments/${id}`
+      )
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
   },
 
   async searchEnrollments(
     filters: EnrollmentFilters
   ): Promise<Enrollment[]> {
-    const response = await api.get(
-      `${BASE_URL}/enrollments/search`,
-      {
-        params: filters
-      }
-    )
+    try {
+      const response = await api.get(
+        `${BASE_URL}/enrollments/search`,
+        {
+          params: filters
+        }
+      )
 
-    return response.data.data
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
+  },
+
+  async getEnrollmentsByStudentId(studentId: number): Promise<Enrollment[]> {
+    try {
+      const response = await api.get(
+        `${BASE_URL}/enrollments/search`,
+        {
+          params: {
+            student_id: studentId
+          }
+        }
+      )
+
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
+  },
+
+  async getGroups(): Promise<Group[]> {
+    try {
+      const response = await api.get(`${BASE_URL}/groups`)
+
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
+  },
+
+  async getSemesters(): Promise<Semester[]> {
+    try {
+      const response = await api.get(`${BASE_URL}/semesters`)
+
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
+  },
+
+  async getSubjects(): Promise<Subject[]> {
+    try {
+      const response = await api.get(`${BASE_URL}/subjects`)
+
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
   }
 }
