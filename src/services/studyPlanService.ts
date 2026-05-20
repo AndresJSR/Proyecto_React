@@ -1,5 +1,3 @@
-// src/services/studyPlanService.ts
-
 import { api } from '../interceptors/authInterceptor'
 
 import { Career } from '../models/Career'
@@ -83,7 +81,16 @@ export const studyPlanService = {
         `${BASE_URL}/study-plans/${studyPlanId}/subjects`
       )
 
-      return response.data.data
+      const raw = response.data.data
+
+      // Normaliza la respuesta del API al tipo StudyPlanSubject
+      return (raw ?? []).map((item: any): StudyPlanSubject => ({
+        subject_id:         item.subject_id         ?? item.id               ?? 0,
+        subject_name:       item.subject_name        ?? item.subject?.name    ?? item.name  ?? '',
+        subject_code:       item.subject_code        ?? item.subject?.code    ?? item.code  ?? '',
+        credits:            item.credits             ?? item.subject?.credits ?? 0,
+        suggested_semester: item.suggested_semester  ?? 0
+      }))
     } catch (error) {
       throw new Error(getErrorMessage(error))
     }

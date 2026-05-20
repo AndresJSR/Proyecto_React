@@ -242,7 +242,7 @@ const AdminMenu = ({ pathname }: { pathname: string }) => (
           </NavLink>
         </li>
         <li>
-          <NavLink to="/plan-estudios" className={linkClass(pathname, '/plan-estudios')}>
+          <NavLink to="/study-plans/list" className={linkClass(pathname, '/study-plans')}>
             <BookOpen size={18} />
             Plan de estudios
           </NavLink>

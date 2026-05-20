@@ -10,39 +10,39 @@ interface Props {
 
 const StudyPlanCatalog: React.FC<Props> = ({ subjects, search, onSearch, onAdd }) => {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-      <h3 className="text-lg font-semibold">Catálogo de asignaturas</h3>
-      <div className="mt-4 flex items-center gap-2">
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-black dark:text-white">Catálogo de asignaturas</h3>
+      <div className="flex items-center gap-2">
         <input
           value={search}
           onChange={(e) => onSearch(e.target.value)}
           placeholder="Buscar por nombre o código"
-          className="w-full rounded border px-3 py-2"
+          className="w-full rounded-md border border-stroke bg-white px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-primary dark:border-strokedark dark:bg-boxdark dark:text-white"
         />
-        <button type="button" className="rounded border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+        <button type="button" className="rounded-md border border-stroke bg-white px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-50 dark:border-strokedark dark:bg-boxdark dark:text-white">
           Filtros
         </button>
       </div>
 
-      <div className="mt-4 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+      <div className="text-sm text-gray-600">
         Mostrando {subjects.length} asignaturas disponibles
       </div>
 
-      <div className="mt-4 space-y-2 max-h-[420px] overflow-y-auto">
+      <div className="max-h-[420px] space-y-2 overflow-y-auto">
         {subjects.length === 0 ? (
-          <div className="rounded p-4 text-sm text-gray-500">No hay asignaturas disponibles</div>
+          <div className="p-4 text-sm text-gray-500">No hay asignaturas disponibles</div>
         ) : (
           subjects.map((subject) => (
-            <div key={subject.id} className="flex items-center justify-between rounded border border-gray-100 p-3 hover:bg-gray-50">
+            <div key={subject.id} className="flex items-center justify-between rounded-md border border-stroke p-3 transition hover:bg-gray-50 dark:border-strokedark dark:hover:bg-meta-4">
               <div>
-                <div className="text-sm font-semibold text-gray-900">{subject.code}</div>
-                <div className="text-sm text-gray-700">{subject.name}</div>
+                <div className="text-sm font-semibold text-gray-900 dark:text-white">{subject.code}</div>
+                <div className="text-sm text-gray-700 dark:text-gray-300">{subject.name}</div>
                 <div className="text-xs text-gray-500">{subject.credits} créditos</div>
               </div>
               <button
                 type="button"
                 onClick={() => onAdd(subject)}
-                className="rounded-full bg-green-600 px-3 py-1 text-white text-sm hover:bg-green-700"
+                className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1 text-sm font-medium text-white transition hover:bg-opacity-90"
               >
                 +
               </button>

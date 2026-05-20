@@ -12,9 +12,9 @@ const StudyPlanDetailsCard: React.FC<Props> = ({ careerName, version, planItems 
   const totalCredits = planItems.reduce((sum, item) => sum + (item.credits || 0), 0)
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm mb-4">
-      <h3 className="text-lg font-semibold">Detalles del plan</h3>
-      <div className="mt-4 space-y-2 text-sm text-gray-700">
+    <div className="space-y-2">
+      <h3 className="text-lg font-semibold text-black dark:text-white">Detalles del plan</h3>
+      <div className="space-y-2 text-sm text-gray-700">
         <div>Carrera: {careerName || 'Sin carrera seleccionada'}</div>
         <div>Versión: {version ? `${version.year}` : 'Sin versión'}</div>
         <div>

@@ -29,8 +29,11 @@ const StudyPlanTable: React.FC<Props> = ({ subjects, onEdit, onDelete }) => {
               </td>
             </tr>
           ) : (
-            subjects.map((subject) => (
-              <tr key={subject.subject_id} className="hover:bg-gray-50">
+            subjects.map((subject, index) => (
+              <tr
+                key={`${subject.subject_id}-${subject.suggested_semester}-${index}`}
+                className="hover:bg-gray-50"
+              >
                 <td className="border px-3 py-3">{subject.suggested_semester}</td>
                 <td className="border px-3 py-3">{subject.subject_code}</td>
                 <td className="border px-3 py-3">{subject.subject_name}</td>
