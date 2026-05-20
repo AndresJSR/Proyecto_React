@@ -217,6 +217,8 @@ const IcoChevronDown = () => (
 /* ───────────────────────────── MENÚ ADMINISTRADOR ───────────────────────────── */
 const AdminMenu = ({ pathname }: { pathname: string }) => {
   const location = useLocation();
+  const isCarrerasActive =
+    location.pathname.startsWith('/admin/carreras') || location.pathname.startsWith('/carreras');
   const isGruposActive =
     location.pathname.startsWith('/admin/grupos') || location.pathname.startsWith('/grupos');
   const isMatriculasActive =
@@ -224,6 +226,7 @@ const AdminMenu = ({ pathname }: { pathname: string }) => {
     location.pathname.startsWith('/enrollments') ||
     location.pathname.startsWith('/inscripciones');
 
+  const [isCarrerasOpen, setIsCarrerasOpen] = useState<boolean>(isCarrerasActive);
   const [isGruposOpen, setIsGruposOpen] = useState<boolean>(isGruposActive);
   const [isMatriculasOpen, setIsMatriculasOpen] = useState<boolean>(isMatriculasActive);
 
@@ -243,11 +246,85 @@ const AdminMenu = ({ pathname }: { pathname: string }) => {
               Usuarios
             </NavLink>
           </li>
+          {/* ── Carreras (submenú) ───────────────────────────────────────── */}
           <li>
-            <NavLink to="/admin/carreras" className={linkClass(pathname, '/admin/carreras')}>
-              <IcoGraduate />
-              Carreras
-            </NavLink>
+            <button
+              onClick={() => setIsCarrerasOpen((prev) => !prev)}
+              className={`group relative flex w-full items-center justify-between gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                isCarrerasActive || isCarrerasOpen ? 'bg-graydark dark:bg-meta-4' : ''
+              }`}
+            >
+              <span className="flex items-center gap-2.5">
+                <IcoGraduate />
+                Carreras
+              </span>
+              {isCarrerasOpen ? <IcoChevronUp /> : <IcoChevronDown />}
+            </button>
+
+            {isCarrerasOpen && (
+              <ul className="mt-1 ml-4 flex flex-col gap-1 border-l border-graydark pl-3">
+                <li>
+                  <NavLink
+                    to="/carreras/list"
+                    className={({ isActive }) =>
+                      `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        isActive ? 'bg-graydark text-white dark:bg-meta-4' : 'text-bodydark1'
+                      }`
+                    }
+                  >
+                    Ver carreras
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/carreras/create"
+                    className={({ isActive }) =>
+                      `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        isActive ? 'bg-graydark text-white dark:bg-meta-4' : 'text-bodydark1'
+                      }`
+                    }
+                  >
+                    Crear carrera
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/carreras/list"
+                    className={({ isActive }) =>
+                      `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        isActive ? 'bg-graydark text-white dark:bg-meta-4' : 'text-bodydark1'
+                      }`
+                    }
+                  >
+                    Editar carrera
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/carreras/list"
+                    className={({ isActive }) =>
+                      `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        isActive ? 'bg-graydark text-white dark:bg-meta-4' : 'text-bodydark1'
+                      }`
+                    }
+                  >
+                    Archivar carrera
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/carreras/list"
+                    className={({ isActive }) =>
+                      `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        isActive ? 'bg-graydark text-white dark:bg-meta-4' : 'text-bodydark1'
+                      }`
+                    }
+                  >
+                    Ver detalle de carrera
+                  </NavLink>
+                </li>
+              </ul>
+            )}
           </li>
           <li>
             <NavLink to="/admin/semestres" className={linkClass(pathname, '/admin/semestres')}>

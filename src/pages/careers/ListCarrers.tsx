@@ -13,7 +13,8 @@ import ArchiveCareerModal from '../../components/Career/modal/ArchiveCareerModal
 
 import CareerForm from '../../components/Career/CareerForm';
 import CareerModal from '../../components/Career/CareerModal';
-import CareerTable from '../../components/Career/CareerTable';
+import ActionDropdown from '../../components/common/ActionDropdown';
+import GenericTable from '../../components/GenericTable';
 
 import { Career, CreateCareerDto, UpdateCareerDto } from '../../models/Career';
 import { Semester } from '../../models/Semester';
@@ -42,7 +43,7 @@ const CareerSectionContent = ({
   });
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [archiveCareer, setArchiveCareer] = useState<Career | null>(null);
-  const [archiveActiveSemesters, setArchiveActiveSemesters] = useState
+  const [archiveActiveSemesters, setArchiveActiveSemesters] = useState<
     { name: string; period: string }[]
   >([]);
 
@@ -83,35 +84,6 @@ const CareerSectionContent = ({
     setOpenModal(true);
   };
 
-  const handleDelete = async (id: string) => {
-    const result = await Swal.fire({
-      title: '¿Archivar carrera?',
-      text: 'Se archivará la carrera (no será eliminada físicamente).',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Archivar',
-      cancelButtonText: 'Cancelar',
-    });
-
-    if (!result.isConfirmed) return;
-
-    try {
-      await careerBusiness.deleteCareer(id);
-      await Swal.fire({
-        icon: 'success',
-        title: 'Carrera archivada',
-        text: 'La carrera se archivó correctamente',
-      });
-      loadCareers();
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo archivar la carrera',
-      });
-    }
-  };
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -237,12 +209,112 @@ const CareerSectionContent = ({
       )}
 
       <div className="mb-8">
-        <CareerTable
-          careers={careers}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onArchive={handleArchiveOpen}
-          onView={handleView}
+        <GenericTable<Career>
+          data={careers}
+          columns={[
+            { key: 'code', label: 'Codigo' },
+            { key: 'name', label: 'Nombre' },
+            {
+              key: 'description',
+              label: 'Descripcion',
+              render: (item) => item.description || '-',
+            },
+            {
+              key: 'is_active',
+              label: 'Estado',
+              render: (item) => (
+                <span
+                  className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                    item.is_active
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  {item.is_active ? 'Activa' : 'Archivada'}
+                </span>
+              ),
+            },
+          ]}
+          renderActions={(item) => (
+            <ActionDropdown
+              items={[
+                {
+                  key: 'edit',
+                  label: 'Editar carrera',
+                  onClick: () => handleEdit(item),
+                  icon: (
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z"
+                      />
+                    </svg>
+                  ),
+                },
+                {
+                  key: 'archive',
+                  label: 'Archivar carrera',
+                  onClick: () => handleArchiveOpen(item),
+                  colorClass: 'text-yellow-600',
+                  icon: (
+                    <svg
+                      className="h-4 w-4 text-yellow-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4 7h16M8 7v10a2 2 0 002 2h4a2 2 0 002-2V7"
+                      />
+                      <path
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 7V5a3 3 0 016 0v2"
+                      />
+                    </svg>
+                  ),
+                },
+                {
+                  key: 'view',
+                  label: 'Ver detalle',
+                  onClick: () => handleView(item),
+                  icon: (
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7S3.732 16.057 2.458 12z"
+                      />
+                    </svg>
+                  ),
+                },
+              ]}
+              align="right"
+            />
+          )}
         />
         {careers.length === 0 && (
           <div className="py-8 text-center text-gray-500">
