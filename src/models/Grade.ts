@@ -1,19 +1,21 @@
-import { Enrollment } from './Enrollment';
-import { Rubric } from './Rubric';
+import { Enrollment } from './Enrollment'
+import { Rubric } from './Rubric'
+import { GradeDetail } from './GradeDetail'
 
 export interface Grade {
-  id?: string;
-  enrollment_id?: string;
-  rubric_id?: string;
+  id: number | string              // AJUSTE: requerido
+  enrollment_id: number | string   // AJUSTE: requerido
+  rubric_id: number | string       // AJUSTE: requerido
 
-  final_score?: number;
-  status?: string;
-  observations?: string;
-  is_locked?: boolean;
+  final_score: number              // AJUSTE: requerido
+  status: 'DRAFT' | 'SENT'        // AJUSTE: union type
+  observations?: string
+  is_locked: boolean               // AJUSTE: requerido
 
-  created_at?: string;
-  updated_at?: string;
+  created_at?: string
+  updated_at?: string
 
-  enrollment?: Enrollment;
-  rubric?: Rubric;
+  enrollment?: Enrollment
+  rubric?: Rubric
+  details?: GradeDetail[]          // AGREGAR: alias usado en tareas 10-20
 }

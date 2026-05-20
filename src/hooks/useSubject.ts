@@ -6,7 +6,7 @@ import {
     UpdateSubjectDto
 } from '../models/Subject'
 
-import { subjectBusiness } from '../business/SubjectBusiness'
+import { subjectBusiness } from '../business/subjectBusiness'
 
 export const useSubject = () => {
   const [subjects, setSubjects] =

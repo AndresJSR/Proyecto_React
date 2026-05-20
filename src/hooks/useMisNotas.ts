@@ -2,8 +2,11 @@ import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import { misNotasBusiness, NotaRow } from '../business/MisNotasBusiness'
+import { GradeDetail } from '../models/GradeDetail'
 import { misNotasService } from '../services/misNotasService'
 import { RootState } from '../store/store'
+
+type GradeDetailsMap = Record<string, GradeDetail[]>
 
 const useMisNotas = () => {
   const user = useSelector((state: RootState) => state.user.user)
@@ -36,12 +39,38 @@ const useMisNotas = () => {
           misNotasService.getSubjects()
         ])
 
+        const gradeDetailsResults = await Promise.allSettled(
+          grades.map(async (grade) => {
+            const gradeId = String(grade.id ?? '')
+
+            if (!gradeId) {
+              return { gradeId, details: [] }
+            }
+
+            const details = await misNotasService.getGradeDetailsByGradeId(gradeId)
+
+            return { gradeId, details }
+          })
+        )
+
+        const gradeDetailsByGradeId = gradeDetailsResults.reduce<GradeDetailsMap>(
+          (acc, result) => {
+            if (result.status === 'fulfilled') {
+              acc[result.value.gradeId] = result.value.details
+            }
+
+            return acc
+          },
+          {}
+        )
+
         const notaRows = misNotasBusiness.buildNotaRows(
           grades,
           evaluations,
           enrollments,
           groups,
-          subjects
+          subjects,
+          gradeDetailsByGradeId
         )
 
         const promedio = misNotasBusiness.calcularPromedioPonderado(notaRows)

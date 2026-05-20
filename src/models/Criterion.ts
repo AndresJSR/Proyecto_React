@@ -1,17 +1,17 @@
-import { Rubric } from './Rubric';
-import { Scale } from './Scale';
+import { Rubric } from './Rubric'
+import { Scale } from './Scale'
 
 export interface Criterion {
-  id?: string;
-  rubric_id?: string;
+  id: number | string         // AJUSTE: requerido
+  rubric_id: number | string  // AJUSTE: requerido
 
-  name?: string;
-  description?: string;
-  weight?: number;
+  name: string                // AJUSTE: requerido
+  description?: string
+  weight: number              // AJUSTE: requerido
 
-  created_at?: string;
-  updated_at?: string;
+  created_at?: string
+  updated_at?: string
 
-  rubric?: Rubric;
-  scales?: Scale[];
+  rubric?: Rubric
+  scales?: Scale[]
 }

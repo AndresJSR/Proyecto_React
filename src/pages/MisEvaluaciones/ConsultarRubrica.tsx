@@ -311,6 +311,18 @@ const ConsultarRubrica = () => {
                 <p className="mt-1 font-medium text-black dark:text-white">Pública</p>
               </div>
               <div>
+                <p className="text-xs uppercase tracking-wide text-meta-3 dark:text-meta-2">Fecha de publicación</p>
+                <p className="mt-1 font-medium text-black dark:text-white">
+                  {rubric?.created_at
+                    ? new Intl.DateTimeFormat('es-CO', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    }).format(new Date(rubric.created_at))
+                    : 'No disponible'}
+                </p>
+              </div>
+              <div>
                 <p className="text-xs uppercase tracking-wide text-meta-3 dark:text-meta-2">Cantidad de criterios</p>
                 <p className="mt-1 font-medium text-black dark:text-white">{rubricSummary.totalCriteria}</p>
               </div>

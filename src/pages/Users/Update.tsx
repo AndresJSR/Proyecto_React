@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
+import { userBusiness } from '../../business/UserBusiness';
+import { UserFormValues } from '../../components/Users/UserFormValidator';
 import { User } from '../../models/User';
 import { userService } from '../../services/userService';
-import { userBusiness } from '../../business/UserBusiness';
-import { UserFormValues } from '../../components/users/UserFormValidator';
 
 import Breadcrumb from '../../components/Breadcrumb';
-import UserFormValidator from '../../components/users/UserFormValidator';
+import UserFormValidator from '../../components/Users/UserFormValidator';
 
 const UpdateUserPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -68,8 +68,8 @@ const UpdateUserPage: React.FC = () => {
 
   return (
     <>
-      <Breadcrumb pageName="Actualizar Usuario" showBackButton/>
-    
+      <Breadcrumb pageName="Actualizar Usuario" showBackButton />
+
       <UserFormValidator handleAction={handleUpdateUser} mode={2} user={user} />
     </>
   );

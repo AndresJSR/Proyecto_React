@@ -1,17 +1,17 @@
-import { Criterion } from './Criterion';
-import { GradeDetail } from './GradeDetail';
+import { Criterion } from './Criterion'
+import { GradeDetail } from './GradeDetail'
 
 export interface Scale {
-  id?: string;
-  criterion_id?: string;
+  id: number | string              // AJUSTE: requerido
+  criterion_id: number | string    // AJUSTE: requerido
 
-  name?: string;
-  description?: string;
-  value?: number;
+  name: string                     // AJUSTE: requerido
+  description?: string
+  value: number                    // AJUSTE: requerido
 
-  created_at?: string;
-  updated_at?: string;
+  created_at?: string
+  updated_at?: string
 
-  criterion?: Criterion;
-  grade_details?: GradeDetail[];
+  criterion?: Criterion
+  grade_details?: GradeDetail[]
 }

@@ -5,6 +5,13 @@ import { Enrollment } from '../models/Enrollment'
 import { Group } from '../models/Group'
 import { Subject } from '../models/Subject'
 
+export interface GradeDetailRow {
+  criterionName: string
+  levelName: string
+  score: number
+  comment: string
+}
+
 export interface NotaRow {
   gradeId: string
   evaluationName: string
@@ -16,15 +23,26 @@ export interface NotaRow {
   status: string
   isLocked: boolean
   observations: string
+  details: GradeDetailRow[]
 }
 
 class MisNotasBusiness {
+  buildGradeDetailRows(details: GradeDetail[] = []): GradeDetailRow[] {
+    return details.map((detail) => ({
+      criterionName: detail.scale?.criterion?.name ?? 'Criterio sin nombre',
+      levelName: detail.scale?.name ?? 'Nivel sin nombre',
+      score: detail.score,
+      comment: detail.comment ?? ''
+    }))
+  }
+
   buildNotaRows(
     grades: Grade[],
     evaluations: Evaluation[],
     enrollments: Enrollment[],
     groups: Group[],
-    subjects: Subject[]
+    subjects: Subject[],
+    gradeDetailsByGradeId: Record<string, GradeDetail[]> = {}
   ): NotaRow[] {
     return grades
       .map((grade) => {
@@ -58,7 +76,8 @@ class MisNotasBusiness {
           finalScore: grade.final_score ?? null,
           status: grade.status ?? 'DRAFT',
           isLocked: grade.is_locked ?? false,
-          observations: grade.observations ?? ''
+          observations: grade.observations ?? '',
+          details: this.buildGradeDetailRows(gradeDetailsByGradeId[grade.id ?? ''])
         }
       })
       .filter((row): row is NotaRow => row !== null)

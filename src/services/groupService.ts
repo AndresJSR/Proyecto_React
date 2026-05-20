@@ -24,10 +24,12 @@ class GroupService {
     }
   }
 
-  async getGroupById(id: string): Promise<Group | null> {
+  async getGroupById(id: string | number): Promise<Group> {
     try {
       const response = await api.get(`${BASE_URL}/${id}`)
-      return response.data.data
+      const data = response.data.data
+      if (!data) throw new Error(`Grupo ${id} no encontrado`)
+      return data
     } catch (error) {
       throw new Error(getErrorMessage(error))
     }
@@ -62,6 +64,34 @@ class GroupService {
   async searchGroups(filters: GroupFilters): Promise<Group[]> {
     try {
       const response = await api.get(`${BASE_URL}/search`, { params: filters })
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
+  }
+
+  /**
+   * Obtiene los grupos asignados a un docente específico.
+   * Endpoint: GET /api/academic/groups/search?teacher_id={teacherId}
+   * Delega en searchGroups para no duplicar la llamada HTTP.
+   */// AGREGAR: obtener grupos filtrados por docente
+  async getGroupsByTeacher(teacherId: number | string): Promise<Group[]> {
+    try {
+      const response = await api.get(`${BASE_URL}/search`, {
+        params: { teacher_id: teacherId }
+      })
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
+  }
+
+  // AGREGAR: asignar docente a un grupo
+  async assignTeacher(groupId: number | string, teacherId: number | string): Promise<Group> {
+    try {
+      const response = await api.patch(
+        `${BASE_URL}/${groupId}/assign-teacher/${teacherId}`
+      )
       return response.data.data
     } catch (error) {
       throw new Error(getErrorMessage(error))

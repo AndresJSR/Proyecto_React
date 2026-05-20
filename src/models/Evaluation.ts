@@ -1,22 +1,22 @@
-import { Subject } from './Subject';
-import { Rubric } from './Rubric';
-import { Group } from './Group';
+import { Subject } from './Subject'
+import { Rubric } from './Rubric'
+import { Group } from './Group'
 
 export interface Evaluation {
-  id?: string;
+  id: number | string              // AJUSTE: requerido
 
-  subject_id?: string;
-  rubric_id?: string;
-  group_id?: string;
+  subject_id: number | string      // AJUSTE: requerido
+  group_id: number | string        // AJUSTE: requerido
+  rubric_id?: number | string
 
-  name?: string;
-  description?: string;
-  weight?: number;
+  name: string                     // AJUSTE: requerido
+  description?: string
+  weight: number                   // AJUSTE: requerido
 
-  created_at?: string;
-  updated_at?: string;
+  created_at?: string
+  updated_at?: string
 
-  subject?: Subject;
-  rubric?: Rubric;
-  group?: Group;
+  subject?: Subject
+  rubric?: Rubric
+  group?: Group
 }

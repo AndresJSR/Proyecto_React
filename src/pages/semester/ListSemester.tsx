@@ -1,78 +1,67 @@
-import React, {
-    useEffect,
-    useState
-} from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 
-import SemesterTable from '../../components/Semester/SemesterTable'
-import useCarreras from '../../hooks/useCareer'
+import SemesterTable from '../../components/Semester/SemesterTable';
+import useCarreras from '../../hooks/useCareer';
 
-import {
-    Semester
-} from '../../models/Semester'
+import { Semester } from '../../models/Semester';
 
-import {
-    semesterBusiness
-} from '../../business/SemesterBusiness'
+import { semesterBusiness } from '../../business/SemesterBusiness';
 
 interface SemesterSectionContentProps {
-  hideSectionTitle?: boolean
+  hideSectionTitle?: boolean;
 }
 
 const SemesterSectionContent = ({
-  hideSectionTitle = false
+  hideSectionTitle = false,
 }: SemesterSectionContentProps) => {
-  const { careers } = useCarreras()
-  const [semesters, setSemesters] =
-    useState<Semester[]>([])
+  const { careers } = useCarreras();
+  const [semesters, setSemesters] = useState<Semester[]>([]);
 
   const loadSemesters = async () => {
     try {
-      const data =
-        await semesterBusiness.getSemesters()
+      const data = await semesterBusiness.getSemesters();
 
       const enriched = data.map((semester) => ({
         ...semester,
         career_name:
-          careers.find(
-            (career) => career.id === semester.career_id
-          )?.name || semester.career_name || '-'
-      }))
+          careers.find((career) => career.id === semester.career_id)?.name ||
+          semester.career_name ||
+          '-',
+      }));
 
-      setSemesters(enriched)
+      setSemesters(enriched);
     } catch (error: any) {
       Swal.fire({
         icon: 'error',
-        title: error.message
-      })
+        title: error.message,
+      });
     }
-  }
+  };
 
   useEffect(() => {
-    loadSemesters()
-  }, [careers])
+    loadSemesters();
+  }, [careers]);
 
-  const handleDelete = async (
-    id: string
-  ) => {
+  const handleDelete = async (id: string) => {
     try {
-      await semesterBusiness.deleteSemester(id)
+      await semesterBusiness.deleteSemester(id);
 
       Swal.fire({
         icon: 'success',
-        title: 'Semestre eliminado'
-      })
+        title: 'Semestre eliminado',
+      });
 
-      loadSemesters()
+      loadSemesters();
     } catch (error: any) {
       Swal.fire({
         icon: 'error',
-        title: error.message
-      })
+        title: error.message,
+      });
     }
-  }
+  };
 
   return (
     <>
@@ -88,9 +77,7 @@ const SemesterSectionContent = ({
               🔍 Filtros
             </button>
           </div>
-          <button
-            className="rounded-lg bg-green-600 px-4 py-2 text-white font-medium hover:bg-green-700 flex items-center gap-2"
-          >
+          <button className="rounded-lg bg-green-600 px-4 py-2 text-white font-medium hover:bg-green-700 flex items-center gap-2">
             + Nuevo semestre
           </button>
         </div>
@@ -98,12 +85,14 @@ const SemesterSectionContent = ({
 
       <div className="mb-8">
         {!hideSectionTitle && (
-          <h2 className="mb-4 text-xl font-semibold text-gray-900">Semestres</h2>
+          <h2 className="mb-4 text-xl font-semibold text-gray-900">
+            Semestres
+          </h2>
         )}
         <SemesterTable
           semesters={semesters}
           onEdit={(semester) => {
-            console.log(semester)
+            console.log(semester);
           }}
           onDelete={handleDelete}
         />
@@ -114,19 +103,25 @@ const SemesterSectionContent = ({
         )}
       </div>
     </>
-  )
-}
+  );
+};
 
 export const SemesterSection = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-green-700">Académico</p>
-          <h2 className="mt-1 text-xl font-semibold text-gray-900">Semestres</h2>
-          <p className="mt-2 text-sm text-gray-600">Configura las fechas y estados de los semestres.</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-green-700">
+            Académico
+          </p>
+          <h2 className="mt-1 text-xl font-semibold text-gray-900">
+            Semestres
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Configura las fechas y estados de los semestres.
+          </p>
         </div>
         <button
           type="button"
@@ -138,8 +133,8 @@ export const SemesterSection = () => {
       </div>
       <SemesterSectionContent hideSectionTitle />
     </section>
-  )
-}
+  );
+};
 
 const ListSemester: React.FC = () => {
   return (
@@ -150,7 +145,9 @@ const ListSemester: React.FC = () => {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Académico</h1>
-              <p className="mt-2 text-gray-600">Gestiona las carreras y los semestres del sistema.</p>
+              <p className="mt-2 text-gray-600">
+                Gestiona las carreras y los semestres del sistema.
+              </p>
             </div>
           </div>
         </div>
@@ -161,7 +158,7 @@ const ListSemester: React.FC = () => {
         <SemesterSectionContent />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ListSemester 
+export default ListSemester;

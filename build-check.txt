@@ -1,0 +1,148 @@
+﻿
+> tailadmin-react-free@1.0.5 build
+> vite build
+
+[36mvite v4.4.7 [32mbuilding for production...[36m[39m
+transforming...
+node.exe : Browserslist: caniuse-lite is outdated. Please run:
+En línea: 1 Carácter: 1
++ & "C:\nvm4w\nodejs2\nodejs/node.exe" "C:\nvm4w\nodejs2\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Browserslist: c...ed. Please run: 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  npx update-browserslist-db@latest
+  Why you should do it regularly: 
+https://github.com/browserslist/update-db#readme
+[32mÔ£ô[39m 2023 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32massets/icon-arrow-down-40793fc6.svg         [39m[1m[2m    0.50 kB[22m[1m[22m[2m Ôöé gzip:   0.30 kB[22m
+[2mdist/[22m[32mindex.html                                  [39m[1m[2m    0.51 kB[22m[1m[22m[2m Ôöé gzip:   0.33 kB[22m
+[2mdist/[22m[32massets/icon-calendar-8a123eed.svg           [39m[1m[2m    1.50 kB[22m[1m[22m[2m Ôöé gzip:   0.62 kB[22m
+[2mdist/[22m[32massets/logo-icon-cc979474.svg               [39m[1m[2m    3.44 kB[22m[1m[22m[2m Ôöé gzip:   0.89 kB[22m
+[2mdist/[22m[32massets/logo-6d593be9.svg                    [39m[1m[2m    6.42 kB[22m[1m[22m[2m Ôöé gzip:   1.99 kB[22m
+[2mdist/[22m[32massets/logo-dark-2504a794.svg               [39m[1m[2m    6.44 kB[22m[1m[22m[2m Ôöé gzip:   2.00 kB[22m
+[2mdist/[22m[32massets/user-01-b007ff3f.png                 [39m[1m[2m   15.16 kB[22m[1m[22m
+[2mdist/[22m[32massets/user-03-3c4ef32c.png                 [39m[1m[2m   20.63 kB[22m[1m[22m
+[2mdist/[22m[32massets/user-02-5a304001.png                 [39m[1m[2m   20.97 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Light-8a24f395.woff2         [39m[1m[2m   22.80 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-LightItalic-9690a557.woff2   [39m[1m[2m   23.41 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Black-bd11b582.woff2         [39m[1m[2m   23.48 kB[22m[1m[22m
+[2mdist/[22m[32massets/user-04-04f11146.png                 [39m[1m[2m   23.55 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-BlackItalic-83d61d67.woff2   [39m[1m[2m   24.28 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Bold-353a7fbf.woff2          [39m[1m[2m   25.33 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Regular-50dca57f.woff2       [39m[1m[2m   25.52 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Medium-af02a722.woff2        [39m[1m[2m   25.60 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-BoldItalic-52bfd9e8.woff2    [39m[1m[2m   26.30 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Italic-dbcb8c32.woff2        [39m[1m[2m   26.46 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-MediumItalic-beb15382.woff2  [39m[1m[2m   26.70 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Light-dd42e743.woff          [39m[1m[2m   29.28 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-LightItalic-2f9c5264.woff    [39m[1m[2m   30.34 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Black-a849a7b7.woff          [39m[1m[2m   30.38 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-BlackItalic-cf5edac8.woff    [39m[1m[2m   31.36 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Bold-1789917c.woff           [39m[1m[2m   32.97 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Regular-9fbc41c9.woff        [39m[1m[2m   33.02 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Medium-7aeaf037.woff         [39m[1m[2m   33.27 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Italic-a6df1710.woff         [39m[1m[2m   34.34 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-BoldItalic-5d73878e.woff     [39m[1m[2m   34.34 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-MediumItalic-cf98a3ed.woff   [39m[1m[2m   34.58 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Light-b54cf060.ttf           [39m[1m[2m   71.68 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Black-78edaca6.ttf           [39m[1m[2m   73.18 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Bold-2c122eab.ttf            [39m[1m[2m   73.37 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Regular-243b23f6.ttf         [39m[1m[2m   73.48 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Medium-7130cef6.ttf          [39m[1m[2m   73.76 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-LightItalic-c9a8d027.ttf     [39m[1m[2m   75.40 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-BlackItalic-d3d6c8d6.ttf     [39m[1m[2m   75.76 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-BoldItalic-8ff85a17.ttf      [39m[1m[2m   76.45 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-Italic-14c3d259.ttf          [39m[1m[2m   76.60 kB[22m[1m[22m
+[2mdist/[22m[32massets/Satoshi-MediumItalic-71f8dce5.ttf    [39m[1m[2m   76.70 kB[22m[1m[22m
+[2mdist/[22m[32massets/user-06-00406fb8.png                 [39m[1m[2m   86.18 kB[22m[1m[22m
+[2mdist/[22m[32massets/cover-01-e8bbef04.png                [39m[1m[2m  482.38 kB[22m[1m[22m
+[2mdist/[22m[35massets/index-6df3dcfe.css                   [39m[1m[2m   61.93 kB[22m[1m[22m[2m Ôöé gzip:  11.13 kB[22m
+[2mdist/[22m[36massets/api-39e4a0b2.js                      [39m[1m[2m    0.16 kB[22m[1m[22m[2m Ôöé gzip:   0.16 kB[22m
+[2mdist/[22m[36massets/useCareer-1249a175.js                [39m[1m[2m    0.38 kB[22m[1m[22m[2m Ôöé gzip:   0.28 kB[22m
+[2mdist/[22m[36massets/List-be2875cd.js                     [39m[1m[2m    0.45 kB[22m[1m[22m[2m Ôöé gzip:   0.32 kB[22m
+[2mdist/[22m[36massets/book-open-57aca1c9.js                [39m[1m[2m    0.46 kB[22m[1m[22m[2m Ôöé gzip:   0.32 kB[22m
+[2mdist/[22m[36massets/careerService-eb1e3164.js            [39m[1m[2m    0.52 kB[22m[1m[22m[2m Ôöé gzip:   0.23 kB[22m
+[2mdist/[22m[36massets/subjectService-ab82c1e7.js           [39m[1m[2m    0.53 kB[22m[1m[22m[2m Ôöé gzip:   0.24 kB[22m
+[2mdist/[22m[36massets/semesterService-4b1bdb31.js          [39m[1m[2m    0.54 kB[22m[1m[22m[2m Ôöé gzip:   0.23 kB[22m
+[2mdist/[22m[36massets/registrationService-943a2e68.js      [39m[1m[2m    0.58 kB[22m[1m[22m[2m Ôöé gzip:   0.24 kB[22m
+[2mdist/[22m[36massets/star-ee1bfe5b.js                     [39m[1m[2m    0.66 kB[22m[1m[22m[2m Ôöé gzip:   0.41 kB[22m
+[2mdist/[22m[36massets/Create-0328e71a.js                   [39m[1m[2m    0.70 kB[22m[1m[22m[2m Ôöé gzip:   0.41 kB[22m
+[2mdist/[22m[36massets/rubricaService-10df7193.js           [39m[1m[2m    0.72 kB[22m[1m[22m[2m Ôöé gzip:   0.27 kB[22m
+[2mdist/[22m[36massets/CreateEnrollment-8c61a8db.js         [39m[1m[2m    0.73 kB[22m[1m[22m[2m Ôöé gzip:   0.47 kB[22m
+[2mdist/[22m[36massets/useSemester-ee089d71.js              [39m[1m[2m    0.74 kB[22m[1m[22m[2m Ôöé gzip:   0.35 kB[22m
+[2mdist/[22m[36massets/CreateGroup-1da9a3f0.js              [39m[1m[2m    0.77 kB[22m[1m[22m[2m Ôöé gzip:   0.49 kB[22m
+[2mdist/[22m[36massets/CreateRegistration-e4c0fb0b.js       [39m[1m[2m    0.77 kB[22m[1m[22m[2m Ôöé gzip:   0.48 kB[22m
+[2mdist/[22m[36massets/inscripcionService-c145c99b.js       [39m[1m[2m    0.83 kB[22m[1m[22m[2m Ôöé gzip:   0.33 kB[22m
+[2mdist/[22m[36massets/CreaterSubject-c34f8cfa.js           [39m[1m[2m    0.85 kB[22m[1m[22m[2m Ôöé gzip:   0.49 kB[22m
+[2mdist/[22m[36massets/CreateCareers-e78691de.js            [39m[1m[2m    0.86 kB[22m[1m[22m[2m Ôöé gzip:   0.53 kB[22m
+[2mdist/[22m[36massets/RegistrationBusiness-9efeaf0a.js     [39m[1m[2m    0.89 kB[22m[1m[22m[2m Ôöé gzip:   0.37 kB[22m
+[2mdist/[22m[36massets/RegistrationForm-b90e0c21.js         [39m[1m[2m    0.93 kB[22m[1m[22m[2m Ôöé gzip:   0.37 kB[22m
+[2mdist/[22m[36massets/Update-e13bcdc9.js                   [39m[1m[2m    0.97 kB[22m[1m[22m[2m Ôöé gzip:   0.55 kB[22m
+[2mdist/[22m[36massets/groupService-f4e8e27d.js             [39m[1m[2m    1.11 kB[22m[1m[22m[2m Ôöé gzip:   0.43 kB[22m
+[2mdist/[22m[36massets/GenericTable-7e108b41.js             [39m[1m[2m    1.12 kB[22m[1m[22m[2m Ôöé gzip:   0.51 kB[22m
+[2mdist/[22m[36massets/ActionDropdown-ba74d082.js           [39m[1m[2m    1.19 kB[22m[1m[22m[2m Ôöé gzip:   0.66 kB[22m
+[2mdist/[22m[36massets/enrollmentService-9b6d8a6a.js        [39m[1m[2m    1.35 kB[22m[1m[22m[2m Ôöé gzip:   0.40 kB[22m
+[2mdist/[22m[36massets/createLucideIcon-1e2fc9b3.js         [39m[1m[2m    1.58 kB[22m[1m[22m[2m Ôöé gzip:   0.66 kB[22m
+[2mdist/[22m[36massets/EnrollmentBusiness-eb8261da.js       [39m[1m[2m    1.68 kB[22m[1m[22m[2m Ôöé gzip:   0.59 kB[22m
+[2mdist/[22m[36massets/GroupForm-a5329abb.js                [39m[1m[2m    1.77 kB[22m[1m[22m[2m Ôöé gzip:   0.47 kB[22m
+[2mdist/[22m[36massets/ListInscripciones-8a78f71c.js        [39m[1m[2m    1.91 kB[22m[1m[22m[2m Ôöé gzip:   0.94 kB[22m
+[2mdist/[22m[36massets/SemesterForm-6b4fd68f.js             [39m[1m[2m    1.94 kB[22m[1m[22m[2m Ôöé gzip:   0.67 kB[22m
+[2mdist/[22m[36massets/evaluacionService-edba8999.js        [39m[1m[2m    2.03 kB[22m[1m[22m[2m Ôöé gzip:   0.62 kB[22m
+[2mdist/[22m[36massets/CreateStudyPlan-3f59d1f4.js          [39m[1m[2m    2.23 kB[22m[1m[22m[2m Ôöé gzip:   0.91 kB[22m
+[2mdist/[22m[36massets/EditCareer-cc5417f0.js               [39m[1m[2m    2.28 kB[22m[1m[22m[2m Ôöé gzip:   1.07 kB[22m
+[2mdist/[22m[36massets/CareerForm-44a289c3.js               [39m[1m[2m    2.29 kB[22m[1m[22m[2m Ôöé gzip:   0.77 kB[22m
+[2mdist/[22m[36massets/useMisEvaluaciones-7d6bd750.js       [39m[1m[2m    2.37 kB[22m[1m[22m[2m Ôöé gzip:   1.06 kB[22m
+[2mdist/[22m[36massets/SemesterBusiness-085d8556.js         [39m[1m[2m    2.47 kB[22m[1m[22m[2m Ôöé gzip:   0.74 kB[22m
+[2mdist/[22m[36massets/EditSemester-469f840a.js             [39m[1m[2m    2.48 kB[22m[1m[22m[2m Ôöé gzip:   1.13 kB[22m
+[2mdist/[22m[36massets/ListRegistration-c1d73b21.js         [39m[1m[2m    2.55 kB[22m[1m[22m[2m Ôöé gzip:   0.99 kB[22m
+[2mdist/[22m[36massets/studyPlanService-afd44552.js         [39m[1m[2m    2.60 kB[22m[1m[22m[2m Ôöé gzip:   0.66 kB[22m
+[2mdist/[22m[36massets/CreateInscripcion-e604541c.js        [39m[1m[2m    2.66 kB[22m[1m[22m[2m Ôöé gzip:   0.87 kB[22m
+[2mdist/[22m[36massets/CreateSemester-b15ea1b8.js           [39m[1m[2m    2.77 kB[22m[1m[22m[2m Ôöé gzip:   1.14 kB[22m
+[2mdist/[22m[36massets/CareerBusiness-735a3466.js           [39m[1m[2m    3.09 kB[22m[1m[22m[2m Ôöé gzip:   0.90 kB[22m
+[2mdist/[22m[36massets/SemesterTable-128b8e6d.js            [39m[1m[2m    3.14 kB[22m[1m[22m[2m Ôöé gzip:   1.00 kB[22m
+[2mdist/[22m[36massets/RubricaBusiness-f8788ec2.js          [39m[1m[2m    3.15 kB[22m[1m[22m[2m Ôöé gzip:   1.35 kB[22m
+[2mdist/[22m[36massets/ListSemester-8aba0756.js             [39m[1m[2m    3.21 kB[22m[1m[22m[2m Ôöé gzip:   1.24 kB[22m
+[2mdist/[22m[36massets/ListEnrollment-b6cc87ac.js           [39m[1m[2m    3.25 kB[22m[1m[22m[2m Ôöé gzip:   1.19 kB[22m
+[2mdist/[22m[36massets/ListGroup-73f700cb.js                [39m[1m[2m    3.45 kB[22m[1m[22m[2m Ôöé gzip:   1.30 kB[22m
+[2mdist/[22m[36massets/Index-e068f853.js                    [39m[1m[2m    3.51 kB[22m[1m[22m[2m Ôöé gzip:   0.92 kB[22m
+[2mdist/[22m[36massets/MisEvaluaciones-c07026a0.js          [39m[1m[2m    3.81 kB[22m[1m[22m[2m Ôöé gzip:   1.10 kB[22m
+[2mdist/[22m[36massets/MisAsignaturas-e6f74863.js           [39m[1m[2m    3.87 kB[22m[1m[22m[2m Ôöé gzip:   1.30 kB[22m
+[2mdist/[22m[36massets/DetailSemester-6de9f016.js           [39m[1m[2m    4.33 kB[22m[1m[22m[2m Ôöé gzip:   1.38 kB[22m
+[2mdist/[22m[36massets/Profile-3d28c14b.js                  [39m[1m[2m    4.47 kB[22m[1m[22m[2m Ôöé gzip:   1.34 kB[22m
+[2mdist/[22m[36massets/VersionHistory-47f0eadb.js           [39m[1m[2m    4.90 kB[22m[1m[22m[2m Ôöé gzip:   1.57 kB[22m
+[2mdist/[22m[36massets/subjectBusiness-f95b50c8.js          [39m[1m[2m    5.01 kB[22m[1m[22m[2m Ôöé gzip:   1.60 kB[22m
+[2mdist/[22m[36massets/StudyPlanBusiness-fd9359c6.js        [39m[1m[2m    5.34 kB[22m[1m[22m[2m Ôöé gzip:   1.78 kB[22m
+[2mdist/[22m[36massets/ListUsers-28bf00d4.js                [39m[1m[2m    5.70 kB[22m[1m[22m[2m Ôöé gzip:   1.72 kB[22m
+[2mdist/[22m[36massets/DetailCareer-3b4952dc.js             [39m[1m[2m    6.13 kB[22m[1m[22m[2m Ôöé gzip:   1.80 kB[22m
+[2mdist/[22m[36massets/CrearEvaluacion-1496e488.js          [39m[1m[2m    7.07 kB[22m[1m[22m[2m Ôöé gzip:   2.09 kB[22m
+[2mdist/[22m[36massets/MisNotas-e70fd474.js                 [39m[1m[2m    7.91 kB[22m[1m[22m[2m Ôöé gzip:   2.22 kB[22m
+[2mdist/[22m[36massets/index-3795e3eb.js                    [39m[1m[2m    8.06 kB[22m[1m[22m[2m Ôöé gzip:   2.25 kB[22m
+[2mdist/[22m[36massets/GroupBusiness-1595290b.js            [39m[1m[2m    8.47 kB[22m[1m[22m[2m Ôöé gzip:   3.02 kB[22m
+[2mdist/[22m[36massets/MisRubricas-889393ae.js              [39m[1m[2m    8.95 kB[22m[1m[22m[2m Ôöé gzip:   2.28 kB[22m
+[2mdist/[22m[36massets/Settings-18f6edea.js                 [39m[1m[2m   10.19 kB[22m[1m[22m[2m Ôöé gzip:   2.37 kB[22m
+[2mdist/[22m[36massets/DetalleGrupo-d3ce9498.js             [39m[1m[2m   10.78 kB[22m[1m[22m[2m Ôöé gzip:   3.81 kB[22m
+[2mdist/[22m[36massets/ListCarrers-46845002.js              [39m[1m[2m   12.78 kB[22m[1m[22m[2m Ôöé gzip:   3.61 kB[22m
+[2mdist/[22m[36massets/ConsultarRubrica-16b55955.js         [39m[1m[2m   12.79 kB[22m[1m[22m[2m Ôöé gzip:   2.79 kB[22m
+[2mdist/[22m[36massets/MisGrupos-e88f3e6c.js                [39m[1m[2m   13.14 kB[22m[1m[22m[2m Ôöé gzip:   3.62 kB[22m
+[2mdist/[22m[36massets/Calendar-0a217e46.js                 [39m[1m[2m   13.67 kB[22m[1m[22m[2m Ôöé gzip:   1.01 kB[22m
+[2mdist/[22m[36massets/SubjectDashboardPage-54ef2493.js     [39m[1m[2m   17.62 kB[22m[1m[22m[2m Ôöé gzip:   3.94 kB[22m
+[2mdist/[22m[36massets/StudyPlanDashboardPage-cc92d4c7.js   [39m[1m[2m   22.44 kB[22m[1m[22m[2m Ôöé gzip:   5.54 kB[22m
+[2mdist/[22m[36massets/Create-f01e7bf7.js                   [39m[1m[2m   24.75 kB[22m[1m[22m[2m Ôöé gzip:   5.74 kB[22m
+[2mdist/[22m[36massets/CalificarEstudiante-a04ea654.js      [39m[1m[2m   25.94 kB[22m[1m[22m[2m Ôöé gzip:   5.84 kB[22m
+[2mdist/[22m[36massets/PlanEstudios-2757b478.js             [39m[1m[2m   32.10 kB[22m[1m[22m[2m Ôöé gzip:   6.47 kB[22m
+[2mdist/[22m[36massets/DefaultLayout-67d78969.js            [39m[1m[2m   38.37 kB[22m[1m[22m[2m Ôöé gzip:   8.83 kB[22m
+[2mdist/[22m[36massets/UserFormValidator-3fcd4626.js        [39m[1m[2m   83.43 kB[22m[1m[22m[2m Ôöé gzip:  26.47 kB[22m
+[2mdist/[22m[36massets/AsociarRubrica-0f8a6830.js           [39m[1m[2m  180.82 kB[22m[1m[22m[2m Ôöé gzip:  30.22 kB[22m
+[2mdist/[22m[36massets/index-8ce9f0f7.js                    [39m[1m[33m1,062.67 kB[39m[22m[2m Ôöé gzip: 290.47 kB[22m
+[33m
+(!) Some chunks are larger than 500 kBs after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: 
+https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via 
+build.chunkSizeWarningLimit.[39m
+[32mÔ£ô built in 10.97s[39m

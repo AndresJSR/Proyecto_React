@@ -5,10 +5,10 @@ import Swal from 'sweetalert2';
 import Breadcrumb from '../../components/Breadcrumb';
 import UserFormValidator, {
   UserFormValues,
-} from '../../components/users/UserFormValidator';
+} from '../../components/Users/UserFormValidator';
 
-import { userService } from '../../services/userService';
 import { userBusiness } from '../../business/UserBusiness';
+import { userService } from '../../services/userService';
 
 const CreateUserPage: React.FC = () => {
   const navigate = useNavigate();

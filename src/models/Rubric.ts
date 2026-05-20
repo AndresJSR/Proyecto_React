@@ -1,19 +1,19 @@
-import { Criterion } from './Criterion';
-import { Grade } from './Grade';
-import { Evaluation } from './Evaluation';
+import { Criterion } from './Criterion'
+import { Grade } from './Grade'
+import { Evaluation } from './Evaluation'
 
 export interface Rubric {
-  id?: string;
+  id: number | string         // AJUSTE: requerido
 
-  title?: string;
-  description?: string;
-  is_public?: boolean;
-  is_archived?: boolean;
+  title: string               // AJUSTE: requerido
+  description?: string
+  is_public: boolean          // AJUSTE: requerido
+  is_archived: boolean        // AJUSTE: requerido
 
-  created_at?: string;
-  updated_at?: string;
+  created_at?: string
+  updated_at?: string
 
-  criteria?: Criterion[];
-  grades?: Grade[];
-  evaluations?: Evaluation[];
+  criteria?: Criterion[]
+  grades?: Grade[]
+  evaluations?: Evaluation[]
 }

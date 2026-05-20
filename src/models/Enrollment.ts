@@ -5,13 +5,13 @@ import { Student } from './Student'
 import { Group } from './Group'
 
 export interface Enrollment {
-  id: string
+  id: number | string
 
-  student_id: string
-  group_id: string
+  student_id: number | string
+  group_id: number | string
 
   enrollment_date: string
-  status: string
+  status: 'ACTIVE' | 'INACTIVE' | 'WITHDRAWN'  // AJUSTE: union type explícito
 
   created_at: string
   updated_at: string
@@ -23,11 +23,11 @@ export interface Enrollment {
 export interface CreateEnrollmentDto {
   student_id: string
   group_id: string
-  status?: string
+  status?: 'ACTIVE' | 'INACTIVE' | 'WITHDRAWN'
 }
 
 export interface UpdateEnrollmentDto {
-  status?: string
+  status?: 'ACTIVE' | 'INACTIVE' | 'WITHDRAWN'
 }
 
 export interface EnrollmentFilters {

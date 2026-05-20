@@ -1,17 +1,17 @@
-import { Scale } from './Scale';
-import { Student } from './Student';
+import { Scale } from './Scale'
+import { Student } from './Student'
 
 export interface GradeDetail {
-  id?: string;
-  scale_id?: string;
-  student_id?: string;
+  id: number | string         // AJUSTE: requerido
+  scale_id: number | string   // AJUSTE: requerido
+  student_id: number | string // AJUSTE: requerido
 
-  score?: number;
-  comment?: string;
+  score: number               // AJUSTE: requerido
+  comment?: string
 
-  created_at?: string;
-  updated_at?: string;
+  created_at?: string
+  updated_at?: string
 
-  scale?: Scale;
-  student?: Student;
+  scale?: Scale
+  student?: Student
 }

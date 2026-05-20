@@ -2,11 +2,11 @@ import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumb';
 import Loader from '../../common/Loader';
-import CalificacionStepper from '../../components/calificacion/CalificacionStepper';
-import EvaluacionInfoCard from '../../components/calificacion/EvaluacionInfoCard';
-import EstudianteInfoCard from '../../components/calificacion/EstudianteInfoCard';
-import CriteriosTabla from '../../components/calificacion/CriteriosTabla';
-import ResumenCalificacion from '../../components/calificacion/ResumenCalificacion';
+import CalificacionStepper from '../../components/Calificacion/CalificacionStepper';
+import EvaluacionInfoCard from '../../components/Calificacion/EvaluacionInfoCard';
+import EstudianteInfoCard from '../../components/Calificacion/EstudianteInfoCard';
+import CriteriosTabla from '../../components/Calificacion/CriteriosTabla';
+import ResumenCalificacion from '../../components/Calificacion/ResumenCalificacion';
 import useCalificarEstudiante from '../../hooks/useCalificarEstudiante';
 
 const CalificarEstudiantePage = () => {
