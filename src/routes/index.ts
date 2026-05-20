@@ -15,41 +15,41 @@ const UserUpdate = lazy(() => import('../pages/Users/Update'));
 const RoleList = lazy(() => import('../pages/Roles/List'));
 
 // ── Admin: Académico ──────────────────────────────────────────────────────────
-const ListCarreras = lazy(() => import('../pages/careers/ListCarrers'));
-const CreateCarrera = lazy(() => import('../pages/careers/CreateCareers'));
-const EditCarrera = lazy(() => import('../pages/careers/EditCareer'));
-const DetailCarrera = lazy(() => import('../pages/careers/DetailCareer'));
-const ListSemestres = lazy(() => import('../pages/semester/ListSemester'));
-const CreateSemestre = lazy(() => import('../pages/semester/CreateSemester'));
-const EditSemestre = lazy(() => import('../pages/semester/EditSemester'));
-const DetailSemestre = lazy(() => import('../pages/semester/DetailSemester'));
+const ListCarreras = lazy(() => import('../pages/Careers/ListCarrers'));
+const CreateCarrera = lazy(() => import('../pages/Careers/CreateCareers'));
+const EditCarrera = lazy(() => import('../pages/Careers/EditCareer'));
+const DetailCarrera = lazy(() => import('../pages/Careers/DetailCareer'));
+const ListSemestres = lazy(() => import('../pages/Semesters/ListSemester'));
+const CreateSemestre = lazy(() => import('../pages/Semesters/CreateSemester'));
+const EditSemestre = lazy(() => import('../pages/Semesters/EditSemester'));
+const DetailSemestre = lazy(() => import('../pages/Semesters/DetailSemester'));
 const SubjectDashboard = lazy(() => import('../pages/Subjects/SubjectDashboardPage'));
 const CreateAsignatura = lazy(() => import('../pages/Subjects/CreaterSubject'));
 const ListGrupos = lazy(() => import('../pages/Group/ListGroup'));
 const CreateGrupo = lazy(() => import('../pages/Group/CreateGroup'));
-const ListMatriculas = lazy(() => import('../pages/enrollment/ListEnrollment'));
-const CreateMatricula = lazy(() => import('../pages/enrollment/CreateEnrollment'));
-const ListInscripciones = lazy(() => import('../pages/inscripciones/ListInscripciones'));
-const CreateInscripcion = lazy(() => import('../pages/inscripciones/CreateInscripcion'));
+const ListMatriculas = lazy(() => import('../pages/Enrollment/ListEnrollment'));
+const CreateMatricula = lazy(() => import('../pages/Enrollment/CreateEnrollment'));
+const ListInscripciones = lazy(() => import('../pages/Registrations/ListInscripciones'));
+const CreateInscripcion = lazy(() => import('../pages/Registrations/CreateInscripcion'));
 const CreateStudyPlan = lazy(() => import('../pages/StudyPlan/CreateStudyPlan'));
 const StudyPlanDashboard = lazy(() => import('../pages/StudyPlan/StudyPlanDashboardPage'));
 const StudyPlanVersions = lazy(() => import('../pages/StudyPlan/VersionHistory'));
-const PlanEstudios = lazy(() => import('../pages/PlanEstudios/PlanEstudios'));
+const PlanEstudios = lazy(() => import('../pages/StudyPlanAdmin/PlanEstudios'));
 const AcademicPage = lazy(() => import('../pages/Academic'));
 const ListRegistrations = lazy(() => import('../pages/Registration/ListRegistration'));
 const CreateRegistration = lazy(() => import('../pages/Registration/CreateRegistration'));
 
 // ── Profesor ──────────────────────────────────────────────────────────────────
-const RubricaCreate = lazy(() => import('../pages/Rubricas/Create'));
-const MisRubricas = lazy(() => import('../pages/Rubricas/MisRubricas'));
-const Evaluaciones = lazy(() => import('../pages/Evaluaciones/Index'));
-const CrearEvaluacion = lazy(() => import('../pages/Evaluaciones/CrearEvaluacion'));
-const AsociarRubrica = lazy(() => import('../pages/Evaluaciones/AsociarRubrica'));
-const CalificarEstudiante = lazy(() => import('../pages/Evaluaciones/CalificarEstudiante'));
-const MisAsignaturas = lazy(() => import('../pages/MisAsignaturas/MisAsignaturas'));
-const MisEvaluaciones = lazy(() => import('../pages/MisEvaluaciones/MisEvaluaciones'));
-const ConsultarRubrica = lazy(() => import('../pages/MisEvaluaciones/ConsultarRubrica'));
-const MisNotas = lazy(() => import('../pages/MisNotas/MisNotas'));
+const RubricaCreate = lazy(() => import('../pages/Rubrics/Create'));
+const MisRubricas = lazy(() => import('../pages/Rubrics/MisRubricas'));
+const Evaluaciones = lazy(() => import('../pages/Evaluations/Index'));
+const CrearEvaluacion = lazy(() => import('../pages/Evaluations/CrearEvaluacion'));
+const AsociarRubrica = lazy(() => import('../pages/Evaluations/AsociarRubrica'));
+const CalificarEstudiante = lazy(() => import('../pages/Evaluations/CalificarEstudiante'));
+const MisAsignaturas = lazy(() => import('../pages/MySubjects/MisAsignaturas'));
+const MisEvaluaciones = lazy(() => import('../pages/MyEvaluations/MisEvaluaciones'));
+const ConsultarRubrica = lazy(() => import('../pages/MyEvaluations/ConsultarRubrica'));
+const MisNotas = lazy(() => import('../pages/MyGrades/MisNotas'));
 
 // ── Profesor: Grupos ──────────────────────────────────────────────────────────
 const MisGrupos = lazy(() => import('../pages/Group/MisGrupos'));
