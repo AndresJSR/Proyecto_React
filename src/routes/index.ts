@@ -48,6 +48,9 @@ const CrearEvaluacion = lazy(() => import('../pages/Evaluaciones/CrearEvaluacion
 const AsociarRubrica = lazy(() => import('../pages/Evaluaciones/AsociarRubrica'));
 const CalificarEstudiante = lazy(() => import('../pages/Evaluaciones/CalificarEstudiante'));
 const MisAsignaturas = lazy(() => import('../pages/MisAsignaturas/MisAsignaturas'));
+const MisEvaluaciones = lazy(() => import('../pages/MisEvaluaciones/MisEvaluaciones'));
+const ConsultarRubrica = lazy(() => import('../pages/MisEvaluaciones/ConsultarRubrica'));
+const MisNotas = lazy(() => import('../pages/MisNotas/MisNotas'));
 
 const ADMIN = [UserRole.ADMIN];
 const TEACHER = [UserRole.TEACHER];
@@ -352,6 +355,24 @@ const routes = [
     path: '/mis-asignaturas',
     title: 'Mis asignaturas',
     component: MisAsignaturas,
+    allowedRoles: STUDENT,
+  },
+  {
+    path: '/mis-evaluaciones',
+    title: 'Mis evaluaciones',
+    component: MisEvaluaciones,
+    allowedRoles: STUDENT,
+  },
+  {
+    path: '/mis-evaluaciones/:id/rubrica',
+    title: 'Consultar rúbrica',
+    component: ConsultarRubrica,
+    allowedRoles: STUDENT,
+  },
+  {
+    path: '/mis-notas',
+    title: 'Mis notas',
+    component: MisNotas,
     allowedRoles: STUDENT,
   },
 ];
