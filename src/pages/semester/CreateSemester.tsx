@@ -1,16 +1,20 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
-import SemesterForm from '../../components/Semester/SemesterForm'
-import useCarreras from '../../hooks/useCareer'
-import { useSemester } from '../../hooks/useSemester'
-import { CreateSemesterDto } from '../../models/Semester'
+import SemesterForm from '../../components/Semester/SemesterForm';
+import useCarreras from '../../hooks/useCareer';
+import { useSemester } from '../../hooks/useSemester';
+import { CreateSemesterDto } from '../../models/Semester';
 
 const CreateSemester: React.FC = () => {
-  const navigate = useNavigate()
-  const { careers, loading: careersLoading, error: careersError } = useCarreras()
-  const { createSemester, loading: semesterLoading } = useSemester()
+  const navigate = useNavigate();
+  const {
+    careers,
+    loading: careersLoading,
+    error: careersError,
+  } = useCarreras();
+  const { createSemester, loading: semesterLoading } = useSemester();
 
   const [formData, setFormData] = useState<CreateSemesterDto>({
     career_id: '',
@@ -18,30 +22,27 @@ const CreateSemester: React.FC = () => {
     code: '',
     start_date: '',
     end_date: '',
-    is_active: false
-  })
+    is_active: false,
+  });
 
-  const handleChange = (
-    field: string,
-    value: string | boolean
-  ) => {
+  const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value
-    }))
-  }
+      [field]: value,
+    }));
+  };
 
   const handleSubmit = async (event?: React.FormEvent<HTMLFormElement>) => {
-    event?.preventDefault()
+    event?.preventDefault();
 
     try {
-      await createSemester(formData)
+      await createSemester(formData);
 
       await Swal.fire({
         icon: 'success',
         title: 'Semestre creado',
-        text: 'El semestre se creó correctamente'
-      })
+        text: 'El semestre se creó correctamente',
+      });
 
       setFormData({
         career_id: '',
@@ -49,18 +50,18 @@ const CreateSemester: React.FC = () => {
         code: '',
         start_date: '',
         end_date: '',
-        is_active: false
-      })
+        is_active: false,
+      });
 
-      navigate('/semestres/list')
+      navigate('/semestres/list');
     } catch (error: any) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: error?.message || 'No se pudo crear el semestre'
-      })
+        text: error?.message || 'No se pudo crear el semestre',
+      });
     }
-  }
+  };
 
   return (
     <div className="p-6">
@@ -92,7 +93,10 @@ const CreateSemester: React.FC = () => {
           <p className="text-gray-500">Cargando carreras...</p>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+        >
           <SemesterForm
             formData={formData}
             onChange={handleChange}
@@ -110,7 +114,9 @@ const CreateSemester: React.FC = () => {
             </button>
             <button
               type="submit"
-              disabled={semesterLoading || careersLoading || careers.length === 0}
+              disabled={
+                semesterLoading || careersLoading || careers.length === 0
+              }
               className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
             >
               {semesterLoading ? 'Guardando...' : 'Crear semestre'}
@@ -125,7 +131,7 @@ const CreateSemester: React.FC = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default CreateSemester
+export default CreateSemester;

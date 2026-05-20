@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumb';
-import RubricaStepper from '../../components/rubrica/RubricaStepper';
-import RubricaInfoSection from '../../components/rubrica/RubricaInfoSection';
-import RubricaCriteriosTable from '../../components/rubrica/RubricaCriteriosTable';
-import RubricaFooterActions from '../../components/rubrica/RubricaFooterActions';
-import RubricaRevision from '../../components/rubrica/RubricaRevision';
+import RubricaStepper from '../../components/Rubrica/RubricaStepper';
+import RubricaInfoSection from '../../components/Rubrica/RubricaInfoSection';
+import RubricaCriteriosTable from '../../components/Rubrica/RubricaCriteriosTable';
+import RubricaFooterActions from '../../components/Rubrica/RubricaFooterActions';
+import RubricaRevision from '../../components/Rubrica/RubricaRevision';
 import useRubricaForm from '../../hooks/useRubricaForm';
 import { getSubjects } from '../../services/rubricaService';
 import { Subject } from '../../types/rubrica';

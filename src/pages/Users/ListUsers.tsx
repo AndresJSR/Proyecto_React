@@ -4,9 +4,12 @@ import Swal from 'sweetalert2';
 
 import { userBusiness, UserTableRow } from '../../business/UserBusiness';
 import GenericTable from '../../components/GenericTable';
-import UserFilters from '../../components/users/UserFilters';
-import UserTableActions from '../../components/users/UserTableActions';
+import UserFilters from '../../components/Users/UserFilters';
+import UserTableActions from '../../components/Users/UserTableActions';
 import { UserSearchFilters, userService } from '../../services/userService';
+import { registrationService } from '../../services/registrationService';
+import { careerService } from '../../services/careerService';
+import { User } from '../../models/User';
 
 const Users: React.FC = () => {
   const navigate = useNavigate();
@@ -17,19 +20,57 @@ const Users: React.FC = () => {
     fetchData();
   }, []);
 
-  const loadUsers = (users: any[]) => {
-    const rows = userBusiness.mapUsersToTableRows(users);
+  const buildCareerByStudentId = async (): Promise<Record<string, string>> => {
+    try {
+      const [registrations, careers] = await Promise.all([
+        registrationService.getRegistrations(),
+        careerService.getCareers(),
+      ]);
+
+      const careerById: Record<string, string> = {};
+
+      careers.forEach((career) => {
+        careerById[String(career.id)] = career.name;
+      });
+
+      const careerByStudentId: Record<string, string> = {};
+
+      registrations.forEach((registration) => {
+        if (!registration.student_id || !registration.is_active) {
+          return;
+        }
+
+        const careerName =
+          registration.career?.name ??
+          careerById[String(registration.career_id)];
+
+        if (careerName) {
+          careerByStudentId[String(registration.student_id)] = careerName;
+        }
+      });
+
+      return careerByStudentId;
+    } catch (error) {
+      console.error('Error cargando carreras por estudiante:', error);
+      return {};
+    }
+  };
+
+  const loadUsers = async (users: User[]) => {
+    const careerByStudentId = await buildCareerByStudentId();
+    const rows = userBusiness.mapUsersToTableRows(users, careerByStudentId);
+
     setData(rows);
   };
 
   const fetchData = async () => {
     const users = await userService.getUsers();
-    loadUsers(users);
+    await loadUsers(users);
   };
 
   const handleSearch = async (filters: UserSearchFilters) => {
     const users = await userService.searchUsers(filters);
-    loadUsers(users);
+    await loadUsers(users);
   };
 
   const handleClearFilters = async () => {
