@@ -1,23 +1,37 @@
-import {
-  Group,
-  CreateGroupDto,
-  UpdateGroupDto,
-  GroupFilters as ServiceGroupFilters,
-} from '../models/Group'
+// src/business/GroupBusiness.ts
+// Lógica de negocio pura del módulo Grupos (Vista Docente) — Tareas 10 a 20.
+// Sin efectos secundarios. Sin imports de React, hooks ni servicios.
+
+import { Group, CreateGroupDto, UpdateGroupDto, GroupFilters as GroupServiceFilters } from '../models/Group'
+import { Subject }    from '../models/Subject'
+import { StudyPlan }  from '../models/StudyPlan'
+import { Career }     from '../models/Career'
+import { Enrollment } from '../models/Enrollment'
 import { Evaluation } from '../models/Evaluation'
-import { Grade } from '../models/Grade'
+import { Grade }      from '../models/Grade'
+import { Rubric }     from '../models/Rubric'
+import { Criterion }  from '../models/Criterion'
+
 import { groupService } from '../services/groupService'
-import { Rubric } from '../models/Rubric'
-import { Subject } from '../models/Subject'
-import { StudyPlan } from '../models/StudyPlan'
-import { Career } from '../models/Career'
 
+// ─── Tipos internos del módulo ────────────────────────────────────────────────
 
+export interface GroupFilters {
+  searchSubject: string
+  searchCode: string
+  semesterName: string
+  groupStatus: string
+}
 
-// ─── Tipos de presentación ────────────────────────────────────────────────────
+export const EMPTY_GROUP_UI_FILTERS: GroupFilters = {
+  searchSubject: '',
+  searchCode: '',
+  semesterName: '',
+  groupStatus: '',
+}
 
 export interface GroupCardData {
-  id: string
+  id: number | string
   name: string
   groupCode: string
   subjectName: string
@@ -34,13 +48,6 @@ export interface GroupCardData {
   gradeStatusColor: 'green' | 'yellow' | 'red' | 'gray'
 }
 
-/** Filtros de UI aplicados localmente sobre GroupCardData[]. */
-export interface GroupUIFilters {
-  searchSubject: string   // filtra sobre subjectName
-  searchCode: string      // filtra sobre groupCode
-  semesterName: string    // '' = todos
-  groupStatus: string     // '' = todos
-}
 export interface GroupDetailInfo {
   name: string
   groupCode: string
@@ -54,13 +61,6 @@ export interface GroupDetailInfo {
   statusColor: 'green' | 'yellow' | 'red'
   isEditable: boolean
 }
-export const EMPTY_GROUP_UI_FILTERS: GroupUIFilters = {
-  searchSubject: '',
-  searchCode: '',
-  semesterName: '',
-  groupStatus: '',
-}
-// ─── Tipos para información académica ────────────────────────────────────────
 
 export interface GroupAcademicInfo {
   subjectName: string
@@ -74,59 +74,68 @@ export interface GroupAcademicInfo {
   suggestedSemesterLabel: string
 }
 
-// ─── Funciones puras de dominio ───────────────────────────────────────────────
-
-/**
- * Filtra planes de estudio que contienen la asignatura indicada.
- * Usado cuando el backend retorna todos los planes sin filtrar.
- */
-export function filterStudyPlansBySubject(
-  plans: StudyPlan[],
-  subjectId: number | string
-): StudyPlan[] {
-  return plans.filter(
-    (p) =>
-      String(p.subject_id) === String(subjectId)
-  )
+export interface EnrolledStudentRow {
+  enrollmentId: number | string
+  studentId: number | string
+  fullName: string
+  identification: string
+  code: string
+  enrollmentStatus: string
+  hasGrade: boolean
+  gradeStatus: string
+  gradeStatusColor: 'green' | 'yellow' | 'red' | 'gray'
 }
 
-/**
- * Construye el objeto GroupAcademicInfo a partir de los datos
- * ya cargados (subject, planes y carrera).
- */
-export function buildAcademicInfo(
-  subject: Subject,
-  studyPlans: StudyPlan[],
-  career: Career | null
-): GroupAcademicInfo {
-  const plan = studyPlans[0] ?? null
-
-  const credits = subject.credits ?? 0
-  const creditsLabel = `${credits} crédito${credits !== 1 ? 's' : ''}`
-
-  const suggestedSemester = plan?.suggested_semester ?? null
-  const suggestedSemesterLabel = suggestedSemester
-    ? `Semestre ${suggestedSemester}`
-    : 'No especificado'
-
-  return {
-    subjectName: subject.name,
-    subjectCode: subject.code,
-    credits,
-    creditsLabel,
-    careerName: career?.name ?? 'Carrera no encontrada',
-    studyPlanName: plan?.name ?? 'Plan no asociado',
-    studyPlanYear: plan?.year ?? null,
-    suggestedSemester,
-    suggestedSemesterLabel,
-  }
+export interface EvaluationRow {
+  id: number | string
+  name: string
+  description: string
+  weight: number
+  weightLabel: string
+  hasRubric: boolean
+  rubricTitle: string
+  rubricIsPublic: boolean
+  canAssociateRubric: boolean
+  canEdit: boolean
+  canDelete: boolean
 }
-// ─── Business ────────────────────────────────────────────────────────────────
+
+export interface AcademicProcessStatus {
+  pendingEvaluations: number
+  studentsWithoutGrade: number
+  unpublishedRubrics: number
+  finalGradesRegistered: boolean
+  completionPercentage: number
+  statusLabel: string
+  statusColor: 'green' | 'yellow' | 'red'
+}
+
+export interface GradePayload {
+  enrollment_id: number | string
+  rubric_id: number | string
+  details: { scale_id: number | string; comment?: string }[]
+  status: 'DRAFT' | 'SENT'
+  observations?: string
+}
+
+// ─── Clase principal ──────────────────────────────────────────────────────────
 
 class GroupBusiness {
-  // ── CRUD (dominio) ──────────────────────────────────────────────────────────
 
-  async getGroups(filters?: ServiceGroupFilters): Promise<Group[]> {
+  // ── Privado compartido ──────────────────────────────────────────────────────
+
+  private calcGroupStatus(
+    semesterIsActive: boolean,
+    studentCount: number
+  ): { label: 'Activo' | 'Sin estudiantes' | 'Cerrado'; color: 'green' | 'yellow' | 'red' } {
+    if (!semesterIsActive) return { label: 'Cerrado',          color: 'red'    }
+    if (studentCount === 0) return { label: 'Sin estudiantes', color: 'yellow' }
+    return                         { label: 'Activo',          color: 'green'  }
+  }
+
+  // ── Métodos heredados (Tarea anterior) ─────────────────────────────────────
+
+  async getGroups(filters?: GroupServiceFilters): Promise<Group[]> {
     const groups = await groupService.getGroups()
     if (!filters) return groups
 
@@ -136,37 +145,31 @@ class GroupBusiness {
         group.name.toLowerCase().includes(filters.search.toLowerCase()) ||
         group.group_code.toLowerCase().includes(filters.search.toLowerCase())
 
-      const matchesTeacher =
-        !filters.teacher_id || group.teacher_id === filters.teacher_id
-
-      const matchesSemester =
-        !filters.semester_id || group.semester_id === filters.semester_id
-
-      const matchesSubject =
-        !filters.subject_id || group.subject_id === filters.subject_id
+      const matchesTeacher  = !filters.teacher_id  || String(group.teacher_id)  === String(filters.teacher_id)
+      const matchesSemester = !filters.semester_id || String(group.semester_id) === String(filters.semester_id)
+      const matchesSubject  = !filters.subject_id  || String(group.subject_id)  === String(filters.subject_id)
 
       return matchesSearch && matchesTeacher && matchesSemester && matchesSubject
     })
   }
 
-  async getGroupById(id: string): Promise<Group> {
-    return await groupService.getGroupById(id)
+  async getGroupById(id: string | number): Promise<Group | null> {
+    return await groupService.getGroupById(String(id))
   }
 
   async createGroup(data: CreateGroupDto): Promise<Group | null> {
-    if (!data.name.trim()) throw new Error('Group name is required')
+    if (!data.name.trim())       throw new Error('Group name is required')
     if (!data.group_code.trim()) throw new Error('Group code is required')
-    if (!data.teacher_id) throw new Error('Teacher is required')
-    if (!data.subject_id) throw new Error('Subject is required')
-    if (!data.semester_id) throw new Error('Semester is required')
-    if (data.capacity <= 0) throw new Error('Capacity must be greater than 0')
+    if (!data.teacher_id)        throw new Error('Teacher is required')
+    if (!data.subject_id)        throw new Error('Subject is required')
+    if (!data.semester_id)       throw new Error('Semester is required')
+    if (data.capacity <= 0)      throw new Error('Capacity must be greater than 0')
     return await groupService.createGroup(data)
   }
 
   async updateGroup(id: string, data: UpdateGroupDto): Promise<Group | null> {
-    if (data.capacity !== undefined && data.capacity <= 0) {
+    if (data.capacity !== undefined && data.capacity <= 0)
       throw new Error('Capacity must be greater than 0')
-    }
     return await groupService.updateGroup(id, data)
   }
 
@@ -175,79 +178,55 @@ class GroupBusiness {
     return await groupService.deleteGroup(id)
   }
 
-  // ── Transformación → cards de presentación ──────────────────────────────────
+  // ── Tarea 10: Validación de acceso ─────────────────────────────────────────
 
-  /**
-   * Filtra grupos dejando solo los que pertenecen a un semestre activo.
-   * El endpoint /search?teacher_id trae todos los grupos sin distinción de
-   * semestre; se filtra en cliente. Si el backend lo asume en el futuro,
-   * esta función devuelve el array intacto sin romper nada.
-   */
-  filterActiveGroups(groups: Group[]): Group[] {
-    return groups.filter((group) => group.semester?.is_active === true)
+  validateGroupId(raw: string | null): number | null {
+    if (raw === null || raw === '') return null
+    const parsed = parseInt(raw, 10)
+    if (isNaN(parsed) || parsed <= 0 || String(parsed) !== raw.trim()) return null
+    return parsed
   }
-  private deriveGroupStatus(
-    semesterActive: boolean,
-    studentCount: number
-  ): { statusLabel: string; statusColor: 'green' | 'yellow' | 'red' } {
-    if (!semesterActive) return { statusLabel: 'Cerrado',          statusColor: 'red'    }
-    if (studentCount === 0) return { statusLabel: 'Sin estudiantes', statusColor: 'yellow' }
-    return                       { statusLabel: 'Activo',           statusColor: 'green'  }
+
+  validateTeacherAccess(group: Group, teacherUserId: number | string): string | null {
+    // NOTA: teacher_id en Group referencia User.id del docente, no Teacher.id.
+    if (String(group.teacher_id) !== String(teacherUserId))
+      return 'No tienes permiso para ver este grupo.'
+    return null
   }
-  /**
-   * Transforma Group[] (dominio) en GroupCardData[] (presentación).
-   * hasEvaluations y hasLockedGrades se inicializan en false;
-   * se completan con enrichGroupCard tras las llamadas async.
-   */
+
+  isGroupOwnedByTeacher(group: Group, teacherUserId: number | string): boolean {
+    return this.validateTeacherAccess(group, teacherUserId) === null
+  }
+
+  // ── Tareas 5-9: MisGrupos (GroupCardData) ──────────────────────────────────
+
   mapGroupsToCards(groups: Group[]): GroupCardData[] {
-    return groups.map((group): GroupCardData => {
-      const semesterActive = group.semester?.is_active === true
-      const studentCount = group.enrollments?.length ?? 0
-
-      const { statusLabel: groupStatusStr } = this.deriveGroupStatus(semesterActive, studentCount)
-      const groupStatus = groupStatusStr as GroupCardData['groupStatus']
+    return groups.map((group) => {
+      const semesterIsActive = group.semester?.is_active ?? false
+      const studentCount     = group.enrollments?.length ?? 0
+      const status           = this.calcGroupStatus(semesterIsActive, studentCount)
 
       return {
-        id: group.id,
-        name: group.name,
-        groupCode: group.group_code,
-        subjectName: group.subject?.name ?? 'Sin asignatura',
-        semesterName: group.semester?.name ?? 'Sin semestre',
+        id:                  group.id,
+        name:                group.name,
+        groupCode:           group.group_code,
+        subjectName:         group.subject?.name ?? '—',
+        semesterName:        group.semester?.name ?? '—',
         studentCount,
-        groupStatus,
-        semesterStatus: semesterActive ? 'Activo' : 'Cerrado',
-        isEditable: semesterActive,
-        hasEvaluations: false,
-        hasLockedGrades: false,
-        evaluationCount: 0,
+        groupStatus:         status.label,
+        semesterStatus:      semesterIsActive ? 'Activo' : 'Cerrado',
+        isEditable:          semesterIsActive,
+        hasEvaluations:      false,
+        hasLockedGrades:     false,
+        evaluationCount:     0,
         publishedRubricCount: 0,
-        gradeStatusLabel: 'Pendiente',
-        gradeStatusColor: 'red',
+        gradeStatusLabel:    '',
+        gradeStatusColor:    'gray',
       }
     })
   }
-  calcularGradeStatus(
-    studentCount: number,
-    grades: Grade[]
-  ): { label: string; color: 'green' | 'yellow' | 'red' | 'gray' } {
-    if (studentCount === 0)
-      return { label: 'Sin estudiantes', color: 'gray' }
-    if (grades.length === 0)
-      return { label: 'Sin calificar', color: 'red' }
-    if (grades.some((g) => g.is_locked === true))
-      return { label: 'Notas consolidadas', color: 'green' }
-    if (grades.every((g) => g.status === 'SENT'))
-      return { label: 'Calificado', color: 'green' }
-    if (grades.some((g) => g.status === 'SENT' || g.status === 'DRAFT'))
-      return { label: 'En progreso', color: 'yellow' }
-    return { label: 'Pendiente', color: 'red' }
-  }
 
-  /**
-   * Enriquece un GroupCardData con datos académicos del grupo.
-   * Función pura: no muta el card original, devuelve uno nuevo.
-   */
-enrichGroupCard(
+  enrichGroupCard(
     card: GroupCardData,
     evaluations: Evaluation[],
     grades: Grade[],
@@ -256,123 +235,61 @@ enrichGroupCard(
     const gradeStatus = this.calcularGradeStatus(card.studentCount, grades)
     return {
       ...card,
-      hasEvaluations: evaluations.length > 0,
-      hasLockedGrades: grades.some((g) => g.is_locked === true),
-      evaluationCount: evaluations.length,
-      publishedRubricCount: rubrics.filter((r) => r.is_public === true).length,
-      gradeStatusLabel: gradeStatus.label,
-      gradeStatusColor: gradeStatus.color,
+      hasEvaluations:       evaluations.length > 0,
+      hasLockedGrades:      grades.some((g) => g.is_locked),
+      evaluationCount:      evaluations.length,
+      publishedRubricCount: rubrics.filter((r) => r.is_public).length,
+      gradeStatusLabel:     gradeStatus.label,
+      gradeStatusColor:     gradeStatus.color,
     }
   }
 
-  /**
-   * Devuelve un resumen legible del estado académico del grupo,
-   * útil para tooltips y atributo title (accesibilidad).
-   */
+  calcularGradeStatus(
+    studentCount: number,
+    grades: Grade[]
+  ): { label: string; color: 'green' | 'yellow' | 'red' | 'gray' } {
+    if (studentCount === 0)                         return { label: 'Sin estudiantes',    color: 'gray'   }
+    if (grades.length === 0)                        return { label: 'Sin calificar',      color: 'red'    }
+    if (grades.some((g) => g.is_locked))            return { label: 'Notas consolidadas', color: 'green'  }
+    if (grades.every((g) => g.status === 'SENT'))   return { label: 'Calificado',         color: 'green'  }
+    if (grades.some((g) => g.status === 'SENT' || g.status === 'DRAFT'))
+                                                    return { label: 'En progreso',        color: 'yellow' }
+    return                                                 { label: 'Pendiente',          color: 'red'    }
+  }
+
   getGroupStatusSummary(card: GroupCardData): string {
-    const parts: string[] = []
-
-    parts.push(
-      card.semesterStatus === 'Activo' ? 'Semestre activo' : 'Semestre cerrado'
-    )
-
-    if (card.groupStatus === 'Sin estudiantes') {
-      parts.push('Sin estudiantes inscritos')
-    } else if (card.groupStatus === 'Activo') {
-      parts.push(`${card.studentCount} estudiante${card.studentCount !== 1 ? 's' : ''}`)
-    }
-
-    parts.push(card.hasEvaluations ? 'Con evaluaciones' : 'Sin evaluaciones')
-    parts.push(card.hasLockedGrades ? 'Notas consolidadas' : 'Notas pendientes')
-
+    const parts = [
+      `Grupo ${card.groupStatus.toLowerCase()}`,
+      `${card.evaluationCount} evaluación${card.evaluationCount !== 1 ? 'es' : ''}`,
+      card.gradeStatusLabel || 'Sin calificar',
+    ]
     return parts.join(' · ')
   }
 
-  // ── Filtrado local (UI) ─────────────────────────────────────────────────────
-
-  /**
-   * Aplica filtros locales sobre GroupCardData[].
-   * Todos los criterios se combinan con AND.
-   * Si todos los campos son '' devuelve el array completo sin recorrerlo.
-   */
-  filterGroups(cards: GroupCardData[], filters: GroupUIFilters): GroupCardData[] {
+  filterGroups(cards: GroupCardData[], filters: GroupFilters): GroupCardData[] {
     const { searchSubject, searchCode, semesterName, groupStatus } = filters
-    const noFilters =
-      !searchSubject && !searchCode && !semesterName && !groupStatus
-    if (noFilters) return cards
+    if (!searchSubject && !searchCode && !semesterName && !groupStatus) return cards
 
     return cards.filter((card) => {
-      const matchesSubject =
-        !searchSubject ||
-        card.subjectName.toLowerCase().includes(searchSubject.toLowerCase())
-
-      const matchesCode =
-        !searchCode ||
-        card.groupCode.toLowerCase().includes(searchCode.toLowerCase())
-
-      const matchesSemester =
-        !semesterName || card.semesterName === semesterName
-
-      const matchesStatus =
-        !groupStatus || card.groupStatus === groupStatus
-
-      return matchesSubject && matchesCode && matchesSemester && matchesStatus
+      const matchSubject  = !searchSubject  || card.subjectName.toLowerCase().includes(searchSubject.toLowerCase())
+      const matchCode     = !searchCode     || card.groupCode.toLowerCase().includes(searchCode.toLowerCase())
+      const matchSemester = !semesterName   || card.semesterName === semesterName
+      const matchStatus   = !groupStatus    || card.groupStatus  === groupStatus
+      return matchSubject && matchCode && matchSemester && matchStatus
     })
   }
 
-  /**
-   * Extrae nombres de semestre únicos del conjunto de cards,
-   * ordenados alfabéticamente. Usado para poblar el select de semestres.
-   */
   getUniqueSemesters(cards: GroupCardData[]): string[] {
-    const unique = Array.from(new Set(cards.map((c) => c.semesterName)))
-    return unique.sort((a, b) => a.localeCompare(b))
-  }
-    /**
-   * Valida que un raw query param sea un entero positivo usable como groupId.
-   * Vive en Business para mantener la lógica fuera de la página.
-   */
-  validateGroupId(raw: string | null): string | null {
-    if (!raw || raw.trim() === '') return null
-    // Los IDs del proyecto son strings (UUIDs o numéricos como string)
-    // Aceptamos cualquier string no vacío y no-whitespace
-    return raw.trim() || null
-  }
-  /**
-   * Valida que el docente autenticado sea el propietario del grupo.
-   *
-   * Decisión de modelo: Group.teacher_id referencia User.id directamente
-   * (no Teacher.id), confirmado en src/models/Group.ts donde teacher_id: string
-   * coincide con User.id: string. El backend asigna el grupo al user_id del
-   * docente, no al id de la tabla teachers.
-   *
-   * Retorna el mensaje de error si el acceso no está permitido, o null si es válido.
-   */
-  validateTeacherAccess(group: Group, teacherUserId: string): string | null {
-    if (group.teacher_id !== teacherUserId) {
-      return 'No tienes permiso para ver este grupo.'
-    }
-    return null
+    return [...new Set(cards.map((c) => c.semesterName))].sort()
   }
 
-  /**
-   * Wrapper semántico sobre validateTeacherAccess para contextos
-   * donde se necesita un boolean en lugar del mensaje de error.
-   */
-  isGroupOwnedByTeacher(group: Group, teacherUserId: string): boolean {
-    return this.validateTeacherAccess(group, teacherUserId) === null
-  }
-  /**
-   * Transforma un Group (dominio) en GroupDetailInfo (presentación de detalle).
-   * Nota: si el backend no retorna subject/semester anidados en
-   * GET /api/academic/groups/{id}, el hook debe enriquecerlos antes de llamar
-   * esta función (ver useDetalleGrupo).
-   */
+  // ── Tarea 11: Info general del grupo ───────────────────────────────────────
+
   buildGroupDetailInfo(group: Group): GroupDetailInfo {
-    const semesterActive = group.semester?.is_active === true
-    const studentCount = group.enrollments?.length ?? 0
-    const capacity = group.capacity ?? null
-    const { statusLabel, statusColor } = this.deriveGroupStatus(semesterActive, studentCount)
+    const semesterIsActive = group.semester?.is_active ?? false
+    const studentCount     = group.enrollments?.length ?? 0
+    const capacity         = group.capacity ?? null
+    const status           = this.calcGroupStatus(semesterIsActive, studentCount)
 
     const occupancyLabel = capacity != null
       ? `${studentCount} / ${capacity} estudiantes`
@@ -381,17 +298,303 @@ enrichGroupCard(
     return {
       name:             group.name,
       groupCode:        group.group_code,
-      subjectName:      group.subject?.name  ?? 'Sin asignatura',
-      semesterName:     group.semester?.name ?? 'Sin semestre',
-      semesterIsActive: semesterActive,
+      subjectName:      group.subject?.name   ?? '—',
+      semesterName:     group.semester?.name  ?? '—',
+      semesterIsActive,
       studentCount,
       capacity,
       occupancyLabel,
+      statusLabel:      status.label,
+      statusColor:      status.color,
+      isEditable:       semesterIsActive,
+    }
+  }
+
+  // ── Tarea 12: Info académica ───────────────────────────────────────────────
+
+  buildAcademicInfo(
+    subject: Subject,
+    studyPlans: StudyPlan[],
+    career: Career | null
+  ): GroupAcademicInfo {
+    const plan    = studyPlans[0] ?? null
+    const credits = subject.credits ?? 0
+
+    return {
+      subjectName:            subject.name,
+      subjectCode:            subject.code,
+      credits,
+      creditsLabel:           `${credits} crédito${credits !== 1 ? 's' : ''}`,
+      careerName:             career?.name    ?? 'Carrera no encontrada',
+      studyPlanName:          plan?.name      ?? 'Plan no asociado',
+      studyPlanYear:          plan?.year      ?? null,
+      suggestedSemester:      plan?.suggested_semester ?? null,
+      suggestedSemesterLabel: plan?.suggested_semester
+        ? `Semestre ${plan.suggested_semester}`
+        : 'No especificado',
+    }
+  }
+
+  filterStudyPlansBySubject(plans: StudyPlan[], subjectId: number | string): StudyPlan[] {
+    return plans.filter((p) =>
+      // Filtra por array subjects[] si existe; fallback a subject_id directo
+      p.subjects
+        ? p.subjects.some((s) => String(s.id) === String(subjectId))
+        : String(p.subject_id) === String(subjectId)
+    )
+  }
+
+  // ── Tarea 13: Estudiantes inscritos ────────────────────────────────────────
+
+  mapEnrollmentsToRows(
+    enrollments: Enrollment[],
+    grades: Grade[]
+  ): EnrolledStudentRow[] {
+    return enrollments.map((enrollment) => {
+      const enrollmentGrades = grades.filter(
+        (g) => String(g.enrollment_id) === String(enrollment.id)
+      )
+      const hasGrade    = enrollmentGrades.length > 0
+      const gradeStatus = this.calcularGradeStatus(1, enrollmentGrades)
+
+      return {
+        enrollmentId:      enrollment.id ?? '',
+        studentId:         enrollment.student_id ?? enrollment.student?.id ?? '',
+        fullName:          [
+                             enrollment.student?.first_name,
+                             enrollment.student?.last_name,
+                           ].filter(Boolean).join(' ') || '—',
+        identification:    enrollment.student?.identification ?? '—',
+        code:              (enrollment.student as any)?.code  ?? '—',
+        enrollmentStatus:  enrollment.status,
+        hasGrade,
+        gradeStatus:       hasGrade ? gradeStatus.label : 'Sin calificar',
+        gradeStatusColor:  hasGrade ? gradeStatus.color : 'gray',
+      }
+    })
+  }
+
+  // ── Tarea 14: Evaluaciones del grupo ───────────────────────────────────────
+
+  mapEvaluationsToRows(
+    evaluations: Evaluation[],
+    semesterIsActive: boolean
+  ): EvaluationRow[] {
+    return evaluations.map((ev) => {
+      const hasRubric = ev.rubric_id != null
+      return {
+        id:                 ev.id ?? '',
+        name:               ev.name        ?? '',
+        description:        ev.description ?? '',
+        weight:             ev.weight       ?? 0,
+        weightLabel:        `${ev.weight ?? 0}%`,
+        hasRubric,
+        rubricTitle:        ev.rubric?.title    ?? 'Sin rúbrica',
+        rubricIsPublic:     ev.rubric?.is_public ?? false,
+        canAssociateRubric: semesterIsActive && !hasRubric,
+        canEdit:            semesterIsActive,
+        canDelete:          semesterIsActive && !hasRubric,
+      }
+    })
+  }
+
+  validateEvaluation(payload: { name: string; weight: number; description?: string }): string | null {
+    if (!payload.name.trim())                          return 'El nombre es requerido.'
+    if (payload.weight <= 0 || payload.weight > 100)   return 'El peso debe estar entre 1 y 100.'
+    return null
+  }
+
+  validateTotalWeight(
+    evaluations: Evaluation[],
+    newWeight: number,
+    excludeId?: number | string
+  ): string | null {
+    const currentTotal = evaluations
+      .filter((e) => String(e.id) !== String(excludeId))
+      .reduce((sum, e) => sum + (e.weight ?? 0), 0)
+
+    if (currentTotal + newWeight > 100)
+      return 'El peso total de las evaluaciones supera el 100%.'
+    return null
+  }
+
+  // ── Tareas 15-16: Rúbricas y criterios ────────────────────────────────────
+
+  filterPublicRubrics(rubrics: Rubric[]): Rubric[] {
+    return rubrics.filter((r) => r.is_public === true && r.is_archived === false)
+  }
+
+  filterRubricsByTeacher(rubrics: Rubric[], teacherRubricIds: (number | string)[]): Rubric[] {
+    // Nota: el backend no filtra rúbricas por docente directamente.
+    // Este método filtra localmente por IDs conocidos del docente.
+    const ids = teacherRubricIds.map(String)
+    return rubrics.filter((r) => r.id !== undefined && ids.includes(String(r.id)))
+  }
+
+  validateCriterionWeight(
+    criteria: Criterion[],
+    newWeight: number,
+    excludeId?: number | string
+  ): string | null {
+    const currentTotal = criteria
+      .filter((c) => String(c.id) !== String(excludeId))
+      .reduce((sum, c) => sum + (c.weight ?? 0), 0)
+
+    if (currentTotal + newWeight > 100)
+      return 'La suma de pesos de los criterios supera el 100%.'
+    return null
+  }
+
+  canPublishRubric(rubric: Rubric, criteria: Criterion[]): string | null {
+    if (criteria.length === 0)
+      return 'La rúbrica debe tener al menos un criterio.'
+
+    const totalWeight = criteria.reduce((sum, c) => sum + (c.weight ?? 0), 0)
+    if (totalWeight !== 100)
+      return 'Los pesos deben sumar exactamente 100.'
+
+    for (const criterion of criteria) {
+      const scaleCount = criterion.scales?.length ?? 0
+      if (scaleCount < 2 || scaleCount > 5)
+        return 'Cada criterio debe tener entre 2 y 5 escalas.'
+    }
+
+    return null
+  }
+
+  // ── Tareas 17-18: Calificaciones y notas ──────────────────────────────────
+
+  buildGradePayload(
+    enrollmentId: number | string,
+    rubricId: number | string,
+    selectedScales: { criterionId: number | string; scaleId: number | string; comment?: string }[],
+    status: 'DRAFT' | 'SENT',
+    observations?: string
+  ): GradePayload {
+    return {
+      enrollment_id: enrollmentId,
+      rubric_id:     rubricId,
+      details:       selectedScales.map((s) => ({
+        scale_id: s.scaleId,
+        comment:  s.comment,
+      })),
+      status,
+      observations,
+    }
+  }
+
+  validateGradeBeforeSend(
+    criteria: Criterion[],
+    selectedScales: { criterionId: number | string; scaleId: number | string }[]
+  ): string | null {
+    const selectedIds = selectedScales.map((s) => String(s.criterionId))
+    const allCovered  = criteria.every((c) => selectedIds.includes(String(c.id)))
+    if (!allCovered)
+      return 'Debes calificar todos los criterios antes de enviar.'
+    return null
+  }
+
+  canEditGrade(grade: Grade): string | null {
+    if (grade.is_locked) return 'Esta nota está bloqueada y no puede editarse.'
+    return null
+  }
+
+  canRegisterFinalScores(grades: Grade[], enrollments: Enrollment[]): string | null {
+    if (enrollments.length === 0)
+      return 'No hay estudiantes inscritos en el grupo.'
+
+    const allSent = enrollments.every((e) =>
+      grades.some(
+        (g) => String(g.enrollment_id) === String(e.id) && g.status === 'SENT'
+      )
+    )
+    if (!allSent)
+      return 'Todos los estudiantes deben tener calificaciones enviadas.'
+
+    if (grades.some((g) => g.is_locked))
+      return 'Las notas ya están consolidadas.'
+
+    return null
+  }
+
+  // ── Tarea 19: Estado del proceso académico ────────────────────────────────
+
+  buildAcademicProcessStatus(
+    evaluations: Evaluation[],
+    enrollments: Enrollment[],
+    grades: Grade[],
+    rubrics: Rubric[]
+  ): AcademicProcessStatus {
+    const pendingEvaluations    = evaluations.filter((e) => e.rubric_id == null).length
+    const studentsWithoutGrade  = enrollments.filter(
+      (e) => !grades.some(
+        (g) => String(g.enrollment_id) === String(e.id) && g.status === 'SENT'
+      )
+    ).length
+    const unpublishedRubrics    = rubrics.filter((r) => !r.is_public && !r.is_archived).length
+    const finalGradesRegistered = grades.some((g) => g.is_locked)
+
+    const total                 = enrollments.length
+    const completionPercentage  = total > 0
+      ? Math.round(((total - studentsWithoutGrade) / total) * 100)
+      : 0
+
+    let statusLabel: string
+    let statusColor: 'green' | 'yellow' | 'red'
+
+    if (completionPercentage === 100 && finalGradesRegistered) {
+      statusLabel = 'Proceso completo'; statusColor = 'green'
+    } else if (completionPercentage > 0) {
+      statusLabel = 'En progreso';      statusColor = 'yellow'
+    } else {
+      statusLabel = 'Sin iniciar';      statusColor = 'red'
+    }
+
+    return {
+      pendingEvaluations,
+      studentsWithoutGrade,
+      unpublishedRubrics,
+      finalGradesRegistered,
+      completionPercentage,
       statusLabel,
       statusColor,
-      isEditable: semesterActive,
     }
+  }
+
+  // ── Tarea 20: Validaciones del grupo ──────────────────────────────────────
+
+  canAssociateRubricToEvaluation(rubric: Rubric, semesterIsActive: boolean): string | null {
+    if (!rubric.is_public)     return 'Solo se pueden asociar rúbricas publicadas.'
+    if (rubric.is_archived)    return 'No se pueden asociar rúbricas archivadas.'
+    if (!semesterIsActive)     return 'No se pueden modificar evaluaciones en semestres cerrados.'
+    return null
+  }
+
+  canRegisterGradeInSemester(semesterIsActive: boolean): string | null {
+    if (!semesterIsActive)
+      return 'No se pueden registrar notas en semestres cerrados.'
+    return null
+  }
+
+  canModifyOfficialGrade(grade: Grade): string | null {
+    if (grade.is_locked)
+      return 'No se puede modificar una nota oficial ya registrada.'
+    return null
+  }
+
+  isDuplicateEvaluation(
+    evaluations: Evaluation[],
+    name: string,
+    excludeId?: number | string
+  ): boolean {
+    const normalized = name.trim().toLowerCase()
+    return evaluations.some(
+      (e) =>
+        String(e.id) !== String(excludeId) &&
+        (e.name ?? '').trim().toLowerCase() === normalized
+    )
   }
 }
 
+// ─── Singleton ────────────────────────────────────────────────────────────────
 export const groupBusiness = new GroupBusiness()
