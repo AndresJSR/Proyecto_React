@@ -2,7 +2,6 @@
 import { Group } from '../models/Group';
 import { Registration } from '../models/Registration';
 import { Student } from '../models/Student';
-import { StudyPlan } from '../models/StudyPlan';
 import {
   EnrollmentSummary,
   EnrollmentValidationError,
@@ -162,7 +161,15 @@ class EnrollStudentBusiness {
   /**
    * Construye filas para la tabla de grupos
    */
-  buildGroupTableRows(groups: Group[]): GroupTableRow[] {
+  buildGroupTableRows(groups: Group[], studyPlanSubjects?: StudyPlanSubject[]): GroupTableRow[] {
+    const subjectFallbackMap = new Map<string, StudyPlanSubject>();
+
+    studyPlanSubjects?.forEach((subject) => {
+      if (subject.subject_id != null) {
+        subjectFallbackMap.set(subject.subject_id.toString(), subject);
+      }
+    });
+
     return groups.map((group) => {
       const enrollmentCount = group.enrollments?.length || 0;
       const availableCapacity = group.capacity - enrollmentCount;
@@ -176,19 +183,24 @@ class EnrollStudentBusiness {
         capacityStatus = 'good';
       }
 
+      const fallbackSubject = group.subject_id ? subjectFallbackMap.get(group.subject_id.toString()) : undefined;
+      const subjectName = group.subject?.name || fallbackSubject?.subject_name || 'N/A';
+      const subjectCode = group.subject?.code || fallbackSubject?.subject_code || 'N/A';
+      const careerName = fallbackSubject ? 'Carrera actual' : 'N/A';
+
       return {
         id: group.id,
         groupCode: group.group_code,
-        subjectName: group.subject?.name || 'N/A',
-        subjectCode: group.subject?.code || 'N/A',
-        careerName: group.subject?.code || 'N/A',
+        subjectName,
+        subjectCode,
+        careerName,
         teacherName:
-          group.teacher && typeof group.teacher.profile === 'object' && 'first_name' in group.teacher.profile
-            ? `${(group.teacher.profile as any).first_name} ${(group.teacher.profile as any).last_name}`
+          group.teacher?.first_name || (group.teacher?.user?.profile as any)?.first_name
+            ? `${group.teacher?.first_name || (group.teacher?.user?.profile as any)?.first_name} ${group.teacher?.last_name || (group.teacher?.user?.profile as any)?.last_name}`.trim()
             : 'N/A',
         availableCapacity,
         totalCapacity: group.capacity,
-        credits: group.subject?.credits || 0,
+        credits: group.subject?.credits ?? fallbackSubject?.credits ?? 0,
         capacityStatus,
       };
     });
@@ -201,7 +213,6 @@ class EnrollStudentBusiness {
     selectedGroups: Group[],
     studentId: string,
     registration: Registration | null,
-    studyPlan: StudyPlan | null,
     studyPlanSubjects: StudyPlanSubject[] | null,
     existingEnrollments: any[]
   ): EnrollmentValidationError[] {

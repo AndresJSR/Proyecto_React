@@ -43,7 +43,8 @@ const EnrollStudentInGroup = () => {
         row.groupCode.toLowerCase().includes(query) ||
         row.subjectName.toLowerCase().includes(query) ||
         row.subjectCode.toLowerCase().includes(query) ||
-        row.teacherName.toLowerCase().includes(query);
+        row.teacherName.toLowerCase().includes(query) ||
+        row.careerName.toLowerCase().includes(query);
       const matchesProgram = programFilter === 'all' || row.careerName === programFilter;
       const matchesSubject = subjectFilter === 'all' || row.subjectName === subjectFilter;
       return matchesSearch && matchesProgram && matchesSubject;

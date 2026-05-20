@@ -7,16 +7,15 @@ import DeleteSubjectModal from '../../components/StudyPlan/DeleteSubjectModal'
 import PublishVersionModal from '../../components/StudyPlan/PublishVersionModal'
 import StudyPlanCatalog from '../../components/StudyPlan/StudyPlanCatalog'
 import StudyPlanDetailsCard from '../../components/StudyPlan/StudyPlanDetailsCard'
-import EditSubjectModal from './EditSubjectModal'
 import StudyPlanSection from '../../components/StudyPlan/StudyPlanSection'
 import StudyPlanVersionPanel from '../../components/StudyPlan/StudyPlanVersionPanel'
 import useStudyPlans from '../../hooks/useStudyPlans'
 import { StudyPlanVersion } from '../../models/StudyPlanVersion'
 import { Subject } from '../../models/Subject'
-import { studyPlanVersionService } from '../../services/studyPlanVersionService'
 import { studyPlanService } from '../../services/studyPlanService'
-import { StudyPlanSubject } from '../../types/studyPlan'
 import { subjectService } from '../../services/subjectService'
+import { StudyPlanSubject } from '../../types/studyPlan'
+import EditSubjectModal from './EditSubjectModal'
 
 const StudyPlanDashboardPage: React.FC = () => {
   const navigate = useNavigate()
@@ -90,7 +89,7 @@ const StudyPlanDashboardPage: React.FC = () => {
 
   const loadVersions = async (careerId: string) => {
     try {
-      const data = await studyPlanVersionService.getVersionsByCareer(careerId)
+      const data = await studyPlanService.getVersionsByCareer(careerId)
       console.debug('StudyPlanDashboard: loaded versions for career', careerId, 'count', Array.isArray(data) ? data.length : 0)
       setVersions(data)
       const published = data.find((version) => version.is_published)

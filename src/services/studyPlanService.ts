@@ -9,7 +9,7 @@ import {
   StudyPlanSubject
 } from '../types/studyPlan'
 
-type StudyPlanPayload = Omit<StudyPlan, 'id' | 'is_published'>
+type StudyPlanPayload = Omit<StudyPlan, 'id' | 'is_published' | 'created_at' | 'updated_at'>
 
 const BASE_URL = '/api/academic'
 
@@ -32,7 +32,7 @@ export const studyPlanService = {
     }
   },
 
-  async getStudyPlanById(id: number): Promise<StudyPlan> {
+  async getStudyPlanById(id: string | number): Promise<StudyPlan> {
     try {
       const response = await api.get(`${BASE_URL}/study-plans/${id}`)
 
@@ -127,6 +127,58 @@ export const studyPlanService = {
     }
   },
 
+  async getVersionsByCareer(careerId: string): Promise<StudyPlan[]> {
+    try {
+      const response = await api.get(`${BASE_URL}/study-plans/search`, {
+        params: { career_id: careerId }
+      })
+
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
+  },
+
+  async createVersion(
+    payload: {
+      career_id: string
+      year: number
+      name: string
+    }
+  ): Promise<StudyPlan> {
+    try {
+      const response = await api.post(`${BASE_URL}/study-plans`, payload)
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
+  },
+
+  async getVersionById(id: string): Promise<StudyPlan> {
+    try {
+      const response = await api.get(`${BASE_URL}/study-plans/${id}`)
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
+  },
+
+  async publishVersion(
+    payload: {
+      version_id: string
+      replace_previous?: boolean
+    }
+  ): Promise<StudyPlan> {
+    try {
+      const response = await api.patch(
+        `/api/evaluation/rubrics/${payload.version_id}/publish`
+      )
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
+  },
+
   async getCareers(): Promise<Career[]> {
     try {
       const response = await api.get(`${BASE_URL}/careers`)
@@ -147,7 +199,7 @@ export const studyPlanService = {
     }
   },
 
-  async updateStudyPlan(id: string, payload: unknown): Promise<StudyPlan> {
+  async updateStudyPlan(id: string | number, payload: unknown): Promise<StudyPlan> {
     try {
       const response = await api.put(
         `${BASE_URL}/study-plans/${id}`,

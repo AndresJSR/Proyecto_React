@@ -229,7 +229,6 @@ export const useEnrollStudentInGroup = (): UseEnrollStudentInGroupReturn => {
         state.selectedGroups,
         studentId,
         state.studentRegistration,
-        state.studentStudyPlan,
         state.studyPlanSubjects,
         existingEnrollments
       );
@@ -323,7 +322,8 @@ export const useEnrollStudentInGroup = (): UseEnrollStudentInGroupReturn => {
     : groupsOnSemester;
 
   const groupTableRows = enrollStudentBusiness.buildGroupTableRows(
-    filteredGroups
+    filteredGroups,
+    state.studyPlanSubjects || undefined
   );
 
   const enrollmentSummary = state.selectedGroups.length > 0
