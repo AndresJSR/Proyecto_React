@@ -13,6 +13,9 @@ const UserList = lazy(() => import('../pages/Users/ListUsers'));
 const UserCreate = lazy(() => import('../pages/Users/Create'));
 const UserUpdate = lazy(() => import('../pages/Users/Update'));
 const RoleList = lazy(() => import('../pages/Roles/List'));
+const StudyPlanDetail = lazy(() => import('../pages/PlanEstudios/StudyPlanDetailPage'));
+const AdminStudyPlans = lazy(() => import('../pages/PlanEstudios/PlanEstudios'));
+
 
 // ── Admin: Académico ──────────────────────────────────────────────────────────
 const ListCarreras = lazy(() => import('../pages/careers/ListCarrers'));
@@ -269,6 +272,24 @@ const routes = [
     component: StudyPlanVersions,
     allowedRoles: ADMIN,
   },
+  {
+  path: '/admin/study-plans',
+  title: 'Planes de Estudio',
+  component: AdminStudyPlans,
+  allowedRoles: ADMIN,
+},
+{
+  path: '/admin/study-plans/:id',
+  title: 'Detalle del Plan',
+  component: StudyPlanDetail,
+  allowedRoles: ADMIN,
+},
+{
+  path: '/admin/study-plans/edit/:id',
+  title: 'Editar Plan',
+  component: AdminStudyPlans,   // Reutiliza la lista; el edit se hace con modal
+  allowedRoles: ADMIN,
+},
 
   // ── Admin: Inscripciones y Registros ─────────────────────────────────────────
   {
