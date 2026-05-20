@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { BookOpen } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { BookOpen, LayoutGrid, ChevronDown, ChevronUp } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Logo from '../images/logo/logo.svg';
@@ -319,122 +319,166 @@ const AdminMenu = ({ pathname }: { pathname: string }) => (
 );
 
 /* ───────────────────────────── MENÚ DOCENTE ───────────────────────────── */
-const TeacherMenu = ({ pathname }: { pathname: string }) => (
-  <>
-    <div>
-      <ul className="mb-6 flex flex-col gap-1.5">
-        <li>
-          <NavLink to="/" className={linkClass(pathname, (p) => p === '/')}>
-            <IcoHome />
-            Inicio
-          </NavLink>
-        </li>
-      </ul>
-    </div>
+const TeacherMenu = ({ pathname }: { pathname: string }) => {
 
-    <div>
-      <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">MI CLASE</h3>
-      <ul className="mb-6 flex flex-col gap-1.5">
-        <li>
-          <NavLink to="/grupos" className={linkClass(pathname, '/grupos')}>
-            <IcoUsers />
-            Grupos
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/users/list" className={linkClass(pathname, '/users')}>
-            <IcoUser />
-            Estudiantes
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/evaluaciones" className={linkClass(pathname, (p) => p === '/evaluaciones')}>
-            <IcoDoc />
-            Evaluaciones
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/calificaciones" className={linkClass(pathname, '/calificaciones')}>
-            <IcoCheck />
-            Calificaciones
-          </NavLink>
-        </li>
-      </ul>
-    </div>
+  // ─── NUEVO: estado local de UI para el desplegable "Grupos" ───────────────
+  // Solo useState, sin Redux ni Context — estado de presentación pura
+  const [isGruposOpen, setIsGruposOpen] = useState<boolean>(false);
+  // ─────────────────────────────────────────────────────────────────────────
 
-    <div>
-      <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">RUBRICAS</h3>
-      <ul className="mb-6 flex flex-col gap-1.5">
-        <li>
-          <NavLink to="/rubricas/create" className={linkClass(pathname, (p) => p === '/rubricas/create')}>
-            <IcoNewFile />
-            Nueva rúbrica
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/rubricas/mis-rubricas" className={linkClass(pathname, '/mis-rubricas')}>
-            <IcoMyBooks />
-            Mis rúbricas
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/evaluaciones/asociar-rubrica" className={linkClass(pathname, '/asociar-rubrica')}>
-            <IcoLink />
-            Asociar a evaluación
-          </NavLink>
-        </li>
-      </ul>
-    </div>
+  return (
+    <>
+      <div>
+        <ul className="mb-6 flex flex-col gap-1.5">
+          <li>
+            <NavLink to="/" className={linkClass(pathname, (p) => p === '/')}>
+              <IcoHome />
+              Inicio
+            </NavLink>
+          </li>
+        </ul>
+      </div>
 
-    <div>
-      <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">EVALUACIONES</h3>
-      <ul className="mb-6 flex flex-col gap-1.5">
-        <li>
-          <NavLink to="/evaluaciones" className={linkClass(pathname, (p) => p === '/evaluaciones')}>
-            <IcoDoc />
-            Calificar
-          </NavLink>
-        </li>
-      </ul>
-    </div>
+      <div>
+        <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">MI CLASE</h3>
+        <ul className="mb-6 flex flex-col gap-1.5">
 
-    <div>
-      <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">RECURSOS</h3>
-      <ul className="mb-6 flex flex-col gap-1.5">
-        <li>
-          <NavLink to="/escalas" className={linkClass(pathname, '/escalas')}>
-            <IcoBarChart />
-            Escalas
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/biblioteca" className={linkClass(pathname, '/biblioteca')}>
-            <IcoMyBooks />
-            Biblioteca
-          </NavLink>
-        </li>
-      </ul>
-    </div>
+          {/* ── NUEVO: botón "Grupos" con toggle desplegable ──────────────────
+              Reemplaza el NavLink directo que había antes a /grupos.
+              isGruposOpen controla la expansión — solo estado local.         */}
+          <li>
+            <button
+              onClick={() => setIsGruposOpen((prev) => !prev)}
+              className={`group relative flex w-full items-center justify-between gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                isGruposOpen ? 'bg-graydark dark:bg-meta-4' : ''
+              }`}
+            >
+              {/* Lado izquierdo: ícono + etiqueta */}
+              <span className="flex items-center gap-2.5">
+                <LayoutGrid size={18} />
+                Grupos
+              </span>
 
-    <div>
-      <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">CONFIGURACIÓN</h3>
-      <ul className="mb-6 flex flex-col gap-1.5">
-        <li>
-          <NavLink to="/profile" className={linkClass(pathname, '/profile')}>
-            <IcoProfile />
-            Perfil
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/settings" className={linkClass(pathname, '/settings')}>
-            <IcoSettings />
-            Preferencias
-          </NavLink>
-        </li>
-      </ul>
-    </div>
-  </>
-);
+              {/* Lado derecho: flecha que rota según estado */}
+              {isGruposOpen ? (
+                <ChevronUp size={16} className="text-bodydark2" />
+              ) : (
+                <ChevronDown size={16} className="text-bodydark2" />
+              )}
+            </button>
+
+            {/* Submenú colapsable — vacío por ahora, listo para agregar ítems */}
+            {isGruposOpen && (
+              <ul className="mt-1 ml-4 flex flex-col gap-1 border-l border-graydark pl-3">
+                {/* TODO: aquí irán los NavLink de sub-opciones de Grupos */}
+                {/* Ejemplo futuro:
+                <li>
+                  <NavLink to="/grupos/mis-grupos" className={linkClass(pathname, '/grupos/mis-grupos')}>
+                    Mis grupos
+                  </NavLink>
+                </li>
+                */}
+              </ul>
+            )}
+          </li>
+          {/* ── FIN botón "Grupos" ─────────────────────────────────────────── */}
+
+          <li>
+            <NavLink to="/users/list" className={linkClass(pathname, '/users')}>
+              <IcoUser />
+              Estudiantes
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/evaluaciones" className={linkClass(pathname, (p) => p === '/evaluaciones')}>
+              <IcoDoc />
+              Evaluaciones
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/calificaciones" className={linkClass(pathname, '/calificaciones')}>
+              <IcoCheck />
+              Calificaciones
+            </NavLink>
+          </li>
+        </ul>
+      </div>
+
+      {/* ── El resto de las secciones queda exactamente igual ── */}
+      <div>
+        <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">RUBRICAS</h3>
+        <ul className="mb-6 flex flex-col gap-1.5">
+          <li>
+            <NavLink to="/rubricas/create" className={linkClass(pathname, (p) => p === '/rubricas/create')}>
+              <IcoNewFile />
+              Nueva rúbrica
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/rubricas/mis-rubricas" className={linkClass(pathname, '/mis-rubricas')}>
+              <IcoMyBooks />
+              Mis rúbricas
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/evaluaciones/asociar-rubrica" className={linkClass(pathname, '/asociar-rubrica')}>
+              <IcoLink />
+              Asociar a evaluación
+            </NavLink>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">EVALUACIONES</h3>
+        <ul className="mb-6 flex flex-col gap-1.5">
+          <li>
+            <NavLink to="/evaluaciones" className={linkClass(pathname, (p) => p === '/evaluaciones')}>
+              <IcoDoc />
+              Calificar
+            </NavLink>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">RECURSOS</h3>
+        <ul className="mb-6 flex flex-col gap-1.5">
+          <li>
+            <NavLink to="/escalas" className={linkClass(pathname, '/escalas')}>
+              <IcoBarChart />
+              Escalas
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/biblioteca" className={linkClass(pathname, '/biblioteca')}>
+              <IcoMyBooks />
+              Biblioteca
+            </NavLink>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">CONFIGURACIÓN</h3>
+        <ul className="mb-6 flex flex-col gap-1.5">
+          <li>
+            <NavLink to="/profile" className={linkClass(pathname, '/profile')}>
+              <IcoProfile />
+              Perfil
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/settings" className={linkClass(pathname, '/settings')}>
+              <IcoSettings />
+              Preferencias
+            </NavLink>
+          </li>
+        </ul>
+      </div>
+    </>
+  );
+};
 
 /* ───────────────────────────── MENÚ ESTUDIANTE ───────────────────────────── */
 const StudentMenu = ({ pathname }: { pathname: string }) => (
