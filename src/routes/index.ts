@@ -31,6 +31,7 @@ const ListMatriculas = lazy(() => import('../pages/enrollment/ListEnrollment'));
 const CreateMatricula = lazy(() => import('../pages/enrollment/CreateEnrollment'));
 const ListInscripciones = lazy(() => import('../pages/inscripciones/ListInscripciones'));
 const CreateInscripcion = lazy(() => import('../pages/inscripciones/CreateInscripcion'));
+const EnrollStudentInGroup = lazy(() => import('../pages/enrollstudentingroup'));
 const CreateStudyPlan = lazy(() => import('../pages/StudyPlan/CreateStudyPlan'));
 const StudyPlanDashboard = lazy(() => import('../pages/StudyPlan/StudyPlanDashboardPage'));
 const StudyPlanVersions = lazy(() => import('../pages/StudyPlan/VersionHistory'));
@@ -280,6 +281,12 @@ const routes = [
     path: '/inscripciones/create',
     title: 'Crear Inscripción',
     component: CreateInscripcion,
+    allowedRoles: ADMIN,
+  },
+  {
+    path: '/inscripciones/enroll-student-in-group',
+    title: 'Inscribir estudiante en grupo',
+    component: EnrollStudentInGroup,
     allowedRoles: ADMIN,
   },
   {
