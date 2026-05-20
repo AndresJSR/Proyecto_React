@@ -2,7 +2,6 @@ import React from 'react'
 import { StudyPlan } from '../../models/StudyPlan'
 import { StudyPlanVersion } from '../../models/StudyPlanVersion'
 import StudyPlanTable from './StudyPlanTable'
-import StudyPlanTabs from './StudyPlanTabs'
 
 interface Props {
   planItems: StudyPlan[]
@@ -23,9 +22,10 @@ const StudyPlanSection: React.FC<Props> = ({ planItems, careerName, version, onE
           <p className="text-sm text-gray-500">Carrera: {careerName || 'Sin carrera seleccionada'}</p>
           <p className="text-sm text-gray-500">Versión activa: {version ? `${version.year} • ${version.is_published ? 'Publicado' : 'Borrador'}` : 'No hay versión'}</p>
         </div>
+        <button type="button" className="inline-flex items-center rounded-lg bg-white px-3 py-2 text-sm font-medium text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50">
+          Vista por malla
+        </button>
       </div>
-
-      <StudyPlanTabs />
 
       <div className="mt-4 rounded border border-dashed border-gray-200 p-4 text-center text-gray-400">
         Arrastra asignaturas aquí o usa el catálogo para agregarlas al plan.

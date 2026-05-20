@@ -17,5 +17,6 @@ export interface CreateStudyPlanVersionDto {
 }
 
 export interface PublishVersionDto {
+  version_id: string
   replace_previous?: boolean
 }

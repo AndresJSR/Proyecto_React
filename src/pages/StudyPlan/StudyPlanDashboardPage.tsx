@@ -44,7 +44,7 @@ const StudyPlanDashboardPage: React.FC = () => {
 
   useEffect(() => {
     if (careers.length > 0 && !selectedCareerId) {
-      setSelectedCareerId(careers[0].id)
+      setSelectedCareerId(careers[0].code)
     }
   }, [careers, selectedCareerId])
 
@@ -95,16 +95,21 @@ const StudyPlanDashboardPage: React.FC = () => {
     )
   })
 
-  const currentPlanItems = studyPlans.filter(
-    (plan) =>
-      plan.career_id === selectedCareerId &&
-      (!selectedVersion || plan.year === selectedVersion.year)
-  )
+  const currentPlanItems = studyPlans
+    .filter(
+      (plan) =>
+        plan.career_id === selectedCareerId &&
+        (!selectedVersion || plan.year === selectedVersion.year)
+    )
+    .map((plan) => ({
+      ...plan,
+      subject: subjects.find((subject) => subject.id === plan.subject_id) || plan.subject
+    }))
 
-  const currentCareer = careers.find((career) => career.id === selectedCareerId)
+  const currentCareer = careers.find((career) => career.code === selectedCareerId)
 
-  const handleSelectCareer = (careerId: string) => {
-    setSelectedCareerId(careerId)
+  const handleSelectCareer = (careerCode: string) => {
+    setSelectedCareerId(careerCode)
     setSelectedVersion(null)
   }
 
@@ -125,13 +130,14 @@ const StudyPlanDashboardPage: React.FC = () => {
       return
     }
 
-    const selectedSubjectName = subjects.find((subject) => subject.id === payload.subject_id)?.name || payload.subject_id
+    const subject = subjects.find((subject) => subject.id === payload.subject_id)
+    const selectedSubjectCode = subject?.code || subject?.name || payload.subject_id
 
     try {
       await studyPlanBusiness.createStudyPlan({
         career_id: selectedCareerId,
         subject_id: payload.subject_id,
-        name: selectedSubjectName,
+        name: selectedSubjectCode,
         year: selectedVersion.year,
         suggested_semester: payload.suggested_semester
       })
@@ -150,7 +156,7 @@ const StudyPlanDashboardPage: React.FC = () => {
     setSelectedEditPlan(plan)
     setEditFormData({
       career_id: plan.career_id,
-      subject_id: plan.subject_id,
+      subject_id: plan.subject_id ?? '',
       name: plan.name,
       year: plan.year,
       suggested_semester: plan.suggested_semester
@@ -173,19 +179,6 @@ const StudyPlanDashboardPage: React.FC = () => {
 
   const handleDeleteClick = (plan: StudyPlan) => {
     setSelectedDeletePlan(plan)
-  }
-
-  const handleConfirmDelete = async () => {
-    if (!selectedDeletePlan) return
-
-    try {
-      await studyPlanBusiness.removeSubjectFromPlan(selectedDeletePlan.id, selectedDeletePlan.subject_id)
-      Swal.fire({ icon: 'success', title: 'Asignatura eliminada', text: 'Se eliminó la asignatura del plan.' })
-      setSelectedDeletePlan(null)
-      await refreshPlans()
-    } catch (error: any) {
-      Swal.fire({ icon: 'error', title: 'No se puede eliminar', text: error?.message || 'Revisa las razones de bloqueo en el modal.' })
-    }
   }
 
   const handlePublish = async (year: number) => {
@@ -219,6 +212,13 @@ const StudyPlanDashboardPage: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Plan de estudios</h1>
               <p className="mt-2 text-gray-600">Define y versiona las asignaturas por semestre de cada carrera.</p>
+              {selectedVersion ? (
+                <div className="mt-3 inline-flex items-center gap-3 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-sm text-green-700">
+                  <span className="font-semibold">Versión activa:</span>
+                  <span>{selectedVersion.year}</span>
+                  <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-green-800 shadow-sm">{selectedVersion.is_published ? 'Publicado' : 'Borrador'}</span>
+                </div>
+              ) : null}
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
@@ -230,7 +230,7 @@ const StudyPlanDashboardPage: React.FC = () => {
                 >
                   <option value="">Seleccione una carrera</option>
                   {careerOptions.map((career) => (
-                    <option key={career.id} value={career.id}>{career.name}</option>
+                    <option key={career.id} value={career.code}>{career.name}</option>
                   ))}
                 </select>
               </div>

@@ -18,16 +18,19 @@ const StudyPlanVersionPanel: React.FC<Props> = ({ versions, selectedVersionId, o
           versions.map((version) => (
             <div
               key={version.id}
-              className={`flex items-center justify-between rounded-xl border px-3 py-3 ${selectedVersionId === version.id ? 'border-blue-500 bg-blue-50' : 'border-transparent bg-white'}`}
+              className={`flex items-center justify-between rounded-2xl border px-4 py-3 shadow-sm ${selectedVersionId === version.id ? 'border-blue-500 bg-blue-50' : 'border-gray-100 bg-white'}`}
             >
               <div>
-                <div className="text-sm font-medium">{version.name || version.year}</div>
-                <div className="text-xs text-gray-500">{version.subjects_count ?? 0} asignaturas • {version.total_credits ?? 0} créditos</div>
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                  <span>{version.name || version.year}</span>
+                  {version.is_published && <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-800">Publicado</span>}
+                </div>
+                <div className="mt-1 text-xs text-gray-500">{version.subjects_count ?? 0} asignaturas • {version.total_credits ?? 0} créditos</div>
               </div>
               <button
                 type="button"
                 onClick={() => onSelectVersion(version)}
-                className="text-sm text-blue-600 hover:underline"
+                className="rounded bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-700"
               >
                 Ver
               </button>

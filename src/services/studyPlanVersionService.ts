@@ -19,8 +19,8 @@ export const studyPlanVersionService = {
     return response.data.data
   },
 
-  async publishVersion(id: string, payload: PublishVersionDto): Promise<StudyPlanVersion> {
-    const response = await api.post(`${BASE_URL}/study-plan-versions/${id}/publish`, payload)
+  async publishVersion(payload: PublishVersionDto): Promise<StudyPlanVersion> {
+    const response = await api.put(`${BASE_URL}/study-plan-versions/publish`, payload)
     return response.data.data
   }
 }

@@ -19,6 +19,13 @@ const StudyPlanCatalog: React.FC<Props> = ({ subjects, search, onSearch, onAdd }
           placeholder="Buscar por nombre o código"
           className="w-full rounded border px-3 py-2"
         />
+        <button type="button" className="rounded border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+          Filtros
+        </button>
+      </div>
+
+      <div className="mt-4 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+        Mostrando {subjects.length} asignaturas disponibles
       </div>
 
       <div className="mt-4 space-y-2 max-h-[420px] overflow-y-auto">
@@ -28,8 +35,9 @@ const StudyPlanCatalog: React.FC<Props> = ({ subjects, search, onSearch, onAdd }
           subjects.map((subject) => (
             <div key={subject.id} className="flex items-center justify-between rounded border border-gray-100 p-3 hover:bg-gray-50">
               <div>
-                <div className="text-sm font-medium">{subject.code}</div>
-                <div className="text-xs text-gray-500">{subject.name} • {subject.credits} créditos</div>
+                <div className="text-sm font-semibold text-gray-900">{subject.code}</div>
+                <div className="text-sm text-gray-700">{subject.name}</div>
+                <div className="text-xs text-gray-500">{subject.credits} créditos</div>
               </div>
               <button
                 type="button"

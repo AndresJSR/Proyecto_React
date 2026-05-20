@@ -1,22 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import Swal from 'sweetalert2'
 
-import StudyPlanTable from '../../components/StudyPlan/StudyPlanTable'
-import StudyPlanModal from '../../components/StudyPlan/StudyPlanModal'
 import StudyPlanForm from '../../components/StudyPlan/StudyPlanForm'
+import StudyPlanModal from '../../components/StudyPlan/StudyPlanModal'
+import StudyPlanTable from '../../components/StudyPlan/StudyPlanTable'
 
 import {
-  StudyPlan,
-  CreateStudyPlanDto,
-  UpdateStudyPlanDto
+    CreateStudyPlanDto,
+    StudyPlan,
+    UpdateStudyPlanDto
 } from '../../models/StudyPlan'
 
 import { studyPlanBusiness } from '../../business/StudyPlanBusiness'
+import useStudyPlans from '../../hooks/useStudyPlans'
 
 const ListStudyPlan = () => {
-  const [studyPlans, setStudyPlans] =
-    useState<StudyPlan[]>([])
+  const { studyPlans, refresh } = useStudyPlans()
 
   const [loading, setLoading] =
     useState(false)
@@ -38,28 +38,6 @@ const ListStudyPlan = () => {
       suggested_semester: 1
     })
 
-  const loadStudyPlans = async () => {
-    try {
-      setLoading(true)
-
-      const data =
-        await studyPlanBusiness.getStudyPlans()
-
-      setStudyPlans(data)
-    } catch (error) {
-      Swal.fire(
-        'Error',
-        'Could not load study plans',
-        'error'
-      )
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    loadStudyPlans()
-  }, [])
 
   const handleCreate = () => {
     setSelectedStudyPlan(null)
@@ -131,7 +109,7 @@ const ListStudyPlan = () => {
 
       setOpenModal(false)
 
-      loadStudyPlans()
+      await refresh()
     } catch (error: any) {
       Swal.fire(
         'Error',
@@ -145,7 +123,7 @@ const ListStudyPlan = () => {
   }
 
   const handleDelete = async (
-    id: string
+    studyPlan: StudyPlan
   ) => {
     const result = await Swal.fire({
       title: 'Delete study plan?',
@@ -159,7 +137,7 @@ const ListStudyPlan = () => {
 
     try {
       await studyPlanBusiness.deleteStudyPlan(
-        id
+        studyPlan.id
       )
 
       Swal.fire(
@@ -168,7 +146,7 @@ const ListStudyPlan = () => {
         'success'
       )
 
-      loadStudyPlans()
+      await refresh()
     } catch (error) {
       Swal.fire(
         'Error',

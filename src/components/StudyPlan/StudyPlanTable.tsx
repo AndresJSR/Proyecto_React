@@ -32,7 +32,7 @@ const StudyPlanTable: React.FC<Props> = ({ studyPlans, onEdit, onDelete }) => {
             studyPlans.map((studyPlan) => (
               <tr key={studyPlan.id} className="hover:bg-gray-50">
                 <td className="border px-3 py-3">{studyPlan.suggested_semester}</td>
-                <td className="border px-3 py-3">{studyPlan.subject?.code || studyPlan.subject_id}</td>
+                <td className="border px-3 py-3">{studyPlan.subject?.code || studyPlan.name || studyPlan.subject_id || studyPlan.id}</td>
                 <td className="border px-3 py-3">{studyPlan.subject?.name || studyPlan.name}</td>
                 <td className="border px-3 py-3">{studyPlan.subject?.credits ?? '-'}</td>
                 <td className="border px-3 py-3">
