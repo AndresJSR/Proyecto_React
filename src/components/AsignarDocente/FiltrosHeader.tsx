@@ -1,5 +1,5 @@
 // src/components/AsignarDocente/FiltrosHeader.tsx
-import { Semester } from '../../../models/Semester'
+import { Semester } from '../../models/Semester'
 
 interface Props {
   semesters: Semester[]

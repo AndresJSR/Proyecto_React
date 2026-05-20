@@ -1,5 +1,5 @@
 // src/components/AsignarDocente/HistorialAsignaciones.tsx
-import { AssignmentRecord } from '../../../pages/Group/AsignarDocente'
+import { AssignmentRecord } from '../../pages/Group/AsignarDocente'
 
 interface Props {
   history: AssignmentRecord[]

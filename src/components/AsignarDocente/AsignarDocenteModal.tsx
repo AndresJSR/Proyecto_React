@@ -1,8 +1,8 @@
 // src/components/AsignarDocente/AsignarDocenteModal.tsx
 import { useState, useRef, useEffect } from 'react'
-import { Group } from '../../../models/Group'
-import { Semester } from '../../../models/Semester'
-import { User } from '../../../models/User'
+import { Group } from '../../models/Group'
+import { Semester } from '../../models/Semester'
+import { User } from '../../models/User'
 import DocenteCard from './DocenteCard'
 
 interface Props {

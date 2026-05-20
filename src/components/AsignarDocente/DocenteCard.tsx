@@ -1,5 +1,5 @@
 // src/components/AsignarDocente/DocenteCard.tsx
-import { User } from '../../../models/User'
+import { User } from '../../models/User'
 
 interface Props {
   teacher: User

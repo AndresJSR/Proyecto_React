@@ -1,5 +1,5 @@
 // src/components/AsignarDocente/SemesterActivoBanner.tsx
-import { Semester } from '../../../models/Semester'
+import { Semester } from '../../models/Semester'
 
 interface Props {
   activeSemester: Semester | null

@@ -1,6 +1,6 @@
 // src/components/AsignarDocente/GruposTable.tsx
-import { Group } from '../../../models/Group'
-import { Semester } from '../../../models/Semester'
+import { Group } from '../../models/Group'
+import { Semester } from '../../models/Semester'
 
 interface Props {
   groups: Group[]
