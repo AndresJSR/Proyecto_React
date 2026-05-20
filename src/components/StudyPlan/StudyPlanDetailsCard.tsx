@@ -1,15 +1,15 @@
 import React from 'react'
-import { StudyPlan } from '../../models/StudyPlan'
 import { StudyPlanVersion } from '../../models/StudyPlanVersion'
+import { StudyPlanSubject } from '../../types/studyPlan'
 
 interface Props {
   careerName?: string
   version?: StudyPlanVersion | null
-  planItems: StudyPlan[]
+  planItems: StudyPlanSubject[]
 }
 
 const StudyPlanDetailsCard: React.FC<Props> = ({ careerName, version, planItems }) => {
-  const totalCredits = planItems.reduce((sum, item) => sum + (item.subject?.credits || 0), 0)
+  const totalCredits = planItems.reduce((sum, item) => sum + (item.credits || 0), 0)
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm mb-4">

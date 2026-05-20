@@ -1,7 +1,7 @@
 import { CreateStudyPlanVersionDto, PublishVersionDto, StudyPlanVersion } from '../models/StudyPlanVersion'
-import api from './api'
+import { api } from '../interceptors/authInterceptor'
 
-const BASE_URL = '/academic'
+const BASE_URL = '/api/academic'
 
 export const studyPlanVersionService = {
   async getVersionsByCareer(careerId: string): Promise<StudyPlanVersion[]> {

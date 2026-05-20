@@ -16,6 +16,8 @@ import { StudyPlan } from '../../models/StudyPlan'
 import { StudyPlanVersion } from '../../models/StudyPlanVersion'
 import { Subject } from '../../models/Subject'
 import { studyPlanVersionService } from '../../services/studyPlanVersionService'
+import { studyPlanService } from '../../services/studyPlanService'
+import { StudyPlanSubject } from '../../types/studyPlan'
 import { subjectService } from '../../services/subjectService'
 
 const StudyPlanDashboardPage: React.FC = () => {
@@ -23,10 +25,11 @@ const StudyPlanDashboardPage: React.FC = () => {
   const { studyPlans, careers, refresh: refreshPlans } = useStudyPlans()
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [subjectSearch, setSubjectSearch] = useState('')
-  const [selectedCareerId, setSelectedCareerId] = useState<number | null>(null)
+  const [selectedCareerId, setSelectedCareerId] = useState('')
   const [versions, setVersions] = useState<StudyPlanVersion[]>([])
   const [selectedVersion, setSelectedVersion] = useState<StudyPlanVersion | null>(null)
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null)
+  const [planSubjects, setPlanSubjects] = useState<StudyPlanSubject[]>([])
   const [openAdd, setOpenAdd] = useState(false)
   const [selectedEditPlan, setSelectedEditPlan] = useState<StudyPlan | null>(null)
   const [selectedDeletePlan, setSelectedDeletePlan] = useState<StudyPlan | null>(null)
@@ -41,13 +44,13 @@ const StudyPlanDashboardPage: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (careers.length > 0 && selectedCareerId === null) {
-      setSelectedCareerId(Number(careers[0].id))
+    if (careers.length > 0 && !selectedCareerId) {
+      setSelectedCareerId(String(careers[0].id))
     }
   }, [careers, selectedCareerId])
 
   useEffect(() => {
-    if (selectedCareerId !== null) {
+    if (selectedCareerId) {
       loadVersions(selectedCareerId)
     }
   }, [selectedCareerId])
@@ -63,6 +66,21 @@ const StudyPlanDashboardPage: React.FC = () => {
     }
   }, [versions, selectedVersion])
 
+  useEffect(() => {
+    const loadPlanSubjects = async () => {
+      if (!selectedVersion) return
+
+      try {
+        const data = await studyPlanService.getSubjectsByStudyPlan(selectedVersion.id)
+        setPlanSubjects(data)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    loadPlanSubjects()
+  }, [selectedVersion])
+
   const loadSubjects = async () => {
     try {
       const data = await subjectService.getSubjects()
@@ -72,9 +90,9 @@ const StudyPlanDashboardPage: React.FC = () => {
     }
   }
 
-  const loadVersions = async (careerId: number) => {
+  const loadVersions = async (careerId: string) => {
     try {
-      const data = await studyPlanVersionService.getVersionsByCareer(String(careerId))
+      const data = await studyPlanVersionService.getVersionsByCareer(careerId)
       setVersions(data)
       const published = data.find((version) => version.is_published)
       setSelectedVersion(published || data[0] || null)
@@ -93,21 +111,10 @@ const StudyPlanDashboardPage: React.FC = () => {
     )
   })
 
-  const currentPlanItems = studyPlans
-    .filter(
-      (plan) =>
-        Number(plan.career_id) === selectedCareerId &&
-        (!selectedVersion || plan.year === selectedVersion.year)
-    )
-    .map((plan) => ({
-      ...plan,
-      subject: subjects.find((subject) => subject.id === plan.subject_id) || plan.subject
-    }))
-
-  const currentCareer = careers.find((career) => Number(career.id) === selectedCareerId)
+  const currentCareer = careers.find((career) => String(career.id) === selectedCareerId)
 
   const handleSelectCareer = (careerCode: string): void => {
-    setSelectedCareerId(Number(careerCode))
+    setSelectedCareerId(careerCode)
     setSelectedVersion(null)
   }
 
@@ -123,7 +130,7 @@ const StudyPlanDashboardPage: React.FC = () => {
   }
 
   const handleAddSubject = async (payload: { subject_id: string; suggested_semester: number; credits: number }) => {
-    if (selectedCareerId === null || !selectedVersion) {
+    if (!selectedCareerId || !selectedVersion) {
       Swal.fire({ icon: 'warning', title: 'Seleccione una carrera y versión antes de agregar' })
       return
     }
@@ -133,7 +140,7 @@ const StudyPlanDashboardPage: React.FC = () => {
 
     try {
       await studyPlanBusiness.createStudyPlan({
-        career_id: String(selectedCareerId),
+        career_id: selectedCareerId,
         subject_id: payload.subject_id,
         name: selectedSubjectCode,
         year: selectedVersion.year,
@@ -150,16 +157,26 @@ const StudyPlanDashboardPage: React.FC = () => {
     }
   }
 
-  const handleEditClick = (plan: StudyPlan) => {
-    setSelectedEditPlan(plan)
-    setEditFormData({
-      career_id: plan.career_id,
-      subject_id: plan.subject_id ?? '',
-      name: plan.name,
-      year: plan.year,
-      suggested_semester: plan.suggested_semester
-    })
-    sectionRef.current?.scrollIntoView({ behavior: 'smooth' })
+  const handleEditClick = (subject: StudyPlanSubject) => {
+    // find corresponding StudyPlan entry to preserve plan id
+    const matching = studyPlans.find(
+      (plan) =>
+        String(plan.subject_id) === String(subject.subject_id) &&
+        String(plan.career_id) === selectedCareerId &&
+        (!selectedVersion || plan.year === selectedVersion.year)
+    )
+
+    if (matching) {
+      setSelectedEditPlan(matching)
+      setEditFormData({
+        career_id: matching.career_id,
+        subject_id: matching.subject_id ?? '',
+        name: matching.name,
+        year: matching.year,
+        suggested_semester: matching.suggested_semester
+      })
+      sectionRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 
   const handleUpdatePlan = async () => {
@@ -175,23 +192,30 @@ const StudyPlanDashboardPage: React.FC = () => {
     }
   }
 
-  const handleDeleteClick = (plan: StudyPlan) => {
-    setSelectedDeletePlan(plan)
+  const handleDeleteClick = (subject: StudyPlanSubject) => {
+    const matching = studyPlans.find(
+      (plan) =>
+        String(plan.subject_id) === String(subject.subject_id) &&
+        String(plan.career_id) === selectedCareerId &&
+        (!selectedVersion || plan.year === selectedVersion.year)
+    )
+
+    if (matching) setSelectedDeletePlan(matching)
   }
 
   const handlePublish = async (year: number) => {
-    if (selectedCareerId === null) {
+    if (!selectedCareerId) {
       Swal.fire({ icon: 'warning', title: 'Seleccione una carrera' })
       return
     }
 
     try {
       const version = await studyPlanBusiness.createVersion({
-        career_id: String(selectedCareerId),
+        career_id: selectedCareerId,
         year,
         name: `Versión ${year}`
       })
-      await studyPlanBusiness.publishVersion(version.id, { career_id: String(selectedCareerId), replace_previous: true })
+      await studyPlanBusiness.publishVersion(version.id, { career_id: selectedCareerId, replace_previous: true })
 
       Swal.fire({ icon: 'success', title: 'Versión publicada', text: 'La nueva versión ha reemplazado a la anterior.' })
       setPublishOpen(false)
@@ -222,7 +246,7 @@ const StudyPlanDashboardPage: React.FC = () => {
               <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
                 <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500">Carrera</label>
                 <select
-                  value={selectedCareerId ?? ''}
+                  value={selectedCareerId}
                   onChange={(e) => handleSelectCareer(e.target.value)}
                   className="mt-1 w-full rounded border-gray-200 bg-white px-2 py-2 text-sm text-gray-700"
                 >
@@ -266,7 +290,7 @@ const StudyPlanDashboardPage: React.FC = () => {
 
           <div className="col-span-12 lg:col-span-6" ref={sectionRef}>
             <StudyPlanSection
-              planItems={currentPlanItems}
+              subjects={planSubjects}
               careerName={currentCareer?.name}
               version={selectedVersion}
               onEdit={handleEditClick}
@@ -278,7 +302,7 @@ const StudyPlanDashboardPage: React.FC = () => {
             <StudyPlanDetailsCard
               careerName={currentCareer?.name}
               version={selectedVersion}
-              planItems={currentPlanItems}
+              planItems={planSubjects}
             />
             <StudyPlanVersionPanel
               versions={versions}

@@ -1,18 +1,18 @@
 import React from 'react'
-import { StudyPlan } from '../../models/StudyPlan'
 import { StudyPlanVersion } from '../../models/StudyPlanVersion'
 import StudyPlanTable from './StudyPlanTable'
+import { StudyPlanSubject } from '../../types/studyPlan'
 
 interface Props {
-  planItems: StudyPlan[]
+  subjects: StudyPlanSubject[]
   careerName?: string
   version?: StudyPlanVersion | null
-  onEdit: (plan: StudyPlan) => void
-  onDelete: (plan: StudyPlan) => void
+  onEdit: (subject: StudyPlanSubject) => void
+  onDelete: (subject: StudyPlanSubject) => void
 }
 
-const StudyPlanSection: React.FC<Props> = ({ planItems, careerName, version, onEdit, onDelete }) => {
-  const totalCredits = planItems.reduce((sum, item) => sum + (item.subject?.credits || 0), 0)
+const StudyPlanSection: React.FC<Props> = ({ subjects, careerName, version, onEdit, onDelete }) => {
+  const totalCredits = subjects.reduce((sum, s) => sum + s.credits, 0)
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -32,13 +32,13 @@ const StudyPlanSection: React.FC<Props> = ({ planItems, careerName, version, onE
       </div>
 
       <div className="mt-6">
-        <div className="mb-3 flex items-center justify-between">
+          <div className="mb-3 flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-600">{planItems.length} asignaturas en la versión actual</p>
+            <p className="text-sm text-gray-600">{subjects.length} asignaturas en la versión actual</p>
           </div>
         </div>
 
-        <StudyPlanTable studyPlans={planItems} onEdit={onEdit} onDelete={onDelete} />
+        <StudyPlanTable subjects={subjects} onEdit={onEdit} onDelete={onDelete} />
       </div>
 
       <div className="mt-4 rounded-lg border border-gray-100 bg-gray-50 p-4 text-sm text-gray-600">
