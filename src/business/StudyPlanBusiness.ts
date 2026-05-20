@@ -9,13 +9,8 @@ import { Subject } from '../models/Subject'
 import { enrollmentService } from '../services/enrollmentService'
 import { groupService } from '../services/groupService'
 import { studyPlanService } from '../services/studyPlanService'
-import { studyPlanVersionService } from '../services/studyPlanVersionService'
 
-import {
-  AddSubjectToStudyPlanPayload,
-  StudyPlanSubject,
-  StudyPlanVersion
-} from '../types/studyPlan'
+import { StudyPlanSubject } from '../types/studyPlan'
 
 function normalizeText(value: string): string {
   return value.trim().toLowerCase()
@@ -312,12 +307,12 @@ class StudyPlanBusiness {
     if (!payload.name?.trim()) throw new Error('Version name is required')
 
     // create version via service
-    return await studyPlanVersionService.createVersion(payload as any)
+    return await studyPlanService.createVersion(payload)
   }
 
   async getVersionsByCareer(careerId: string) {
     if (!careerId) throw new Error('Career id is required')
-    return await studyPlanVersionService.getVersionsByCareer(careerId)
+    return await studyPlanService.getVersionsByCareer(careerId)
   }
 
   async publishVersion(versionId: string, options: { career_id: string; replace_previous?: boolean }) {
@@ -325,7 +320,7 @@ class StudyPlanBusiness {
     if (!options?.career_id) throw new Error('Career id is required')
 
     // Get the version to be published
-    const version = await studyPlanVersionService.getVersionById(versionId)
+    const version = await studyPlanService.getVersionById(versionId)
     
     if (!version) {
       throw new Error('Study plan version not found')
@@ -343,7 +338,7 @@ class StudyPlanBusiness {
     }
 
     // Check for existing published version in same career
-    const versions = await studyPlanVersionService.getVersionsByCareer(options.career_id)
+    const versions = await studyPlanService.getVersionsByCareer(options.career_id)
     const alreadyPublished = versions.find((v: any) => v.is_published && v.id !== versionId)
 
     if (alreadyPublished && !options.replace_previous) {
@@ -355,7 +350,7 @@ class StudyPlanBusiness {
       await studyPlanService.updateStudyPlan(alreadyPublished.id, { is_published: false })
     }
 
-    return await studyPlanVersionService.publishVersion({ version_id: versionId, replace_previous: !!options.replace_previous })
+    return await studyPlanService.publishVersion({ version_id: versionId, replace_previous: !!options.replace_previous })
   }
 
   private validateStudyPlanPayload(

@@ -13,6 +13,10 @@ const UserList = lazy(() => import('../pages/Users/ListUsers'));
 const UserCreate = lazy(() => import('../pages/Users/Create'));
 const UserUpdate = lazy(() => import('../pages/Users/Update'));
 const RoleList = lazy(() => import('../pages/Roles/List'));
+const StudyPlanDetail = lazy(() => import('../pages/PlanEstudios/StudyPlanDetailPage'));
+const AdminStudyPlans = lazy(() => import('../pages/PlanEstudios/PlanEstudios'));
+const EnrollStudentGroupPage = lazy(() => import('../pages/Inscripciones/EnrollStudentGroupPage'));
+const AsignarDocente = lazy(() => import('../pages/Group/AsignarDocente'));
 
 // ── Admin: Académico ──────────────────────────────────────────────────────────
 const ListCarreras = lazy(() => import('../pages/careers/ListCarrers'));
@@ -31,6 +35,7 @@ const ListMatriculas = lazy(() => import('../pages/enrollment/ListEnrollment'));
 const CreateMatricula = lazy(() => import('../pages/enrollment/CreateEnrollment'));
 const ListInscripciones = lazy(() => import('../pages/inscripciones/ListInscripciones'));
 const CreateInscripcion = lazy(() => import('../pages/inscripciones/CreateInscripcion'));
+const EnrollStudentInGroup = lazy(() => import('../pages/enrollstudentingroup'));
 const CreateStudyPlan = lazy(() => import('../pages/StudyPlan/CreateStudyPlan'));
 const StudyPlanDashboard = lazy(() => import('../pages/StudyPlan/StudyPlanDashboardPage'));
 const StudyPlanVersions = lazy(() => import('../pages/StudyPlan/VersionHistory'));
@@ -216,6 +221,12 @@ const routes = [
     component: CreateGrupo,
     allowedRoles: ADMIN,
   },
+  {
+  path: '/admin/groups/assign-teacher',
+  title: 'Asignar Docente a Grupo',
+  component: AsignarDocente,
+  allowedRoles: ADMIN,
+},
 
   // ── Admin: Matrículas ────────────────────────────────────────────────────────
   {
@@ -268,6 +279,24 @@ const routes = [
     component: StudyPlanVersions,
     allowedRoles: ADMIN,
   },
+  {
+  path: '/admin/study-plans',
+  title: 'Planes de Estudio',
+  component: AdminStudyPlans,
+  allowedRoles: ADMIN,
+},
+{
+  path: '/admin/study-plans/:id',
+  title: 'Detalle del Plan',
+  component: StudyPlanDetail,
+  allowedRoles: ADMIN,
+},
+{
+  path: '/admin/study-plans/edit/:id',
+  title: 'Editar Plan',
+  component: AdminStudyPlans,   // Reutiliza la lista; el edit se hace con modal
+  allowedRoles: ADMIN,
+},
 
   // ── Admin: Inscripciones y Registros ─────────────────────────────────────────
   {
@@ -283,6 +312,12 @@ const routes = [
     allowedRoles: ADMIN,
   },
   {
+    path: '/inscripciones/enroll-student-in-group',
+    title: 'Inscribir estudiante en grupo',
+    component: EnrollStudentInGroup,
+    allowedRoles: ADMIN,
+  },
+  {
     path: '/registrations/list',
     title: 'Registros',
     component: ListRegistrations,
@@ -294,6 +329,12 @@ const routes = [
     component: CreateRegistration,
     allowedRoles: ADMIN,
   },
+  {
+  path: '/admin/enrollments/groups',
+  title: 'Inscribir Estudiante en Grupo',
+  component: EnrollStudentGroupPage,
+  allowedRoles: ADMIN,
+},
 
   // ── Admin: Académico (dashboard general) ─────────────────────────────────────
   {
