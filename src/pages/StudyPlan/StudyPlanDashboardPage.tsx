@@ -7,12 +7,10 @@ import DeleteSubjectModal from '../../components/StudyPlan/DeleteSubjectModal'
 import PublishVersionModal from '../../components/StudyPlan/PublishVersionModal'
 import StudyPlanCatalog from '../../components/StudyPlan/StudyPlanCatalog'
 import StudyPlanDetailsCard from '../../components/StudyPlan/StudyPlanDetailsCard'
-import StudyPlanForm from '../../components/StudyPlan/StudyPlanForm'
-import StudyPlanModal from '../../components/StudyPlan/StudyPlanModal'
+import EditSubjectModal from './EditSubjectModal'
 import StudyPlanSection from '../../components/StudyPlan/StudyPlanSection'
 import StudyPlanVersionPanel from '../../components/StudyPlan/StudyPlanVersionPanel'
 import useStudyPlans from '../../hooks/useStudyPlans'
-import { StudyPlan } from '../../models/StudyPlan'
 import { StudyPlanVersion } from '../../models/StudyPlanVersion'
 import { Subject } from '../../models/Subject'
 import { studyPlanVersionService } from '../../services/studyPlanVersionService'
@@ -31,16 +29,9 @@ const StudyPlanDashboardPage: React.FC = () => {
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null)
   const [planSubjects, setPlanSubjects] = useState<StudyPlanSubject[]>([])
   const [openAdd, setOpenAdd] = useState(false)
-  const [selectedEditPlan, setSelectedEditPlan] = useState<StudyPlan | null>(null)
-  const [selectedDeletePlan, setSelectedDeletePlan] = useState<StudyPlan | null>(null)
+  const [selectedEditSubject, setSelectedEditSubject] = useState<{ planId: string; subject: StudyPlanSubject } | null>(null)
+  const [selectedDeletePlan, setSelectedDeletePlan] = useState<{ planId: string; subjectId: string; subjectName: string } | null>(null)
   const [publishOpen, setPublishOpen] = useState(false)
-  const [editFormData, setEditFormData] = useState({
-    career_id: '',
-    subject_id: '',
-    name: '',
-    year: new Date().getFullYear(),
-    suggested_semester: 1
-  })
   const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -177,31 +168,12 @@ const StudyPlanDashboardPage: React.FC = () => {
         (!selectedVersion || plan.year === selectedVersion.year)
     )
 
-    if (matching) {
-      setSelectedEditPlan(matching)
-      setEditFormData({
-        career_id: String(matching.career_id),
-        subject_id: matching.subject_id != null ? String(matching.subject_id) : '',
-        name: matching.name,
-        year: matching.year,
-        suggested_semester: matching.suggested_semester
-      })
-      sectionRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (!matching) {
+      Swal.fire({ icon: 'warning', title: 'No se encontró el plan', text: 'No se pudo identificar el registro a editar' })
+      return
     }
-  }
 
-  const handleUpdatePlan = async () => {
-    if (!selectedEditPlan) return
-
-    try {
-      await studyPlanBusiness.updateStudyPlan(String(selectedEditPlan.id), editFormData)
-      Swal.fire({ icon: 'success', title: 'Plan actualizado', text: 'Los cambios han sido guardados.' })
-      setSelectedEditPlan(null)
-      await refreshPlans()
-      if (selectedVersion) await loadPlanSubjects(selectedVersion)
-    } catch (error: any) {
-      Swal.fire({ icon: 'error', title: 'No se pudo actualizar', text: error?.message || 'Ocurrió un error al guardar los cambios' })
-    }
+    setSelectedEditSubject({ planId: String(matching.id), subject })
   }
 
   const handleDeleteClick = (subject: StudyPlanSubject) => {
@@ -212,7 +184,16 @@ const StudyPlanDashboardPage: React.FC = () => {
         (!selectedVersion || plan.year === selectedVersion.year)
     )
 
-    if (matching) setSelectedDeletePlan(matching)
+    if (!matching) {
+      Swal.fire({ icon: 'warning', title: 'No se encontró el plan', text: 'No se pudo identificar el registro a eliminar' })
+      return
+    }
+
+    setSelectedDeletePlan({
+      planId: String(matching.id),
+      subjectId: String(matching.subject_id),
+      subjectName: subject.subject_name
+    })
   }
 
   const handlePublish = async (year: number) => {
@@ -334,26 +315,25 @@ const StudyPlanDashboardPage: React.FC = () => {
         onAdd={handleAddSubject}
       />
 
-      <StudyPlanModal
-        isOpen={Boolean(selectedEditPlan)}
-        title="Editar asignatura del plan"
-        onClose={() => setSelectedEditPlan(null)}
-      >
-        <StudyPlanForm
-          formData={editFormData}
-          onChange={(field, value) => setEditFormData((prev) => ({ ...prev, [field]: value }))}
-          onSubmit={handleUpdatePlan}
-          loading={false}
-          careers={careers}
-        />
-      </StudyPlanModal>
+      <EditSubjectModal
+        isOpen={Boolean(selectedEditSubject)}
+        onClose={() => setSelectedEditSubject(null)}
+        planId={selectedEditSubject?.planId}
+        subject={selectedEditSubject?.subject}
+        onUpdated={async () => {
+          await refreshPlans()
+          if (selectedVersion) await loadPlanSubjects(selectedVersion)
+        }}
+      />
 
       <DeleteSubjectModal
         isOpen={Boolean(selectedDeletePlan)}
         onClose={() => setSelectedDeletePlan(null)}
-        planId={selectedDeletePlan != null ? String(selectedDeletePlan.id) : undefined}
-        subjectId={selectedDeletePlan?.subject_id != null ? String(selectedDeletePlan.subject_id) : undefined}
+        planId={selectedDeletePlan?.planId}
+        subjectId={selectedDeletePlan?.subjectId}
+        subjectName={selectedDeletePlan?.subjectName}
         onRemoved={async () => {
+          setSelectedDeletePlan(null)
           await refreshPlans()
           if (selectedVersion) await loadPlanSubjects(selectedVersion)
         }}

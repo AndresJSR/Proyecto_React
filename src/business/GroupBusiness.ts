@@ -129,12 +129,9 @@ class GroupBusiness {
     )
   }
 
-  async deleteGroup(
-    id: string
-  ): Promise<boolean> {
-    return await groupService.deleteGroup(
-      id
-    )
+  async deleteGroup(id: string): Promise<void> {
+    if (!id) throw new Error('Group id is required')
+    return await groupService.deleteGroup(id)
   }
 }
 

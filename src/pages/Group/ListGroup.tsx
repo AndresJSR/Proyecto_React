@@ -97,43 +97,26 @@ const ListGroup = () => {
     setOpenModal(true)
   }
 
-  const handleDelete = async (
-    id: string
-  ) => {
-    const result = await Swal.fire({
-      title: 'Delete group?',
-      text: 'This action cannot be undone',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Delete'
-    })
+    const handleDelete = async (id: string) => {
+      const result = await Swal.fire({
+        title: '¿Eliminar grupo?',
+        text: 'Esta acción no se puede deshacer',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Eliminar',
+        cancelButtonText: 'Cancelar'
+      })
 
-    if (!result.isConfirmed) return
+      if (!result.isConfirmed) return
 
-    try {
-      const deleted =
+      try {
         await groupBusiness.deleteGroup(id)
-
-      if (deleted) {
-        Swal.fire(
-          'Deleted',
-          'Group deleted successfully',
-          'success'
-        )
-
+        Swal.fire('Eliminado', 'Grupo eliminado correctamente', 'success')
         loadGroups()
+      } catch (error: any) {
+        Swal.fire('Error', error.message || 'No se pudo eliminar el grupo', 'error')
       }
-    } catch (error) {
-      console.error(error)
-
-      Swal.fire(
-        'Error',
-        'Could not delete group',
-        'error'
-      )
     }
-  }
-
   const handleChange = (
     field: string,
     value: string | number
