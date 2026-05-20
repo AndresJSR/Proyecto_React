@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { TiDownload } from 'react-icons/ti'
 import { useSelector } from 'react-redux'
 
-import { misNotasBusiness } from '../../business/MisNotasBusiness'
+import { misNotasBusiness } from '../../business/MyGradesBusiness'
 import useMisNotas from '../../hooks/useMisNotas'
 import { RootState } from '../../store/store'
 import { generarReportePDF } from '../../utils/generarReportePDF'

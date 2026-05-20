@@ -78,7 +78,9 @@ const CriteriosTabla = ({
               const criterionId = criterion.id || '';
               const selection = selections[criterionId];
               const selectedScaleId = selection?.scale_id || '';
-              const selectedScale = criterion.scales?.find((scale) => scale.id === selectedScaleId);
+              const selectedScale = criterion.scales?.find(
+                (scale) => String(scale.id) === selectedScaleId
+              );
               const scoreValue = selectedScale && criterion.weight !== undefined && criterion.weight !== null
                 ? ((selectedScale.value || 0) * criterion.weight) / 100
                 : null;
@@ -108,7 +110,11 @@ const CriteriosTabla = ({
                     >
                       <option value="">Seleccionar nivel...</option>
                       {(criterion.scales || []).map((scale) => (
-                        <option key={scale.id} value={scale.id} className={getScaleTone(scale.value)}>
+                        <option
+                          key={scale.id}
+                          value={String(scale.id)}
+                          className={getScaleTone(scale.value)}
+                        >
                           {scale.name} ({scale.value})
                         </option>
                       ))}

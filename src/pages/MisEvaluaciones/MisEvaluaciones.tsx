@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-import { misEvaluacionesBusiness } from '../../business/MisEvaluacionesBusiness'
+import { misEvaluacionesBusiness } from '../../business/MyEvaluations'
 import useMisEvaluaciones from '../../hooks/useMisEvaluaciones'
 
 const MisEvaluaciones = () => {

@@ -1,5 +1,5 @@
 import useMisAsignaturas from '../../hooks/useMisAsignaturas'
-import { formatCredits } from '../../business/MisAsignaturasBusiness'
+import { formatCredits } from '../../business/MySubjects'
 
 const MisAsignaturas = () => {
   const { asignaturas, loading, error } = useMisAsignaturas()

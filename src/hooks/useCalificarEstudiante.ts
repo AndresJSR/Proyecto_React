@@ -17,11 +17,11 @@ import {
   ScaleMap,
   buildGradePayload,
   buildScaleMap,
-  calcularPuntajeTotal,
-  contarProgreso,
-  ejecutarGuardarCalificacion,
-  todosLosCriteriosSeleccionados,
-} from '../business/RubricaBusiness';
+  calculateTotalScore,
+  countProgress,
+  executeSaveGrade,
+  areAllCriteriaSelected,
+} from '../business/RubricBusiness';
 
 type GradeWithDetails = Grade & { details?: GradeDetail[] };
 
@@ -95,17 +95,17 @@ const useCalificarEstudiante = ({ evaluationId, groupId }: UseCalificarEstudiant
   const scaleMap: ScaleMap = useMemo(() => buildScaleMap(criteria), [criteria]);
 
   const totalScore = useMemo(
-    () => calcularPuntajeTotal(criteria, selections, scaleMap),
+    () => calculateTotalScore(criteria, selections, scaleMap),
     [criteria, selections, scaleMap],
   );
 
   const allCriteriaSelected = useMemo(
-    () => todosLosCriteriosSeleccionados(criteria, selections),
+    () => areAllCriteriaSelected(criteria, selections),
     [criteria, selections],
   );
 
   const progressCount = useMemo(
-    () => contarProgreso(criteria, selections),
+    () => countProgress(criteria, selections),
     [criteria, selections],
   );
 
@@ -127,8 +127,8 @@ const useCalificarEstudiante = ({ evaluationId, groupId }: UseCalificarEstudiant
         setSelections({});
 
         const grade = (await getGradeByEnrollmentAndRubric(
-          currentEnrollment.id,
-          rubric.id,
+          String(currentEnrollment.id),
+          String(rubric.id),
         )) as GradeWithDetails | null;
 
         if (!isMounted) return;
@@ -143,13 +143,13 @@ const useCalificarEstudiante = ({ evaluationId, groupId }: UseCalificarEstudiant
         for (const detail of grade.details) {
           if (!detail.scale_id) continue;
 
-          const scaleMatch = scaleMap.get(detail.scale_id);
+          const scaleMatch = scaleMap.get(String(detail.scale_id));
           const criterionId = scaleMatch?.criterion.id;
           if (!criterionId) continue;
 
           nextSelections[criterionId] = {
-            criterion_id: criterionId,
-            scale_id: detail.scale_id,
+            criterion_id: String(criterionId),
+            scale_id: String(detail.scale_id),
             comment: detail.comment || '',
           };
         }
@@ -207,14 +207,14 @@ const useCalificarEstudiante = ({ evaluationId, groupId }: UseCalificarEstudiant
     }
 
     const payload = buildGradePayload(
-      currentEnrollment.id,
-      rubric.id,
+      String(currentEnrollment.id),
+      String(rubric.id),
       criteria,
       selections,
       status,
     );
 
-    return ejecutarGuardarCalificacion(payload);
+    return executeSaveGrade(payload);
   };
 
   const handleSaveDraft = async () => {

@@ -2,7 +2,7 @@ import { Criterion } from '../models/Criterion'
 import { Evaluation } from '../models/Evaluation'
 import { Rubric } from '../models/Rubric'
 
-class MisEvaluacionesBusiness {
+class MyEvaluationsBusiness {
   filterEvaluationsByGroups(
     evaluations: Evaluation[],
     groupIds: string[]
@@ -14,7 +14,7 @@ class MisEvaluacionesBusiness {
     return evaluations.filter((evaluation) => {
       return Boolean(
         evaluation.group_id &&
-        groupIds.includes(evaluation.group_id)
+        groupIds.includes(String(evaluation.group_id))
       )
     })
   }
@@ -47,4 +47,5 @@ class MisEvaluacionesBusiness {
   }
 }
 
-export const misEvaluacionesBusiness = new MisEvaluacionesBusiness()
+export const myEvaluationsBusiness =
+  new MyEvaluationsBusiness()

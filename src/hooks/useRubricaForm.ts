@@ -10,7 +10,7 @@ import {
   persistRubric,
   validarRubricaParaGuardar,
   validarRubricaParaPublicar,
-} from '../business/RubricaBusiness';
+} from '../business/RubricBusiness';
 
 const useRubricaForm = () => {
   const [activeStep, setActiveStep] = useState<number>(0);

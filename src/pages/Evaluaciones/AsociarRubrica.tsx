@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumb';
-import EvaluacionStepper from '../../components/evaluacion/EvaluacionStepper';
-import EvaluacionInfoCard from '../../components/evaluacion/EvaluacionInfoCard';
-import RubricaTabla from '../../components/evaluacion/RubricaTabla';
-import ResumenAsociacion from '../../components/evaluacion/ResumenAsociacion';
-import useAsociarRubrica from '../../hooks/useAsociarRubrica';
+import EvaluacionStepper from '../../components/evaluacion/EvaluationStepper';
+import EvaluacionInfoCard from '../../components/evaluacion/StudentInfoCard';
+import RubricaTabla from '../../components/evaluacion/RubricTable';
+import ResumenAsociacion from '../../components/evaluacion/AssociationSummary';
+import useAsociarRubrica from '../../hooks/useAssociateRubric';
 
 const AsociarRubricaPage = () => {
   const navigate = useNavigate();

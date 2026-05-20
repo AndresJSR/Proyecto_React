@@ -9,7 +9,7 @@ import {
   getSubjects,
   getGroupsByTeacher,
 } from '../services/evaluacionService';
-import { rubricaBusiness } from '../business/RubricaBusiness';
+import { rubricaBusiness } from '../business/RubricBusiness';
 import { Evaluation } from '../models/Evaluation';
 import { Rubric } from '../models/Rubric';
 import { Subject } from '../models/Subject';

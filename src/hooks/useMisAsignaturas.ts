@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
-import { getAsignaturasDelSemestreActivo, AsignaturaDelSemestre } from '../business/MisAsignaturasBusiness'
+import { getAsignaturasDelSemestreActivo, AsignaturaDelSemestre } from '../business/MySubjects'
 import { enrollmentService } from '../services/enrollmentService'
 import { RootState } from '../store/store'
 

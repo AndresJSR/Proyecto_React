@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
-import { misEvaluacionesBusiness } from '../../business/MisEvaluacionesBusiness'
+import { misEvaluacionesBusiness } from '../../business/MyEvaluations'
 import useMisEvaluaciones from '../../hooks/useMisEvaluaciones'
 
 const getScaleHeaderColorClass = (value: number | undefined): string => {

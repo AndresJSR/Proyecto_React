@@ -3,7 +3,7 @@ import { Group } from '../models/Group'
 import { Semester } from '../models/Semester'
 import { Subject } from '../models/Subject'
 
-export interface AsignaturaDelSemestre {
+export interface ActiveSemesterSubject {
   enrollmentId: number;
   groupId: number;
   groupName: string;
@@ -17,22 +17,26 @@ export interface AsignaturaDelSemestre {
   teacherId: number;
 }
 
-function toNumber(value: string | number | undefined): number {
-  const parsedValue = Number(value)
-  return Number.isNaN(parsedValue) ? 0 : parsedValue
+function parseToNumber(value: string | number | undefined): number {
+  const parsedNumber = Number(value)
+  return Number.isNaN(parsedNumber) ? 0 : parsedNumber
 }
 
-function findActiveSemester(semesters: Semester[]): Semester | undefined {
-  return semesters.find((semester) => semester.is_active === true)
+function getActiveSemester(
+  semesters: Semester[]
+): Semester | undefined {
+  return semesters.find(
+    (semester) => semester.is_active === true
+  )
 }
 
-export function getAsignaturasDelSemestreActivo(
+export function getActiveSemesterSubjects(
   semesters: Semester[],
   enrollments: Enrollment[],
   groups: Group[],
   subjects: Subject[]
-): AsignaturaDelSemestre[] {
-  const activeSemester = findActiveSemester(semesters)
+): ActiveSemesterSubject[] {
+  const activeSemester = getActiveSemester(semesters)
 
   if (!activeSemester) {
     return []
@@ -42,7 +46,7 @@ export function getAsignaturasDelSemestreActivo(
     (group) => group.semester_id === activeSemester.id
   )
 
-  const results: AsignaturaDelSemestre[] = []
+  const results: ActiveSemesterSubject[] = []
 
   for (const enrollment of enrollments) {
     const group = activeSemesterGroups.find(
@@ -62,23 +66,25 @@ export function getAsignaturasDelSemestreActivo(
     }
 
     results.push({
-      enrollmentId: toNumber(enrollment.id),
-      groupId: toNumber(group.id),
+      enrollmentId: parseToNumber(enrollment.id),
+      groupId: parseToNumber(group.id),
       groupName: group.name,
       groupCode: group.group_code,
-      subjectId: toNumber(subject.id),
+      subjectId: parseToNumber(subject.id),
       subjectName: subject.name,
       subjectCode: subject.code,
       credits: subject.credits,
-      semesterId: toNumber(activeSemester.id),
+      semesterId: parseToNumber(activeSemester.id),
       semesterName: activeSemester.name,
-      teacherId: toNumber(group.teacher_id)
+      teacherId: parseToNumber(group.teacher_id)
     })
   }
 
   return results
 }
 
-export function formatCredits(credits: number): string {
-  return `${credits} crédito${credits === 1 ? '' : 's'}`
+export function formatCredits(
+  credits: number
+): string {
+  return `${credits} credit${credits === 1 ? '' : 's'}`
 }

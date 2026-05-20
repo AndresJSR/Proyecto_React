@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf'
 
-import { NotaRow } from '../business/MisNotasBusiness'
+import { NotaRow } from '../business/MyGradesBusiness'
 
 interface GenerarReportePDFParams {
   rows: NotaRow[]

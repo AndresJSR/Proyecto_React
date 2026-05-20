@@ -12,7 +12,7 @@ export interface GradeDetailRow {
   comment: string
 }
 
-export interface NotaRow {
+export interface GradeRow {
   gradeId: string
   evaluationName: string
   evaluationCode: string
@@ -26,24 +26,26 @@ export interface NotaRow {
   details: GradeDetailRow[]
 }
 
-class MisNotasBusiness {
+class MyGradesBusiness {
   buildGradeDetailRows(details: GradeDetail[] = []): GradeDetailRow[] {
     return details.map((detail) => ({
-      criterionName: detail.scale?.criterion?.name ?? 'Criterio sin nombre',
-      levelName: detail.scale?.name ?? 'Nivel sin nombre',
+      criterionName:
+        detail.scale?.criterion?.name ?? 'Unnamed criterion',
+      levelName:
+        detail.scale?.name ?? 'Unnamed level',
       score: detail.score,
       comment: detail.comment ?? ''
     }))
   }
 
-  buildNotaRows(
+  buildGradeRows(
     grades: Grade[],
     evaluations: Evaluation[],
     enrollments: Enrollment[],
     groups: Group[],
     subjects: Subject[],
     gradeDetailsByGradeId: Record<string, GradeDetail[]> = {}
-  ): NotaRow[] {
+  ): GradeRow[] {
     return grades
       .map((grade) => {
         const enrollment = enrollments.find(
@@ -54,47 +56,64 @@ class MisNotasBusiness {
           return null
         }
 
-        const group = groups.find((g) => g.id === enrollment.group_id)
-        const subject = subjects.find((s) => s.id === group?.subject_id)
+        const group = groups.find(
+          (g) => g.id === enrollment.group_id
+        )
+
+        const subject = subjects.find(
+          (s) => s.id === group?.subject_id
+        )
+
         const evaluation = evaluations.find(
-          (e) => e.id === grade.evaluation_id
+          (e) => e.id === evaluationId
         )
 
         if (!group || !subject || !evaluation) {
           return null
         }
 
-        const evaluationCode = this.buildEvaluationCode(evaluation)
+        const evaluationCode =
+          this.buildEvaluationCode(evaluation)
 
         return {
           gradeId: grade.id ?? '',
-          evaluationName: evaluation.name ?? 'Sin nombre',
+          evaluationName:
+            evaluation.name ?? 'Unnamed',
           evaluationCode,
-          subjectName: subject.name ?? 'Sin nombre',
-          groupName: group.name ?? 'Sin nombre',
+          subjectName:
+            subject.name ?? 'Unnamed',
+          groupName:
+            group.name ?? 'Unnamed',
           weight: evaluation.weight ?? 0,
           finalScore: grade.final_score ?? null,
           status: grade.status ?? 'DRAFT',
           isLocked: grade.is_locked ?? false,
-          observations: grade.observations ?? '',
-          details: this.buildGradeDetailRows(gradeDetailsByGradeId[grade.id ?? ''])
+          observations:
+            grade.observations ?? '',
+          details: this.buildGradeDetailRows(
+            gradeDetailsByGradeId[
+              grade.id ?? ''
+            ]
+          )
         }
       })
-      .filter((row): row is NotaRow => row !== null)
+      .filter((row) => row !== null) as GradeRow[]
   }
 
-  buildEvaluationCode(evaluation: Evaluation): string {
+  buildEvaluationCode(
+    evaluation: Evaluation
+  ): string {
     const id = evaluation.id ?? ''
     return `EVAL-${String(id).padStart(2, '0')}`
   }
 
   getStatusLabel(status: string): string {
     if (status === 'DRAFT') {
-      return 'Borrador'
+      return 'Draft'
     }
 
     if (status === 'SENT') {
-      return 'Enviada'
+      return 'Sent'
     }
 
     return status
@@ -112,29 +131,40 @@ class MisNotasBusiness {
     return 'gray'
   }
 
-  calcularPromedioPonderado(rows: NotaRow[]): number | null {
-    const rowsWithScore = rows.filter((row) => row.finalScore !== null)
+  calculateWeightedAverage(
+    rows: GradeRow[]
+  ): number | null {
+    const rowsWithScore = rows.filter(
+      (row) => row.finalScore !== null
+    )
 
     if (rowsWithScore.length === 0) {
       return null
     }
 
-    const sum = rowsWithScore.reduce((acc, row) => {
-      const score = row.finalScore ?? 0
-      const weight = row.weight ?? 0
-      return acc + (score * weight) / 100
-    }, 0)
+    const sum = rowsWithScore.reduce(
+      (acc, row) => {
+        const score = row.finalScore ?? 0
+        const weight = row.weight ?? 0
+
+        return acc + (score * weight) / 100
+      },
+      0
+    )
 
     return sum
   }
 
-  formatScore(score: number | null): string {
+  formatScore(
+    score: number | null
+  ): string {
     if (score === null) {
-      return 'Pendiente'
+      return 'Pending'
     }
 
     return score.toFixed(1)
   }
 }
 
-export const misNotasBusiness = new MisNotasBusiness()
+export const myGradesBusiness =
+  new MyGradesBusiness()

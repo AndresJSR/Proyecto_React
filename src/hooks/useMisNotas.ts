@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
-import { misNotasBusiness, NotaRow } from '../business/MisNotasBusiness'
+import { misNotasBusiness, NotaRow } from '../business/MyGradesBusiness'
 import { GradeDetail } from '../models/GradeDetail'
 import { misNotasService } from '../services/misNotasService'
 import { RootState } from '../store/store'

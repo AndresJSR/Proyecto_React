@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
-import { misEvaluacionesBusiness } from '../business/MisEvaluacionesBusiness'
+import { misEvaluacionesBusiness } from '../business/MyEvaluations'
 import { enrollmentService } from '../services/enrollmentService'
 import { misEvaluacionesService } from '../services/misEvaluacionesService'
 import { Criterion } from '../models/Criterion'
