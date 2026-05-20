@@ -1,5 +1,3 @@
-// src/services/studyPlanService.ts
-
 import { api } from '../interceptors/authInterceptor'
 
 import { Career } from '../models/Career'
@@ -75,15 +73,23 @@ export const studyPlanService = {
     }
   },
 
-  async getSubjectsByStudyPlan(
-    studyPlanId: number
-  ): Promise<StudyPlanSubject[]> {
-    try {
-      const response = await api.get(
-        `${BASE_URL}/study-plans/${studyPlanId}/subjects`
-      )
+    async getSubjectsByStudyPlan(
+      studyPlanId: string | number
+    ): Promise<StudyPlanSubject[]> {
+      try {
+        const response = await api.get(
+          `${BASE_URL}/study-plans/${studyPlanId}/subjects`
+        )
+      const raw = response.data.data
 
-      return response.data.data
+      // Normaliza la respuesta del API al tipo StudyPlanSubject
+      return (raw ?? []).map((item: any): StudyPlanSubject => ({
+        subject_id:         item.subject_id         ?? item.id               ?? 0,
+        subject_name:       item.subject_name        ?? item.subject?.name    ?? item.name  ?? '',
+        subject_code:       item.subject_code        ?? item.subject?.code    ?? item.code  ?? '',
+        credits:            item.credits             ?? item.subject?.credits ?? 0,
+        suggested_semester: item.suggested_semester  ?? 0
+      }))
     } catch (error) {
       throw new Error(getErrorMessage(error))
     }
@@ -173,26 +179,44 @@ export const studyPlanService = {
       throw new Error(getErrorMessage(error))
     }
   },
-
-  async getSubjectsByPlan(planId: string): Promise<StudyPlanSubject[]> {
-    return await studyPlanService.getSubjectsByStudyPlan(Number(planId))
+  // Obtiene planes de estudio que contienen una asignatura específica.
+  // Usa subject_id como filtro directo en el backend (/search?subject_id=...).
+  // Si el backend no soporta el filtro, retorna todos los planes y
+  // filterStudyPlansBySubject (en GroupBusiness) aplica el filtro local.
+  async getStudyPlansBySubject(subjectId: number | string): Promise<StudyPlan[]> {
+    try {
+      const response = await api.get(`${BASE_URL}/study-plans/search`, {
+        params: { subject_id: subjectId }
+      })
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
   },
 
-  async addSubjectToPlan(
-    planId: string,
-    payload: { subject_id: string; suggested_semester: number; credits: number }
-  ): Promise<void> {
-    return await studyPlanService.addSubjectToStudyPlan(Number(planId), Number(payload.subject_id), {
-      subject_id: Number(payload.subject_id),
-      suggested_semester: payload.suggested_semester,
-      credits: payload.credits
-    })
+  async getSubjectsByPlan(planId: number | string): Promise<Subject[]> {
+    try {
+      const response = await api.get(`${BASE_URL}/study-plans/${planId}/subjects`)
+      return response.data.data
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
   },
 
-  async removeSubjectFromPlan(planId: string, subjectId: string): Promise<void> {
-    return await studyPlanService.removeSubjectFromStudyPlan(
-      Number(planId),
-      Number(subjectId)
-    )
+  async addSubjectToPlan(planId: number | string, subjectId: number | string): Promise<void> {
+    try {
+      await api.post(`${BASE_URL}/study-plans/${planId}/subjects/${subjectId}`)
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
+  },
+
+  async removeSubjectFromPlan(planId: number | string, subjectId: number | string): Promise<void> {
+    try {
+      await api.delete(`${BASE_URL}/study-plans/${planId}/subjects/${subjectId}`)
+    } catch (error) {
+      throw new Error(getErrorMessage(error))
+    }
   }
+  
 }

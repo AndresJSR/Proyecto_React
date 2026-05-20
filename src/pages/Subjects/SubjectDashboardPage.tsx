@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import Breadcrumb from '../../components/Breadcrumb'
 import ArchiveSubjectModal from '../../components/Subject/ArchiveSubjectModal'
 import CreateSubjectModal from '../../components/Subject/CreateSubjectModal'
 import EditSubjectModal from '../../components/Subject/EditSubjectModal'
@@ -114,84 +113,74 @@ const SubjectDashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="border-b border-gray-200 bg-white px-6 py-6">
-        <Breadcrumb pageName="Asignaturas" hideTitle />
-        <div className="mt-4 flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Asignaturas</h1>
-            <p className="mt-2 text-sm text-gray-600">Catálogo de asignaturas disponibles en el sistema</p>
-          </div>
-         <button
-  type="button"
-  onClick={() => setCreateModalOpen(true)}
-  className="flex items-center gap-2 rounded-lg bg-gray-800 px-4 py-2 font-medium text-white hover:bg-gray-900"
->
-  <span>+</span>
-  Nueva asignatura
-</button>
+    <div>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-black dark:text-white">Asignaturas</h2>
+          <p className="text-sm text-gray-500">Catálogo de asignaturas disponibles en el sistema.</p>
         </div>
+        <button
+          type="button"
+          onClick={() => setCreateModalOpen(true)}
+          className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-opacity-90"
+        >
+          + Nueva asignatura
+        </button>
       </div>
 
-      {/* Main Content */}
-      <div className="px-6 py-6">
-        {/* Búsqueda y Filtros */}
-        <div className="mb-6 space-y-4">
-          <SubjectSearchBar
-            value={filters.search}
-            onChange={(value) => setFilters((prev) => ({ ...prev, search: value }))}
+      {/* búsqueda y filtros */}
+      <div className="mb-6 space-y-4">
+        <SubjectSearchBar
+          value={filters.search}
+          onChange={(value) => setFilters((prev) => ({ ...prev, search: value }))}
+        />
+        <div className="flex items-center gap-3">
+          <SubjectFilters
+            status={filters.status}
+            credits={filters.credits}
+            onStatusChange={(status) => setFilters((prev) => ({ ...prev, status }))}
+            onCreditsChange={(credits) => setFilters((prev) => ({ ...prev, credits }))}
+            onClear={clearFilters}
           />
-          <div className="flex items-center gap-3">
-            <SubjectFilters
-              status={filters.status}
-              credits={filters.credits}
-              onStatusChange={(status) => setFilters((prev) => ({ ...prev, status }))}
-              onCreditsChange={(credits) => setFilters((prev) => ({ ...prev, credits }))}
-              onClear={clearFilters}
-            />
-            {(filters.search || filters.status !== 'all' || filters.credits) && (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="text-sm font-semibold text-blue-600 hover:text-blue-700"
-              >
-                Limpiar filtros
-              </button>
-            )}
-            <div className="ml-auto text-sm text-gray-600">
-              Mostrando {filteredSubjects.length} de {subjects.length} asignaturas
-            </div>
-          </div>
-        </div>
-
-        {/* Tabla y Panel de Detalles */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Panel Principal - Tabla */}
-          <div className="lg:col-span-2">
-            {loading ? (
-              <div className="flex items-center justify-center rounded-3xl border border-gray-200 bg-white py-12">
-                <p className="text-sm text-gray-500">Cargando asignaturas...</p>
-              </div>
-            ) : (
-              <SubjectTable
-                subjects={filteredSubjects}
-                selectedSubjectId={selectedSubject?.id}
-                onSelect={setSelectedSubject}
-                onEdit={onEditClick}
-                onArchive={onArchiveClick}
-              />
-            )}
-          </div>
-
-          {/* Panel Derecho - Detalles */}
-          <div className="lg:col-span-1">
-            <SubjectDetailsCard subject={selectedSubject} />
+          {(filters.search || filters.status !== 'all' || filters.credits) && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+            >
+              Limpiar filtros
+            </button>
+          )}
+          <div className="ml-auto text-sm text-gray-600">
+            Mostrando {filteredSubjects.length} de {subjects.length} asignaturas
           </div>
         </div>
       </div>
 
-      {/* Modales */}
+      {/* grid con SubjectTable y SubjectDetailsCard */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          {loading ? (
+            <div className="flex items-center justify-center rounded-3xl border border-gray-200 bg-white py-12">
+              <p className="text-sm text-gray-500">Cargando asignaturas...</p>
+            </div>
+          ) : (
+            <SubjectTable
+              subjects={filteredSubjects}
+              selectedSubjectId={selectedSubject?.id}
+              onSelect={setSelectedSubject}
+              onEdit={onEditClick}
+              onArchive={onArchiveClick}
+            />
+          )}
+        </div>
+
+        <div className="lg:col-span-1">
+          <SubjectDetailsCard subject={selectedSubject} />
+        </div>
+      </div>
+
+      {/* modales */}
       <CreateSubjectModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}

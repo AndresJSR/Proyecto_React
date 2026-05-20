@@ -7,44 +7,36 @@ import DeleteSubjectModal from '../../components/StudyPlan/DeleteSubjectModal'
 import PublishVersionModal from '../../components/StudyPlan/PublishVersionModal'
 import StudyPlanCatalog from '../../components/StudyPlan/StudyPlanCatalog'
 import StudyPlanDetailsCard from '../../components/StudyPlan/StudyPlanDetailsCard'
-import StudyPlanForm from '../../components/StudyPlan/StudyPlanForm'
-import StudyPlanModal from '../../components/StudyPlan/StudyPlanModal'
+import EditSubjectModal from './EditSubjectModal'
 import StudyPlanSection from '../../components/StudyPlan/StudyPlanSection'
 import StudyPlanVersionPanel from '../../components/StudyPlan/StudyPlanVersionPanel'
-import useCarreras from '../../hooks/useCareer'
 import useStudyPlans from '../../hooks/useStudyPlans'
-import { StudyPlan } from '../../models/StudyPlan'
 import { StudyPlanVersion } from '../../models/StudyPlanVersion'
 import { Subject } from '../../models/Subject'
 import { studyPlanVersionService } from '../../services/studyPlanVersionService'
+import { studyPlanService } from '../../services/studyPlanService'
+import { StudyPlanSubject } from '../../types/studyPlan'
 import { subjectService } from '../../services/subjectService'
 
 const StudyPlanDashboardPage: React.FC = () => {
   const navigate = useNavigate()
-  const { studyPlans, refresh: refreshPlans } = useStudyPlans()
-  const { careers } = useCarreras()
+  const { studyPlans, careers, refresh: refreshPlans } = useStudyPlans()
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [subjectSearch, setSubjectSearch] = useState('')
   const [selectedCareerId, setSelectedCareerId] = useState('')
   const [versions, setVersions] = useState<StudyPlanVersion[]>([])
   const [selectedVersion, setSelectedVersion] = useState<StudyPlanVersion | null>(null)
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null)
+  const [planSubjects, setPlanSubjects] = useState<StudyPlanSubject[]>([])
   const [openAdd, setOpenAdd] = useState(false)
-  const [selectedEditPlan, setSelectedEditPlan] = useState<StudyPlan | null>(null)
-  const [selectedDeletePlan, setSelectedDeletePlan] = useState<StudyPlan | null>(null)
+  const [selectedEditSubject, setSelectedEditSubject] = useState<{ planId: string; subject: StudyPlanSubject } | null>(null)
+  const [selectedDeletePlan, setSelectedDeletePlan] = useState<{ planId: string; subjectId: string; subjectName: string } | null>(null)
   const [publishOpen, setPublishOpen] = useState(false)
-  const [editFormData, setEditFormData] = useState({
-    career_id: '',
-    subject_id: '',
-    name: '',
-    year: new Date().getFullYear(),
-    suggested_semester: 1
-  })
   const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (careers.length > 0 && !selectedCareerId) {
-      setSelectedCareerId(careers[0].id)
+      setSelectedCareerId(String(careers[0].id))
     }
   }, [careers, selectedCareerId])
 
@@ -65,6 +57,28 @@ const StudyPlanDashboardPage: React.FC = () => {
     }
   }, [versions, selectedVersion])
 
+  useEffect(() => {
+    if (selectedVersion) {
+      loadPlanSubjects(selectedVersion)
+    }
+  }, [selectedVersion])
+
+  const loadPlanSubjects = async (version: StudyPlanVersion) => {
+    try {
+      if (version == null || version.id == null) {
+        console.warn('StudyPlanDashboard: loadPlanSubjects called with empty version', version)
+        setPlanSubjects([])
+        return
+      }
+
+      const data = await studyPlanService.getSubjectsByStudyPlan(version.id)
+      console.debug('StudyPlanDashboard: loaded plan subjects for version', version.id, 'count', Array.isArray(data) ? data.length : 0)
+      setPlanSubjects(data)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   const loadSubjects = async () => {
     try {
       const data = await subjectService.getSubjects()
@@ -77,6 +91,7 @@ const StudyPlanDashboardPage: React.FC = () => {
   const loadVersions = async (careerId: string) => {
     try {
       const data = await studyPlanVersionService.getVersionsByCareer(careerId)
+      console.debug('StudyPlanDashboard: loaded versions for career', careerId, 'count', Array.isArray(data) ? data.length : 0)
       setVersions(data)
       const published = data.find((version) => version.is_published)
       setSelectedVersion(published || data[0] || null)
@@ -95,16 +110,10 @@ const StudyPlanDashboardPage: React.FC = () => {
     )
   })
 
-  const currentPlanItems = studyPlans.filter(
-    (plan) =>
-      plan.career_id === selectedCareerId &&
-      (!selectedVersion || plan.year === selectedVersion.year)
-  )
+  const currentCareer = careers.find((career) => String(career.id) === selectedCareerId)
 
-  const currentCareer = careers.find((career) => career.id === selectedCareerId)
-
-  const handleSelectCareer = (careerId: string) => {
-    setSelectedCareerId(careerId)
+  const handleSelectCareer = (careerCode: string): void => {
+    setSelectedCareerId(careerCode)
     setSelectedVersion(null)
   }
 
@@ -125,13 +134,14 @@ const StudyPlanDashboardPage: React.FC = () => {
       return
     }
 
-    const selectedSubjectName = subjects.find((subject) => subject.id === payload.subject_id)?.name || payload.subject_id
+    const subject = subjects.find((subject) => String(subject.id) === payload.subject_id)
+    const selectedSubjectCode = subject?.code || subject?.name || payload.subject_id
 
     try {
       await studyPlanBusiness.createStudyPlan({
         career_id: selectedCareerId,
         subject_id: payload.subject_id,
-        name: selectedSubjectName,
+        name: selectedSubjectCode,
         year: selectedVersion.year,
         suggested_semester: payload.suggested_semester
       })
@@ -139,53 +149,51 @@ const StudyPlanDashboardPage: React.FC = () => {
       Swal.fire({ icon: 'success', title: 'Asignatura agregada', text: 'Se agregó la asignatura al plan.' })
       setOpenAdd(false)
       setSelectedSubject(null)
+
+      // Refresca tanto los planes como los subjects de la versión actual
       await refreshPlans()
+      await loadPlanSubjects(selectedVersion)
+
       sectionRef.current?.scrollIntoView({ behavior: 'smooth' })
     } catch (error: any) {
       Swal.fire({ icon: 'error', title: 'No se pudo agregar', text: error?.message || 'Ocurrió un error al agregar la asignatura' })
     }
   }
 
-  const handleEditClick = (plan: StudyPlan) => {
-    setSelectedEditPlan(plan)
-    setEditFormData({
-      career_id: plan.career_id,
-      subject_id: plan.subject_id,
-      name: plan.name,
-      year: plan.year,
-      suggested_semester: plan.suggested_semester
+  const handleEditClick = (subject: StudyPlanSubject) => {
+    const matching = studyPlans.find(
+      (plan) =>
+        String(plan.subject_id) === String(subject.subject_id) &&
+        String(plan.career_id) === selectedCareerId &&
+        (!selectedVersion || plan.year === selectedVersion.year)
+    )
+
+    if (!matching) {
+      Swal.fire({ icon: 'warning', title: 'No se encontró el plan', text: 'No se pudo identificar el registro a editar' })
+      return
+    }
+
+    setSelectedEditSubject({ planId: String(matching.id), subject })
+  }
+
+  const handleDeleteClick = (subject: StudyPlanSubject) => {
+    const matching = studyPlans.find(
+      (plan) =>
+        String(plan.subject_id) === String(subject.subject_id) &&
+        String(plan.career_id) === selectedCareerId &&
+        (!selectedVersion || plan.year === selectedVersion.year)
+    )
+
+    if (!matching) {
+      Swal.fire({ icon: 'warning', title: 'No se encontró el plan', text: 'No se pudo identificar el registro a eliminar' })
+      return
+    }
+
+    setSelectedDeletePlan({
+      planId: String(matching.id),
+      subjectId: String(matching.subject_id),
+      subjectName: subject.subject_name
     })
-    sectionRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  const handleUpdatePlan = async () => {
-    if (!selectedEditPlan) return
-
-    try {
-      await studyPlanBusiness.updateStudyPlan(selectedEditPlan.id, editFormData)
-      Swal.fire({ icon: 'success', title: 'Plan actualizado', text: 'Los cambios han sido guardados.' })
-      setSelectedEditPlan(null)
-      await refreshPlans()
-    } catch (error: any) {
-      Swal.fire({ icon: 'error', title: 'No se pudo actualizar', text: error?.message || 'Ocurrió un error al guardar los cambios' })
-    }
-  }
-
-  const handleDeleteClick = (plan: StudyPlan) => {
-    setSelectedDeletePlan(plan)
-  }
-
-  const handleConfirmDelete = async () => {
-    if (!selectedDeletePlan) return
-
-    try {
-      await studyPlanBusiness.removeSubjectFromPlan(selectedDeletePlan.id, selectedDeletePlan.subject_id)
-      Swal.fire({ icon: 'success', title: 'Asignatura eliminada', text: 'Se eliminó la asignatura del plan.' })
-      setSelectedDeletePlan(null)
-      await refreshPlans()
-    } catch (error: any) {
-      Swal.fire({ icon: 'error', title: 'No se puede eliminar', text: error?.message || 'Revisa las razones de bloqueo en el modal.' })
-    }
   }
 
   const handlePublish = async (year: number) => {
@@ -200,7 +208,7 @@ const StudyPlanDashboardPage: React.FC = () => {
         year,
         name: `Versión ${year}`
       })
-      await studyPlanBusiness.publishVersion(version.id, { career_id: selectedCareerId, replace_previous: true })
+      await studyPlanBusiness.publishVersion(String(version.id), { career_id: selectedCareerId, replace_previous: true })
 
       Swal.fire({ icon: 'success', title: 'Versión publicada', text: 'La nueva versión ha reemplazado a la anterior.' })
       setPublishOpen(false)
@@ -219,6 +227,13 @@ const StudyPlanDashboardPage: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Plan de estudios</h1>
               <p className="mt-2 text-gray-600">Define y versiona las asignaturas por semestre de cada carrera.</p>
+              {selectedVersion ? (
+                <div className="mt-3 inline-flex items-center gap-3 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-sm text-green-700">
+                  <span className="font-semibold">Versión activa:</span>
+                  <span>{selectedVersion.year}</span>
+                  <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-green-800 shadow-sm">{selectedVersion.is_published ? 'Publicado' : 'Borrador'}</span>
+                </div>
+              ) : null}
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
@@ -230,7 +245,7 @@ const StudyPlanDashboardPage: React.FC = () => {
                 >
                   <option value="">Seleccione una carrera</option>
                   {careerOptions.map((career) => (
-                    <option key={career.id} value={career.id}>{career.name}</option>
+                    <option key={career.id} value={String(career.id)}>{career.name}</option>
                   ))}
                 </select>
               </div>
@@ -268,7 +283,7 @@ const StudyPlanDashboardPage: React.FC = () => {
 
           <div className="col-span-12 lg:col-span-6" ref={sectionRef}>
             <StudyPlanSection
-              planItems={currentPlanItems}
+              subjects={planSubjects}
               careerName={currentCareer?.name}
               version={selectedVersion}
               onEdit={handleEditClick}
@@ -280,11 +295,11 @@ const StudyPlanDashboardPage: React.FC = () => {
             <StudyPlanDetailsCard
               careerName={currentCareer?.name}
               version={selectedVersion}
-              planItems={currentPlanItems}
+              planItems={planSubjects}
             />
             <StudyPlanVersionPanel
               versions={versions}
-              selectedVersionId={selectedVersion?.id}
+              selectedVersionId={selectedVersion?.id != null ? String(selectedVersion.id) : undefined}
               onSelectVersion={handleSelectVersion}
             />
           </div>
@@ -300,25 +315,28 @@ const StudyPlanDashboardPage: React.FC = () => {
         onAdd={handleAddSubject}
       />
 
-      <StudyPlanModal
-        isOpen={Boolean(selectedEditPlan)}
-        title="Editar asignatura del plan"
-        onClose={() => setSelectedEditPlan(null)}
-      >
-        <StudyPlanForm
-          formData={editFormData}
-          onChange={(field, value) => setEditFormData((prev) => ({ ...prev, [field]: value }))}
-          onSubmit={handleUpdatePlan}
-          loading={false}
-        />
-      </StudyPlanModal>
+      <EditSubjectModal
+        isOpen={Boolean(selectedEditSubject)}
+        onClose={() => setSelectedEditSubject(null)}
+        planId={selectedEditSubject?.planId}
+        subject={selectedEditSubject?.subject}
+        onUpdated={async () => {
+          await refreshPlans()
+          if (selectedVersion) await loadPlanSubjects(selectedVersion)
+        }}
+      />
 
       <DeleteSubjectModal
         isOpen={Boolean(selectedDeletePlan)}
         onClose={() => setSelectedDeletePlan(null)}
-        planId={selectedDeletePlan?.id}
-        subjectId={selectedDeletePlan?.subject_id}
-        onRemoved={async () => await refreshPlans()}
+        planId={selectedDeletePlan?.planId}
+        subjectId={selectedDeletePlan?.subjectId}
+        subjectName={selectedDeletePlan?.subjectName}
+        onRemoved={async () => {
+          setSelectedDeletePlan(null)
+          await refreshPlans()
+          if (selectedVersion) await loadPlanSubjects(selectedVersion)
+        }}
       />
 
       <PublishVersionModal
@@ -331,4 +349,3 @@ const StudyPlanDashboardPage: React.FC = () => {
 }
 
 export default StudyPlanDashboardPage
-"No eso es obcional, d"

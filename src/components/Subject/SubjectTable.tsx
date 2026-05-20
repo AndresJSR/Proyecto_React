@@ -30,10 +30,11 @@ const SubjectTable: React.FC<Props> = ({
   onArchive
 }) => {
   return (
-    <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
-      <table className="min-w-full border-separate border-spacing-0 text-left">
-        <thead className="bg-gray-50">
-          <tr>
+    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className="max-w-full overflow-x-auto">
+        <table className="min-w-full border-separate border-spacing-0 text-left">
+          <thead>
+            <tr className="bg-gray-2 dark:bg-meta-4">
             <th className="px-4 py-4 text-sm font-semibold text-gray-700">Código</th>
             <th className="px-4 py-4 text-sm font-semibold text-gray-700">Nombre</th>
             <th className="px-4 py-4 text-sm font-semibold text-gray-700">Descripción</th>
@@ -41,13 +42,13 @@ const SubjectTable: React.FC<Props> = ({
             <th className="px-4 py-4 text-sm font-semibold text-gray-700">Estado</th>
             <th className="px-4 py-4 text-sm font-semibold text-gray-700">Última actualización</th>
             <th className="px-4 py-4 text-sm font-semibold text-gray-700 text-right">Acciones</th>
-          </tr>
-        </thead>
+            </tr>
+          </thead>
 
-        <tbody>
+          <tbody>
           {subjects.length === 0 ? (
             <tr>
-              <td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-500">
+              <td colSpan={7} className="border-b border-[#eee] px-4 py-5 text-center text-sm text-gray-500 dark:border-strokedark">
                 No se encontraron asignaturas.
               </td>
             </tr>
@@ -59,17 +60,17 @@ const SubjectTable: React.FC<Props> = ({
                   key={subject.id}
                   className={`${isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'} border-t transition`}
                 >
-                  <td className="cursor-pointer px-4 py-4 text-sm text-gray-900" onClick={() => onSelect(subject)}>{subject.code}</td>
-                  <td className="cursor-pointer px-4 py-4 text-sm text-gray-900" onClick={() => onSelect(subject)}>{subject.name}</td>
-                  <td className="cursor-pointer px-4 py-4 text-sm text-gray-600" onClick={() => onSelect(subject)}>{subject.description || '-'}</td>
-                  <td className="cursor-pointer px-4 py-4 text-sm text-gray-900" onClick={() => onSelect(subject)}>{subject.credits}</td>
-                  <td className="px-4 py-4">
+                  <td className="border-b border-[#eee] px-4 py-5 text-sm text-gray-900 dark:border-strokedark cursor-pointer" onClick={() => onSelect(subject)}>{subject.code}</td>
+                  <td className="border-b border-[#eee] px-4 py-5 text-sm text-gray-900 dark:border-strokedark cursor-pointer" onClick={() => onSelect(subject)}>{subject.name}</td>
+                  <td className="border-b border-[#eee] px-4 py-5 text-sm text-gray-600 dark:border-strokedark cursor-pointer" onClick={() => onSelect(subject)}>{subject.description || '-'}</td>
+                  <td className="border-b border-[#eee] px-4 py-5 text-sm text-gray-900 dark:border-strokedark cursor-pointer" onClick={() => onSelect(subject)}>{subject.credits}</td>
+                  <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                     <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${subject.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700'}`}>
                       {subject.is_active ? 'Activo' : 'Archivado'}
                     </span>
                   </td>
-                  <td className="cursor-pointer px-4 py-4 text-sm text-gray-600" onClick={() => onSelect(subject)}>{formatDate(subject.updated_at)}</td>
-                  <td className="px-4 py-4 text-right">
+                  <td className="border-b border-[#eee] px-4 py-5 text-sm text-gray-600 dark:border-strokedark cursor-pointer" onClick={() => onSelect(subject)}>{formatDate(subject.updated_at)}</td>
+                  <td className="border-b border-[#eee] px-4 py-5 text-right dark:border-strokedark">
                     <SubjectActionDropdown
                       subject={subject}
                       onEdit={onEdit}
@@ -80,8 +81,9 @@ const SubjectTable: React.FC<Props> = ({
               )
             })
           )}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

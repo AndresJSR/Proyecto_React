@@ -31,7 +31,6 @@ const ListMatriculas = lazy(() => import('../pages/enrollment/ListEnrollment'));
 const CreateMatricula = lazy(() => import('../pages/enrollment/CreateEnrollment'));
 const ListInscripciones = lazy(() => import('../pages/inscripciones/ListInscripciones'));
 const CreateInscripcion = lazy(() => import('../pages/inscripciones/CreateInscripcion'));
-const ListStudyPlans = lazy(() => import('../pages/StudyPlan/ListStudyPlan'));
 const CreateStudyPlan = lazy(() => import('../pages/StudyPlan/CreateStudyPlan'));
 const StudyPlanDashboard = lazy(() => import('../pages/StudyPlan/StudyPlanDashboardPage'));
 const StudyPlanVersions = lazy(() => import('../pages/StudyPlan/VersionHistory'));
@@ -48,6 +47,13 @@ const CrearEvaluacion = lazy(() => import('../pages/Evaluaciones/CrearEvaluacion
 const AsociarRubrica = lazy(() => import('../pages/Evaluaciones/AsociarRubrica'));
 const CalificarEstudiante = lazy(() => import('../pages/Evaluaciones/CalificarEstudiante'));
 const MisAsignaturas = lazy(() => import('../pages/MisAsignaturas/MisAsignaturas'));
+const MisEvaluaciones = lazy(() => import('../pages/MisEvaluaciones/MisEvaluaciones'));
+const ConsultarRubrica = lazy(() => import('../pages/MisEvaluaciones/ConsultarRubrica'));
+const MisNotas = lazy(() => import('../pages/MisNotas/MisNotas'));
+
+// ── Profesor: Grupos ──────────────────────────────────────────────────────────
+const MisGrupos = lazy(() => import('../pages/Group/MisGrupos'));
+const DetalleGrupo = lazy(() => import('../pages/Group/DetalleGrupo'));
 
 const ADMIN = [UserRole.ADMIN];
 const TEACHER = [UserRole.TEACHER];
@@ -247,12 +253,6 @@ const routes = [
   {
     path: '/study-plans/list',
     title: 'Planes de Estudio',
-    component: ListStudyPlans,
-    allowedRoles: ADMIN,
-  },
-  {
-    path: '/study-plans/dashboard',
-    title: 'Dashboard Planes',
     component: StudyPlanDashboard,
     allowedRoles: ADMIN,
   },
@@ -340,6 +340,31 @@ const routes = [
     component: CalificarEstudiante,
     allowedRoles: TEACHER,
   },
+  {
+    path: '/teacher/grupos',
+    title: 'Mis grupos',
+    component: MisGrupos,
+    allowedRoles: TEACHER,
+  },
+  {
+    path: '/teacher/grupos/detalle',
+    title: 'Detalle del grupo',
+    component: DetalleGrupo,
+    allowedRoles: TEACHER,
+  },
+  // ── Profesor: Grupos ──────────────────────────────────────────────────────────
+  {
+    path: '/teacher/grupos',
+    title: 'Mis grupos',
+    component: MisGrupos,
+    allowedRoles: TEACHER,
+  },
+  {
+    path: '/teacher/grupos/detalle',
+    title: 'Detalle del grupo',
+    component: DetalleGrupo,
+    allowedRoles: TEACHER,
+  },
 
   // ── Estudiante ───────────────────────────────────────────────────────────────
   {
@@ -352,6 +377,24 @@ const routes = [
     path: '/mis-asignaturas',
     title: 'Mis asignaturas',
     component: MisAsignaturas,
+    allowedRoles: STUDENT,
+  },
+  {
+    path: '/mis-evaluaciones',
+    title: 'Mis evaluaciones',
+    component: MisEvaluaciones,
+    allowedRoles: STUDENT,
+  },
+  {
+    path: '/mis-evaluaciones/:id/rubrica',
+    title: 'Consultar rúbrica',
+    component: ConsultarRubrica,
+    allowedRoles: STUDENT,
+  },
+  {
+    path: '/mis-notas',
+    title: 'Mis notas',
+    component: MisNotas,
     allowedRoles: STUDENT,
   },
 ];

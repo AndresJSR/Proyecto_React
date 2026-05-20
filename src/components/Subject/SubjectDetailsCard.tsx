@@ -17,7 +17,7 @@ const SubjectDetailsCard: React.FC<Props> = ({ subject }) => {
 
   if (!subject) {
     return (
-      <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-6 text-center shadow-sm">
+      <div className="p-6 text-center">
         <p className="text-sm font-semibold text-gray-700">Selecciona una asignatura</p>
         <p className="mt-2 text-sm text-gray-500">
           Para editar o archivar una asignatura, selecciónala desde la tabla y elige la acción correspondiente.
@@ -27,7 +27,7 @@ const SubjectDetailsCard: React.FC<Props> = ({ subject }) => {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="space-y-6 p-6">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">Asignatura</p>
@@ -46,24 +46,24 @@ const SubjectDetailsCard: React.FC<Props> = ({ subject }) => {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl bg-gray-50 p-4">
+          <div className="border border-gray-200 p-4">
             <p className="text-xs uppercase tracking-wide text-gray-500">Créditos</p>
             <p className="mt-2 text-lg font-semibold text-gray-900">{subject.credits}</p>
           </div>
 
-          <div className="rounded-2xl bg-gray-50 p-4">
+          <div className="border border-gray-200 p-4">
             <p className="text-xs uppercase tracking-wide text-gray-500">Creado el</p>
             <p className="mt-2 text-lg font-semibold text-gray-900">{formatDate(subject.created_at)}</p>
           </div>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl bg-gray-50 p-4">
+          <div className="border border-gray-200 p-4">
             <p className="text-xs uppercase tracking-wide text-gray-500">Última actualización</p>
             <p className="mt-2 text-lg font-semibold text-gray-900">{formatDate(subject.updated_at)}</p>
           </div>
 
-          <div className="rounded-2xl bg-gray-50 p-4">
+          <div className="border border-gray-200 p-4">
             <p className="text-xs uppercase tracking-wide text-gray-500">Actualizado por</p>
             <p className="mt-2 text-lg font-semibold text-gray-900">N/A</p>
           </div>

@@ -1,14 +1,9 @@
-export interface StudyPlanVersion {
-  id: string
-  career_id: string
-  year: number
-  name: string
-  is_published: boolean
-  subjects_count?: number
-  total_credits?: number
-  created_at?: string
-  updated_at?: string
-}
+import { StudyPlan } from './StudyPlan'
+
+// StudyPlanVersion es un alias de StudyPlan.
+// El backend no tiene un modelo de versiones separado;
+// los "planes" filtrados por career_id son las versiones.
+export type StudyPlanVersion = StudyPlan
 
 export interface CreateStudyPlanVersionDto {
   career_id: string
@@ -17,5 +12,6 @@ export interface CreateStudyPlanVersionDto {
 }
 
 export interface PublishVersionDto {
+  version_id: string
   replace_previous?: boolean
 }

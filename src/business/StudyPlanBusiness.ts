@@ -315,36 +315,47 @@ class StudyPlanBusiness {
     return await studyPlanVersionService.createVersion(payload as any)
   }
 
+  async getVersionsByCareer(careerId: string) {
+    if (!careerId) throw new Error('Career id is required')
+    return await studyPlanVersionService.getVersionsByCareer(careerId)
+  }
+
   async publishVersion(versionId: string, options: { career_id: string; replace_previous?: boolean }) {
     if (!versionId) throw new Error('Version id is required')
     if (!options?.career_id) throw new Error('Career id is required')
 
-    const versions = await studyPlanVersionService.getVersionsByCareer(options.career_id)
-    const published = versions.find((v: any) => v.is_published)
-
-    if (published && !options.replace_previous) {
-      throw new Error('Solo puede existir una versión publicada por carrera')
-    }
-
+    // Get the version to be published
     const version = await studyPlanVersionService.getVersionById(versionId)
+    
+    if (!version) {
+      throw new Error('Study plan version not found')
+    }
 
-    const allPlans = await studyPlanService.getStudyPlans()
-    const subjects = allPlans.filter(
-      (plan) => plan.career_id === options.career_id && plan.year === version.year
-    )
+    // Verify version belongs to the specified career
+    if (version.career_id !== options.career_id) {
+      throw new Error('Study plan version does not belong to the specified career')
+    }
 
+    // Check if version has subjects
+    const subjects = await studyPlanService.getSubjectsByPlan(versionId)
     if (!subjects || subjects.length === 0) {
-      throw new Error('No se puede publicar una versión sin asignaturas')
+      throw new Error('Cannot publish a version without subjects')
     }
 
-    const ids = subjects.map((s: any) => s.subject_id)
-    const dup = ids.some((id: string, idx: number) => ids.indexOf(id) !== idx)
+    // Check for existing published version in same career
+    const versions = await studyPlanVersionService.getVersionsByCareer(options.career_id)
+    const alreadyPublished = versions.find((v: any) => v.is_published && v.id !== versionId)
 
-    if (dup) {
-      throw new Error('Hay asignaturas duplicadas en la versión')
+    if (alreadyPublished && !options.replace_previous) {
+      throw new Error('There is already a published version for this career. Set replace_previous to true to replace it.')
     }
 
-    return await studyPlanVersionService.publishVersion(versionId, { replace_previous: !!options.replace_previous })
+    // If replacing, unpublish the previous version
+    if (alreadyPublished && options.replace_previous) {
+      await studyPlanService.updateStudyPlan(alreadyPublished.id, { is_published: false })
+    }
+
+    return await studyPlanVersionService.publishVersion({ version_id: versionId, replace_previous: !!options.replace_previous })
   }
 
   private validateStudyPlanPayload(

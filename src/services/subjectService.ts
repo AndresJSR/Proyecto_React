@@ -1,4 +1,4 @@
-import api from './api'
+import { api } from '../interceptors/authInterceptor'
 
 import {
   Subject,
@@ -7,7 +7,7 @@ import {
   SubjectFilters
 } from '../models/Subject'
 
-const BASE_URL = '/academic'
+const BASE_URL = '/api/academic'
 
 export const subjectService = {
   async createSubject(

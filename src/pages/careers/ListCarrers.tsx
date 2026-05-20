@@ -266,6 +266,17 @@ const CareerSectionContent = ({
     }
   };
 
+  const columns = [
+    { key: 'code', label: 'Código' },
+    { key: 'name', label: 'Nombre' },
+    { key: 'description', label: 'Descripción', render: (item: Career) => item.description || '-' },
+    {
+      key: 'is_active',
+      label: 'Estado',
+      render: (item: Career) => (item.is_active ? 'Activo' : 'Inactivo')
+    }
+  ]
+
   return (
     <>
       {!hideSectionTitle && (
@@ -306,6 +317,84 @@ const CareerSectionContent = ({
           </div>
         )}
       </div>
+
+      {/* barra de búsqueda */}
+
+      <GenericTable<Career>
+        data={careers}
+        columns={columns}
+        renderActions={(item) => (
+          <ActionDropdown
+            items={[
+              {
+                key: 'edit',
+                label: 'Editar carrera',
+                onClick: () => handleEdit(item),
+                icon: (
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.232 5.232l3.536 3.536M9 11l6 6L21 11l-6-6-6 6z"
+                    />
+                  </svg>
+                )
+              },
+              {
+                key: 'view',
+                label: 'Ver detalle',
+                onClick: () => handleView(item),
+                icon: (
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7S3.732 16.057 2.458 12z"
+                    />
+                  </svg>
+                )
+              },
+              {
+                key: 'archive',
+                label: 'Archivar carrera',
+                onClick: () => handleArchiveOpen(item),
+                colorClass: 'text-yellow-600',
+                icon: (
+                  <svg className="h-4 w-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4 7h16M8 7v10a2 2 0 002 2h4a2 2 0 002-2V7"
+                    />
+                    <path
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 7V5a3 3 0 016 0v2"
+                    />
+                  </svg>
+                )
+              }
+            ]}
+            align="right"
+          />
+        )}
+      />
+
+      {careers.length === 0 && (
+        <div className="py-8 text-center text-gray-500">No hay carreras registradas</div>
+      )}
+
+      {/* modales */}
 
       <CareerModal
         isOpen={openModal}
