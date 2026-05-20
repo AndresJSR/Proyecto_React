@@ -108,9 +108,9 @@ export function useDetalleGrupo(groupId: number) {
     try {
       const results = await Promise.allSettled([
         enrollmentService.searchEnrollments({ group_id: String(gid) }),
-        getEvaluationsByGroup(gid),
-        getGradesByGroup(gid),
-        getRubricsByGroup(gid),
+        getEvaluationsByGroup(String(gid) as any),
+        getGradesByGroup(String(gid) as any),
+        getRubricsByGroup(String(gid) as any),
       ])
 
       if (results[0].status === 'fulfilled') {
@@ -414,5 +414,3 @@ export function useDetalleGrupo(groupId: number) {
     handleRefresh,
   }
 }
-export default useDetalleGrupo
-
