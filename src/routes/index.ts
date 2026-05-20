@@ -15,6 +15,7 @@ const UserUpdate = lazy(() => import('../pages/Users/Update'));
 const RoleList = lazy(() => import('../pages/Roles/List'));
 const StudyPlanDetail = lazy(() => import('../pages/PlanEstudios/StudyPlanDetailPage'));
 const AdminStudyPlans = lazy(() => import('../pages/PlanEstudios/PlanEstudios'));
+const EnrollStudentGroupPage = lazy(() => import('../pages/Inscripciones/EnrollStudentGroupPage'));
 
 
 // ── Admin: Académico ──────────────────────────────────────────────────────────
@@ -322,6 +323,12 @@ const routes = [
     component: CreateRegistration,
     allowedRoles: ADMIN,
   },
+  {
+  path: '/admin/enrollments/groups',
+  title: 'Inscribir Estudiante en Grupo',
+  component: EnrollStudentGroupPage,
+  allowedRoles: ADMIN,
+},
 
   // ── Admin: Académico (dashboard general) ─────────────────────────────────────
   {
