@@ -18,11 +18,10 @@ interface Props {
 
 const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
   <span
-    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-      isPublished
+    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${isPublished
         ? 'bg-meta-3 bg-opacity-10 text-meta-3'
         : 'bg-warning bg-opacity-10 text-warning'
-    }`}
+      }`}
   >
     {isPublished ? 'Publicado' : 'Borrador'}
   </span>
@@ -175,7 +174,7 @@ const StudyPlanMainTable: React.FC<Props> = ({
                             label="Editar"
                             onClick={() => {
                               setOpenDropdownId(null)
-                              navigate(`/admin/study-plans/edit/${planIdStr}`)
+                              navigate(`/admin/study-plans/${planIdStr}`)
                             }}
                           />
                           {!plan.is_published && (
@@ -284,9 +283,8 @@ const ActionItem: React.FC<{
   <button
     type="button"
     onClick={onClick}
-    className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-gray dark:hover:bg-meta-4 ${
-      danger ? 'text-danger' : 'text-black dark:text-white'
-    }`}
+    className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-gray dark:hover:bg-meta-4 ${danger ? 'text-danger' : 'text-black dark:text-white'
+      }`}
   >
     {ICONS[icon]}
     {label}

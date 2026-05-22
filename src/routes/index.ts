@@ -294,7 +294,7 @@ const routes = [
 {
   path: '/admin/study-plans/edit/:id',
   title: 'Editar Plan',
-  component: AdminStudyPlans,   // Reutiliza la lista; el edit se hace con modal
+  component: StudyPlanDetail,  
   allowedRoles: ADMIN,
 },
 

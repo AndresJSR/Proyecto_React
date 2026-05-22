@@ -10,14 +10,14 @@ import { StudyPlanSubject } from '../../types/studyPlan'
 import SemesterStructureView from './components/SemesterStructureView'
 import PlanSubjectsSection from './components/PlanSubjectsSection'
 import VersionHistoryTable from './components/VersionHistoryTable'
+import EditPlanModal from './components/EditPlanModal'
 
 const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
   <span
-    className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-      isPublished
-        ? 'bg-meta-3 bg-opacity-10 text-meta-3'
-        : 'bg-warning bg-opacity-10 text-warning'
-    }`}
+    className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${isPublished
+      ? 'bg-meta-3 bg-opacity-10 text-meta-3'
+      : 'bg-warning bg-opacity-10 text-warning'
+      }`}
   >
     {isPublished ? 'Publicado' : 'Borrador'}
   </span>
@@ -35,6 +35,7 @@ const StudyPlanDetailPage: React.FC = () => {
   const [versions, setVersions] = useState<StudyPlan[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'structure' | 'subjects' | 'history'>(defaultTab as any)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const subjectsBySemester = useMemo(() => groupSubjectsBySemester(subjects), [subjects])
   const totalCredits = useMemo(() => calcularTotalCreditos(subjects), [subjects])
@@ -134,7 +135,7 @@ const StudyPlanDetailPage: React.FC = () => {
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => navigate(`/admin/study-plans/edit/${id}`)}
+              onClick={() => setIsEditModalOpen(true)}
               className="rounded-lg border border-stroke px-4 py-2 text-sm font-medium text-black transition hover:border-primary hover:text-primary dark:border-strokedark dark:text-white"
             >
               Editar
@@ -167,11 +168,10 @@ const StudyPlanDetailPage: React.FC = () => {
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-3 text-sm font-medium transition ${
-              activeTab === tab.key
-                ? 'border-b-2 border-primary text-primary'
-                : 'text-body hover:text-black dark:text-bodydark dark:hover:text-white'
-            }`}
+            className={`px-4 py-3 text-sm font-medium transition ${activeTab === tab.key
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-body hover:text-black dark:text-bodydark dark:hover:text-white'
+              }`}
           >
             {tab.label}
           </button>
@@ -209,6 +209,16 @@ const StudyPlanDetailPage: React.FC = () => {
           }}
         />
       )}
+      <EditPlanModal
+        isOpen={isEditModalOpen}
+        plan={plan}
+        careers={career ? [career] : []}  
+        onUpdated={() => {
+          setIsEditModalOpen(false)
+          loadAll()  
+        }}
+        onCancel={() => setIsEditModalOpen(false)}
+      />
     </div>
   )
 }
@@ -223,11 +233,10 @@ const InfoCard: React.FC<{
     <p className="text-xs font-semibold uppercase tracking-wide text-body dark:text-bodydark">{label}</p>
     {highlight ? (
       <span
-        className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-          highlight === 'green'
-            ? 'bg-meta-3 bg-opacity-10 text-meta-3'
-            : 'bg-warning bg-opacity-10 text-warning'
-        }`}
+        className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${highlight === 'green'
+          ? 'bg-meta-3 bg-opacity-10 text-meta-3'
+          : 'bg-warning bg-opacity-10 text-warning'
+          }`}
       >
         {value}
       </span>

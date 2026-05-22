@@ -95,22 +95,21 @@ export const studyPlanService = {
     }
   },
 
-  async addSubjectToStudyPlan(
-    studyPlanId: number,
-    subjectId: number,
-    payload: AddSubjectToStudyPlanPayload
-  ): Promise<void> {
-    try {
-      const response = await api.post(
-        `${BASE_URL}/study-plans/${studyPlanId}/subjects/${subjectId}`,
-        payload
-      )
-
-      return response.data.data
-    } catch (error) {
-      throw new Error(getErrorMessage(error))
-    }
-  },
+async addSubjectToStudyPlan(
+  studyPlanId: number,
+  subjectId: number,
+  _payload?: AddSubjectToStudyPlanPayload  // se mantiene para no romper los tipos existentes
+): Promise<void> {
+  try {
+    const response = await api.post(
+      `${BASE_URL}/study-plans/${studyPlanId}/subjects/${subjectId}`
+      // sin body — el backend solo necesita los IDs en la URL
+    )
+    return response.data.data
+  } catch (error) {
+    throw new Error(getErrorMessage(error))
+  }
+},
 
   async removeSubjectFromStudyPlan(
     studyPlanId: number,
