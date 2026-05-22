@@ -297,7 +297,7 @@ const AdminMenu = ({ pathname }: { pathname: string }) => {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/study-plans/list" className={linkClass(pathname, '/study-plans')}>
+            <NavLink to="/plan-estudios" className={linkClass(pathname, '/study-plans')}>
               <IcoBook />
               Planes de estudio
             </NavLink>
@@ -340,7 +340,7 @@ const AdminMenu = ({ pathname }: { pathname: string }) => {
                 </li>
                 <li>
                   <NavLink
-                    to="/admin/grupos"
+                    to="/admin/groups/assign-teacher"
                     className={({ isActive }) =>
                       `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
                         isActive ? 'bg-graydark text-white dark:bg-meta-4' : 'text-bodydark1'
@@ -352,7 +352,7 @@ const AdminMenu = ({ pathname }: { pathname: string }) => {
                 </li>
                 <li>
                   <NavLink
-                    to="/inscripciones/enroll-student-in-group"
+                    to="/admin/enrollments/groups"
                     className={({ isActive }) =>
                       `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
                         isActive ? 'bg-graydark text-white dark:bg-meta-4' : 'text-bodydark1'
